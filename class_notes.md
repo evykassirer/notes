@@ -298,142 +298,157 @@ looking at:
 	∈ Θ(m^2)
 
 
-----------
+-----
+##Jan 13
 
-Jan 13
-
-e.g. show 5n^2 log(n) ∈ Ω(n*log^2(n))
+##### Example: show 5n^2 log(n) ∈ Ω(n*log^2(n))
 prove there exists c, n_0 in positive reals s.t. for all n > n_0, 0 <= cnlog^2n <= 5n^2 logn
-log(n) <= n  --> 0 <= clogn <= 5n (for c = 5) --> cnlog^2n <= 5n^2logn - which is what we want
-so c = 5
+
+	log(n) <= n  
+	0 <= clogn <= 5n (for c = 5)
+	cnlog^2n <= 5n^2logn - which is what we want
+	so c = 5
+
 so we can make n_0 = 1 (it needs to be > 0 and an integer, and the above statement works for all +ve values)
 
-***functions***
-1) constant function: f(n) = c
-	useful to count primitive operations
-2) logarithmic function: f(n) = log(n)
-	useful when dividing the size of the input into 2
-	example: j = [some value]
-			 while j>= 0 do
-			 	j <- j/2
-3) linear function: f(n) = n
-4) pseudo linear: f(n)= nlogn
-	e.g. merge sort (more examples later)
-5) quadratic: f(n) = n^2 
-	e.g. for i<-0 to n
-	     	j++;
-6) cubic (polynomial): f(n) = n^3 (n^k)
-7) exponential: f(n) = 2^n
+###functions
+1. constant function: f(n) = c - useful to count primitive operations
+2. logarithmic function: f(n) = log(n) - useful when dividing the size of the input into 2 in a loop
+3. linear function: f(n) = n
+4. pseudo linear: f(n)= nlogn - e.g. merge sort (more examples later)
+5. quadratic: f(n) = n^2  - e.g. for i<-0 to n    j++
+6. cubic (polynomial): f(n) = n^3 (n^k)
+7. exponential: f(n) = 2^n
 
-How Growth Rates Affect Running Time:
+####How Growth Rates Affect Running Time:
 It is interesting to see how the running time is affected when the size of the problem instance doubles (i.e., n → 2n)
-1) constant complexity: T(n) = c, T(2n) = c
-2) logarithmic complexity: T(n)=clogn,T(2n)=T(n)+c 
-3) linear complexity: T (n) = cn, T(2n) = 2T(n)
-4) pseudo linear: T(n)=cnlogn,T(2n)=2T(n)+2cn
-5) quadratic complexity: T(n) = cn^2, T(2n) = 4T(n)
-6) cubic complexity: T(n) = cn^3, T (2n) = 8T(n)
-7) exponential complexity: T(n) = c2^n, T(2n) = (T(n))^2/c
 
-Complexity vs. Running Time:
-Note that if algorithm A1 has lower complexity than algorithm A2, that means it runs faster for large problem instances - but it could still be slower for small problem instances! 
-If A1 and A2 have the same complexity - we can't determine from this information which will be faster for some problem instance.
-Note that if A1 is O(n^3) and A2 is O(n^2) we cannot say A2 is more efficient than A1! This is because big O >= not =, so A1 could actually run in constant time and we can still say it's O(n^3)
+1. constant complexity: T(n) = c, T(2n) = c
+2. logarithmic complexity: T(n)=clogn,T(2n)=T(n)+c 
+3. linear complexity: T (n) = cn, T(2n) = 2T(n)
+4. pseudo linear: T(n)=cnlogn,T(2n)=2T(n)+2cn
+5. quadratic complexity: T(n) = cn^2, T(2n) = 4T(n)
+6. cubic complexity: T(n) = cn^3, T (2n) = 8T(n)
+7. exponential complexity: T(n) = c2^n, T(2n) = (T(n))^2/c
 
-remember we can use l'hopitals rule, lim to inf of f(n)/g(n)
-if limit is 0, g is bigger
-if limit is inf, f is bigger
-if limit is constant, they're equal
+###Complexity vs. Running Time:
+- Note that if algorithm A1 has lower complexity than algorithm A2, that means it runs faster for large problem instances - but it could still be slower for small problem instances! 
+- If A1 and A2 have the same complexity - we can't determine from this information which will be faster for some problem instance.
+- Note that if A1 is O(n^3) and A2 is O(n^2) we cannot say A2 is more efficient than A1! This is because big O is >= not =, so for example A1 could actually run in constant time and we can still say it's O(n^3)
+
+remember we can use **l'hopitals rule**, lim to inf of f(n)/g(n)
+- if limit is 0, g is bigger
+- if limit is inf, f is bigger
+- if limit is constant, they're equal
 
 log is alwayyys less than polynomial
-[log(n)]^k ∈ o(n^i) for any real numbers k, i
-(logn)^100000 will eventually be smaller than n^0.00001
+- [log(n)]^k ∈ o(n^i) for any real numbers k, i
+- (logn)^100000 will eventually be smaller than n^0.00001
 
-example: n(2+sin(npi/2)) is θ(n) -- in slides
-we need to prove 0 <= c_1 n <= n (2+sin(npi/2)) <= c_2 n
-0 <= c_1 <= (2+sin(npi/2)) <= c_2
-0 <= c_1 - 2 <= sin(npi/2) <= c_2 - 2
-sin is bounded, so c_1 -2 = -1 --> c_1 = 1
-similarily c_2 = 3
-n_0 = 1 since this works for all n
+####example: n(2+sin(nπ/2)) is θ(n) 
 
+	we need to prove 0 <= c_1 n <= n (2+sin(npi/2)) <= c_2 n
+	0 <= c_1 <= (2+sin(npi/2)) <= c_2
+	0 <= c_1 - 2 <= sin(npi/2) <= c_2 - 2
+	c_1 -2 = -1 (since sin is bounded) so c_1 = 1
+	similarily c_2 = 3
+	n_0 = 1 since this works for all n
 
-Relationships between Order Notations:
+####Relationships between Order Notations:
 e.g. f(n) ∈ Θ(g(n)) iff g(n) ∈ Θ(f (n))
-this makes sense because f = g iff g = f
-we can say a lot of other similar things using the logic of >, =,  < 
+- this makes sense because f = g iff g = f
+- we can say a lot of other similar things using the logic of >, =,  < 
 
 
-Algebra of Order Notations
-“Maximum” rules: 
+####Algebra of Order Notations - “Maximum” rules: 
 Suppose that f(n) > 0 and g(n) > 0 for all n ≥ n_0. Then:
-O(f(n) + g(n)) = O(max{f(n), g(n)}) 
-Θ(f(n) + g(n)) = Θ(max{f(n), g(n)}) 
-Ω(f(n) + g(n)) = Ω(max{f(n), g(n)})
-Transitivity: If f(n) ∈ O(g(n)) and g(n) ∈ O(h(n)) then f(n) ∈ O(h(n)).
+- O(f(n) + g(n)) = O(max{f(n), g(n)}) 
+- Θ(f(n) + g(n)) = Θ(max{f(n), g(n)}) 
+- Ω(f(n) + g(n)) = Ω(max{f(n), g(n)})
+- Transitivity: If f(n) ∈ O(g(n)) and g(n) ∈ O(h(n)) then f(n) ∈ O(h(n)).
 
-SUGGESTION: print the formulae and misc. math facts to refer to often
-(arithmetic sequence, geometric sequence, harmonic sequence, etc.)
+####SUGGESTION: print the formulae and misc. math facts to refer to often
+- arithmetic sequence, geometric sequence, harmonic sequence, etc.
 
 Tip: to find θ bounds, you can find both at the same time, or sometimes it's easier to find the top bound and lower bound separately
 
 Loop analysis: 
-1) Identify elementary operations that require constant time (denoted Θ(1) time).
-2) Loops: The complexity of a loop is expressed as the sum of the complexities of each iteration of the loop.
-3) Analyze independent loops separately, and then add the results (use “maximum rules” and simplify whenever possible).
-4) If loops are nested, start with the innermost loop and proceed outwards. In general, this kind of analysis requires evaluation of nested summations.
 
-example of loop analysis: Test1(n) - on slides
-sum <-0 					θ(1)
-for i<-1 to n do 			sum_[i=1]^n 1
-	for j<-i to n do 		sum_[j=1]^n 1
-		sum<-sum+(i-j)^2 	θ(1)
-		sum<-sum^2 			θ(1)
-T(n) = θ(1) + sum_[i=1]^n sum_[j=i]^n (θ(1) + θ(1))
-	 = θ(n) + sum_[i=1]^n (θ(1) + (n-i+1))
-	 = θ(n) + (θ(1) (n + n-1 + ... + 1)
-	 = θ(1) + θ(1)*n*(n-1)/2
-	 = θ(1) + θ(1)*n^2+n / 2
-	 = θ(n^2+n / 2)
-	 = θ(n^2 + n)
-	 = θ(n^2)
+1. Identify elementary operations that require constant time (denoted Θ(1) time).
+2. Loops: The complexity of a loop is expressed as the sum of the complexities of each iteration of the loop.
+3. Analyze independent loops separately, and then add the results (use “maximum rules” and simplify whenever possible).
+4. If loops are nested, start with the innermost loop and proceed outwards. In general, this kind of analysis requires evaluation of nested summations.
 
-can also do:
-sum <-0 					O(1)													
-for i<-1 to n do 			O(n)													
-	for j<-i to n do 		O(n) - then multiply by O(n) above to get O(n^2)
-		sum<-sum+(i-j)^2 	O(1)
-		sum<-sum^2 			O(1)
+####Example of loop analysis: 
+#####Test1(n)
 
-Test2 - second example
-  θ(1) + sum_[i=1]^n sum_[j=i]^n (θ(1)  + sum_[k=i]^j(θ(1) + θ(1)))
-= θ(1) + sum_[i=1]^n sum_[j=i]^n (θ(1)  + θ(1)*(j-i+1))
-...
-= θ(n^3)
+	sum <-0 					θ(1)
+	for i<-1 to n do 				sum_[i=1]^n 1
+		for j<-i to n do 			sum_[j=1]^n 1
+			sum<-sum+(i-j)^2 		θ(1)
+			sum<-sum^2 			θ(1)
 
--- to over estimate: 1...n for all loops - nested loops so multiply by each other to get O(n^3)
--- to underestimate: first loop let's say it just goes from 1 to n/4, second from n/4 to n/2, third from n/4 to n/2 -- we get underestimate omega(n^3)
+finding run time:
 
+	T(n) = θ(1) + sum_[i=1]^n sum_[j=i]^n (θ(1) + θ(1))
+	     = θ(n) + sum_[i=1]^n (θ(1) + (n-i+1))
+             = θ(n) + (θ(1) (n + n-1 + ... + 1)
+             = θ(1) + θ(1)*n*(n-1)/2
+             = θ(1) + θ(1)*n^2+n / 2
+             = θ(n^2+n / 2)
+             = θ(n^2 + n)
+             = θ(n^2)
 
-Test3 - third example
-sum ← 0 				θ(1)
-for i ← 1 to n do 		sum i=1..n 1
-	j←i 				θ(1)
-	while j ≥1 do 		 
-		sum ← sum + i/j 
-		j ← ⌊j/2⌋  		
-return sum
+can also look at it like:
 
-for just the while loop:
-when j = i, the time it takes is θ(1) + θ(1) + θ(floor(i/2))  if i >= 1
-                    			  otherwise constant time (to check and break)
-solving the recurrance, the while part takes θ(logi) time
+	sum <-0 				O(1)							
+	for i<-1 to n do 			O(n)								
+		for j<-i to n do 		O(n) - then multiply by O(n) above to get O(n^2)
+			sum<-sum+(i-j)^2 	O(1)
+			sum<-sum^2 		O(1)
+
+#####Test2(A, n)
+
+	max ← 0
+	for i ← 1 to n do
+		for j ← i to n do
+			sum ← 0
+			for k ← i to j do
+				sum ← A[k]
+				if sum > max then
+					max ← sum
+	return max
+
+run time:
+
+	  θ(1) + sum_[i=1]^n sum_[j=i]^n (θ(1)  + sum_[k=i]^j(θ(1) + θ(1)))
+	= θ(1) + sum_[i=1]^n sum_[j=i]^n (θ(1)  + θ(1)*(j-i+1))
+	...
+	= θ(n^3)
+
+- to **over estimate**: 1...n for all loops - nested loops so multiply by each other to get O(n^3)
+- to **underestimate**: first loop let's say it just goes from 1 to n/4, second from n/4 to n/2, third from n/4 to n/2 -- we get underestimate omega(n^3)
+
+#####Test3 - third example
+
+	sum ← 0 				θ(1)
+	for i ← 1 to n do 		sum i=1..n 1
+		j←i 				θ(1)
+		while j ≥1 do 		 
+			sum ← sum + i/j 
+			j ← floor(j/2)  		
+	return sum
+
+- for the while loop: when j = i, the time it takes is θ(1) + θ(1) + θ(floor(i/2))  if i >= 1
+- otherwise constant time (to check and break)
+- solving the recurrance, the while part takes θ(logi) time
+
 so we have running complexity:
+ 
 	θ(1) + sum i..n (θ(1) + θ(logi))
-  = θ(n) + sum i..n θ(logi)
-  = θ(n) + θ(log(n!))
-  = θ(n) + θ(nlog(n)) ******************* where's this from
-  = θ(n logn)
+	  = θ(n) + sum i..n θ(logi)
+	  = θ(n) + θ(nlog(n))
+	  = θ(n logn)
 
 ---
 Jan 15  (was sick, didn't pay attention, notes made after)
