@@ -992,9 +992,7 @@ Decision tree:
 - a binary tree that can model the processing of any algorithm in the comparison model
 
 ![binary decision tree](/Jan_29_binary.jpg)
-
-(took picture of example of binary search decision tree with my phone)
-(and another pic of tree for sorting)
+![binary decision tree](/Jan_29_decision_tree.jpg)
 
 Lower bounds for sorting 
 - thm: the lower bounds for sorting in the comparison model is omega(nlogn)
@@ -1027,6 +1025,8 @@ Pseudo-code:
 
 This takes O(n+R) time
 
+![image of quicksort](/Jan_29_quick_sort.jpg)
+
 ###Radix sort
 - sort n integers in base R (R-radix)
 - # digits of n, in base R = floor(log_R(n)) + 1
@@ -1046,6 +1046,8 @@ try LSD-radix:
 	A: array of size n, contains m-digit radix-R numbers
 	for d ← m down to 1 do 
 		Sort A by dth digit
+
+![LSD radix](/Jan_29_LSD.jpg)
 
 **stable**:
 - Sort-routine must be stable: equal items stay in original order.
