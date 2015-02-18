@@ -991,7 +991,7 @@ More notes on QuickSort
 Decision tree:
 - a binary tree that can model the processing of any algorithm in the comparison model
 
-#INSERT PICTURE HERE
+![binary decision tree](/Jan_29_binary.jpg)
 
 (took picture of example of binary search decision tree with my phone)
 (and another pic of tree for sorting)
@@ -999,8 +999,6 @@ Decision tree:
 Lower bounds for sorting 
 - thm: the lower bounds for sorting in the comparison model is omega(nlogn)
 - look at the sorting tree - if we have >=n leafs - the height must be >= logn
-
-#MORE PICTURES
 
 Talked about Counting Sort:
 - First have Array A
@@ -1048,6 +1046,7 @@ try LSD-radix:
 	A: array of size n, contains m-digit radix-R numbers
 	for d ← m down to 1 do 
 		Sort A by dth digit
+
 **stable**:
 - Sort-routine must be stable: equal items stay in original order.
 􏰶- CountSort, InsertionSort, MergeSort are (usually) stable.
