@@ -1,88 +1,96 @@
 CS 240R (regular)
 
 Daniela Maftuleac
+
 DC 2305C
-dmaftule@
 
---
+dmaftule@uwaterloo.ca
 
-Jan 6
+-----
+
+##Jan 6
 
 Assignments
-LaTeX preferred - pdf submission on Markus
-A0 due next week - intro to LaTeX - gives 5 bonus marks for A1
-5 assignments (not including A0)
+- LaTeX preferred - pdf submission on Markus
+- A0 due next week - intro to LaTeX - gives 5 bonus marks for A1
+- 5 assignments (not including A0)
 
 Textbook
-you can find it online and in the library
+- you can find it online and in the library
 
 
+####Some Terminology
+*Problem*: Given a problem instance, carry out a particular computational task.
+- *Problem Instance*: Input for the specified problem.
+- *Problem Solution*: Output (correct answer) for the specified problem instance.
+- *Size of a problem instance*: Size(I) is a positive integer which is a measure of the size of the instance I
 
-Problem: Given a problem instance, carry out a particular computational task.
-Problem Instance: Input for the specified problem.
-Problem Solution: Output (correct answer) for the specified problem instance.
-Size of a problem instance: Size(I) is a positive integer which is a measure of the size of the instance I
-
-Algorithm: An algorithm is a step-by-step process (e.g., described in pseudocode) for carrying out a series of computations, given an arbitrary problem instance I.
-Algorithm solving a problem: An Algorithm A solves a problem Π if, for every instance I of Π, A finds (computes) a valid solution for the instance I in finite time.
-Program: A program is an implementation of an algorithm using a specified computer language.
-
-Algorithms are NOT programs - but they can be implemented with a program
-
-Algorithm Design: Design an algorithm A that solves Π (this is focused on in later courses)
-Algorithm Analysis: Assess correctness and efficiency of A (this is more the focus of this course)
+*Algorithm*: An algorithm is a step-by-step process (e.g., described in pseudocode) for carrying out a series of computations, given an arbitrary problem instance I.
+- *Algorithm solving a problem*: An Algorithm A solves a problem Π if, for every instance I of Π, A finds (computes) a valid solution for the instance I in finite time.
+- *Program*: A program is an implementation of an algorithm using a specified computer language.
+- note: algorithms are NOT programs - but they can be implemented with a program
+- *Algorithm Design*: Design an algorithm A that solves Π (this is focused on in later courses)
+- *Algorithm Analysis*: Assess correctness and efficiency of A (this is more the focus of this course)
 
 Determining Efficiency of Algorithms/Programs:
-	Running Time: the amount of time a program takes to run.
-	Space: the amount of memory the program requires.
-	The amount of time and/or memory required by a program will depend on Size(I), the size of the given problem instance I.
+- *Running Time*: the amount of time a program takes to run.
+- *Space*: the amount of memory the program requires.
+- The amount of time and/or memory required by a program will depend on Size(I), the size of the given problem instance I.
+- Can be affected by things like the current state (like how sorted the list already is) and the size of the input (might be more efficient with big or with small compared to others)
 
-Things like the currents state (like how sorted the list already is) and the size of the input (might be more efficient with big or with small compared to others)
+Why is it bad to use *experimental studies*? (just running it a few times and time it, compare algorithms)
+- We must implement the algorithm.
+- Timings are affected by many factors: hardware (processor, memory), software environment (OS, compiler, programming language), and human factors (programmer).
+- We cannot test all inputs; what are good sample inputs?
+- We cannot easily compare two algorithms/programs.
 
-Why is it bad to use experimental studies? (just run it a few times and time it, compare algorithms)
-	We must implement the algorithm.
-	Timings are affected by many factors: hardware (processor, memory), software environment (OS, compiler, programming language), and human factors (programmer).
-	We cannot test all inputs; what are good sample inputs?
-	We cannot easily compare two algorithms/programs.
+Measuring running time - Instead of time, count the number of primitive operations - *Random Access Machine (RAM) Model*:
+- The random access machine has a set of memory cells, each of which stores one item (word) of data.
+- Any access to a memory location takes constant time. (not concurrent)
+- Any primitive operation takes constant time.
+- The running time of a program can be computed to be the number of memory accesses plus the number of *primitive operations*.
+e.g. primitive operation: assigning value to a variable indexing into an array, arithmetic operation like addition, comparing numbers, returning from a function
+- primitive operations take constant time - soon we won't care about things that take constant time
 
-Measuring running time - Instead of time, count the number of primitive operations - Random Access Machine (RAM) Model:
-	The random access machine has a set of memory cells, each of which stores one item (word) of data.
-	Any access to a memory location takes constant time. (not concurrent)
-	Any primitive operation takes constant time.
-	The running time of a program can be computed to be the number of memory accesses plus the number of primitive operations.
-		e.g. primitive operation: assignign value to a variable indexing into an array, arithmetic operation like addition, comparing numbers, returning from a function
-		primitive operations take constant time - soon we won't care about things that take constant time
-
-example:
+####Example 1: counting operations
 	algorithm: arrayMax(n)
 	Input (precondition) : Given an array a[0 ... n-1] of size n of integers
 	Output (postcondition) : the max value among a[0], ... , a[n-1]
 
 	pseudo-code:
-		currMax <- a[0]           we can use arrow notation for assignment or =
+		currMax <- a[0]           (we can use arrow notation for assignment or =)
 		for i<-1 to n-1 do
 			if a[i]  > currMax then currMax<-a[i]
 		return currMax
 
-	let's count operations:
-		indexing to array, get the value, assigning to currMax -- constant time
-		assign to i then check if it's in the range n-1, accessing value for n, we do this n times and the last time fails -- constant * n
-		accessing A[i], comapring, assigning, etc. --- constant * n-1
-		now we sum them up - constant + constant * (2n-1) 		or really just 		constant + constant * n 
-		this is a function of n so it's O(n) running time, or linear running time
+let's count operations:
+- first line: indexing to array, get the value, assigning to currMax - constant time
+- second line: assign to i then check if it`s in the range n-1, accessing value for n, we do this n times and the last time fails - constant * n
+- third line: accessing A[i], comapring, assigning, etc. --- constant * n-1
+- now we sum them up 
+-- constant + constant * (2n-1) - we can simplify this
+-- constant + constant * n 
+- we get a function of n so it's O(n) running time, or linear running time
 
-Simplify Comparisons
-	Idea: Use order notation
-	Informally: ignore constants and lower order terms
+####Simplifying Comparisons
+- Idea: Use order notation
+- Informally: ignore constants and lower order terms
 
-example: given an array A of size n, compute the array representing the prefix averages A[0],A[1],...,A[n-1]
-		e.g. S[0] = A[0]    	S[1] = A[0]+A[1] / 2 		S[i] = sum from j=0 to i of   A[j]/(i+1)  	aka S[i] is the average of A[0], A[1] ... A[i]
+####Example 2: counting operations
+given an array A of size n, compute the array representing the prefix averages A[0],A[1],...,A[n-1]
+
+	S[0] = A[0]    	
+	S[1] = A[0]+A[1] / 2 		
+	S[i] = sum from j=0 to i of   A[j]/(i+1)  	
+
+aka S[i] is the average of A[0], A[1] ... A[i]
+
 	algorithm: prefixAVG(n)
 	pre: n-element array A
 	post: n-element arrays where S[i] = 1/(i+1) sum.j=0..i A[j]
 	pseudo-code:
 		for i<-0 to n-1 do		constant * n+1
-			a<-0				constant * n
+			a<-0			constant * n
 			for i<-0 to i do 	constant * i      the for loop on the inside takes n^2 time
 				a <- a + A[j]	constant * i
 			S[i] = a/(i+n)		constant * n
