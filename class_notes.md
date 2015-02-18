@@ -6,6 +6,12 @@ DC 2305C
 
 dmaftule@uwaterloo.ca
 
+Classes:
+* [Jan 6](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-6)
+* [Jan 8](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-8)
+* [Jan 13](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-13)
+* [Jan 15](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-15)
+
 -----
 
 ##Jan 6
