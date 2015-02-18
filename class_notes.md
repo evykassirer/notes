@@ -11,6 +11,7 @@ Classes:
 * [Jan 8](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-8)
 * [Jan 13](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-13)
 * [Jan 15](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-15)
+* [Jan 20](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-20)
 
 -----
 
@@ -646,51 +647,64 @@ Lemma: Height of a heap with n nodes is Θ (log n).
 
 ##Jan 20
 
-Note that level k (starting counting at 1 at the top)  has 2^(k-1) nodes 
-And if we have k levels, the number of nodes we have total is *at least* sum i=0..k-2 2^i + 1 and *at most* sum i=0..k-1 2^i
-let the height be the number of edges in the shortest path from the top node to lowest node
-so h = #levels - 1
-we can use these over and underestimates of the number of nodes to show that the height is theta(logn) where n is #nodes
-	sum i=0..k-2 2^i + 1 = 2^(k-1) <= n <= sum i=0..k-1 2^i = 2^k - 1
+####Proving lemma: Height of a heap with n nodes is Θ (log n).
+* Note that level k (starting counting at 1 at the top)  has 2^(k-1) nodes 
+* If we have k levels, the number of nodes we have total is *at least* sum i=0..k-2 (2^i) + 1 and *at most* sum i=0..k-1 (2^i)
+* let the height be the number of edges in the shortest path from the top node to lowest node
+* so **h = #levels - 1**
 
+we can use these over and underestimates of the number of nodes to show that the height is theta(logn) where n is #nodes:
+
+	sum i=0..k-2 2^i + 1 = 2^(k-1) <= n <= sum i=0..k-1 2^i = 2^k - 1
+	
+	lower bound:
 	2^(k-1) <= n
 	k-1 <= logn
 	h <= logn
-
+	
+	upper bound:
 	n <= sum i=0..k-1 2^i = 2^k - 1
 	n+1 >= 2^k
 	k >= log(n+1)
 	h >= log(n+1) - 1
 
-Storing heaps in arrays:
-	Let H be a heap (binary tree) of n items and let A be an array of size n. Store root in A[0] and continue with elements level-by-level from top to bottom, in each level left-to-right.
+####Storing heaps in arrays:
+-  Let H be a heap (binary tree) of n items and let A be an array of size n. 
+-  Store root in A[0] and continue with elements level-by-level from top to bottom, in each level left-to-right.
+-  It is easy to find parents and children using this array representation: 
+ - the left child of A\[i\] (if it exists) is A\[2i + 1\],
+ - the right child of A\[i\] (if it exists) is A\[2i + 2\],
+ - the parent of A\[i\] (i != 0) is A\[floor(i−1 / 2)\] (A\[0\] is the root node).
 
-	It is easy to find parents and children using this array representation: the left child of A[i ] (if it exists) is A[2i + 1],
-	the right child of A[i] (if it exists) is A[2i + 2],
-	the parent of A[i] (i != 0) is A[floor(i−1 / 2)] (A[0] is the root node).
+####Insertion in Heaps
+1. Place the new key at the first free leaf
+2. The heap-order property might be violated: perform a bubble-up:
 
-Insertion in Heaps
-	Place the new key at the first free leaf
-	The heap-order property might be violated: perform a bubble-up:
-	bubble-up(v) v: a node of the heap
-		while parent(v) exists and key(parent(v)) < key(v) do 
-			swap v and parent(v)
-			v ← parent(v)
-	The new item bubbles up until it reaches its correct place in the heap.
+bubble-up(v) v: a node of the heap
+	while parent(v) exists and key(parent(v)) < key(v) do 
+		swap v and parent(v)
+		v ← parent(v)
+
+The new item bubbles up until it reaches its correct place in the heap.
+
+pseudo-code:
 
 	heapInsert (A, x) A: an array-based heap, x: a new item
-	size(A) ← size(A) + 1  --note size(A) is a variable, not a function
-	A[size(A) − 1] ← x 
-	bubble−up(A, size(A) − 1)
+		size(A) ← size(A) + 1  --note size(A) is a variable, not a function
+		A[size(A) − 1] ← x 
+		bubble−up(A, size(A) − 1)
+
 Worst case: v is bigger than the root - h # of swaps and h is O(logn) so bubble-up is O(logn)
 
 
-Deletemax in heaps:
-	The maximum item of a heap is just the root node.
-	We replace root by the last leaf (last leaf is taken out).
-	The heap-order property might be violated: perform a bubble-down:
-￼￼￼
-	bubble-down(v) v: a node of the heap
+####Deletemax in heaps:
+- The maximum item of a heap is just the root node.
+
+1. We replace root by the last leaf (last leaf is taken out).
+2. The heap-order property might be violated: perform a bubble-down:
+
+bubble-down(v) v: a node of the heap
+
 	while v is not a leaf do
 		u ← child of v with largest key 
 		if key(u) > key(v) then
@@ -699,45 +713,54 @@ Deletemax in heaps:
 		else
 			break
 
+pseudo-code:
+
 	heapDeleteMax (A)  A: an array-based heap
 		max ← A[0]
 		swap(A[0], A[size(A) − 1])
 		size (A) ← size (A) − 1
 		bubble−down(A, 0)
 		return max
-Time: O(height of heap) = O (log n)
-worst case: the last inserted node has the min key - so it's tight - so theta(logn)
 
+- Time: O(height of heap) = O (log n)
+- worst case: the last inserted node has the min key - so it's tight - so theta(logn)
 
-Problem statement: Given n items (in A[0 · · · n − 1]) build a heap containing all of them.
-
+####Problem statement: Given n items (in A[0 · · · n − 1]) build a heap containing all of them.
 Solution 1: Start with an empty heap and insert items one at a time:
+
 	heapify1 (A) A: an array
 		initialize H as an empty heap 
 		for i ← 0 to size(A) − 1 do
 			heapInsert (H , A[i ])
-	This corresponds to going from 0 · · · n − 1 in A and doing bubble-ups 
-	analyzing time:
+
+This corresponds to going from 0 · · · n − 1 in A and doing bubble-ups 
+
+analyzing time:
+
 		TI - time insert at bottom
 		TS - time swap up a single level
+		
 		level 1: 2^0 * TI
 		level 2: 2^1(TI+TS)
 		level 3: 2^3(TI+2TS)
 		...
 		level k-1: 2^(k-2)(TI + (k-2)TS)
 
-		total run time is sum i=0..k-2 2^i(TI + iTS) 
-		 			    = sum 2^i theta(1) + sum 2^i*i*theta(1)
-		 			    = 2^(k-1) - 1      + 2^k*k - 2^(k+1) + 2 *****************from sum sheet
-		 		  approx= n/2 + nlogn - 2n + 1   (k approx= logn)
-	Worst-case running time: Θ(n log n).
+                total run time is 
+                sum i=0..k-2 2^i(TI + iTS) 
+		= sum 2^i theta(1) + sum 2^i*i*theta(1)
+		= 2^(k-1) - 1      + 2^k*k - 2^(k+1) + 2 	(from sum sheet)
+	  approx= n/2 + nlogn - 2n + 1   			(k approx= logn)
 
+Worst-case running time: Θ(n log n).
 
 Solution 2: Using bubble-downs instead:
+
 	heapify (A) A: an array
 	n ← size(A) − 1
 	for i ← ⌊n/2⌋ downto 0 do
 		bubble−down(A,i)
+
 A careful analysis yields a worst-case complexity of Θ (n). A heap can be built in linear time
 - we start at the next to bottom row and bubble to the row below it
 
