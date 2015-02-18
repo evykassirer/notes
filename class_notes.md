@@ -878,6 +878,10 @@ e.g.
 	3 1 2 5 8 9 6 7
 	now 3 is new pivot, everything left of 5 is less, right is greater, continue with pivot 3
 
+---
+##Jan 26 - tutorial
+
+* [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial3.pdf)
 
 ----
 
@@ -956,7 +960,7 @@ Claim: Tavg(n) <=   D if n<=1    or   D\*n\*logn if n>=2
 - Average cost is O(nH(n)) ∈ O(n log n).
 - Since best-case is Θ(n log n), and average case has lower bound of n log n, so average must be Θ(n log n).
 
-Summary
+####Summary
 - worst case is worse than worst case of HeapSort or MergeSort
 - best case is worse than best case for Insertion Sort
 - average case is nlogn which is good!
@@ -970,30 +974,42 @@ More notes on QuickSort
 - QuickSort is often the most efficient algorithm in practice.
 
 --
-Jan 29
-O(nlogn) - lower bound for sorting
-Can we do bettter? Can we do sorting in O(n)?
-Answer: Yes and no! It depends on what we allow.
-No: Comparison-based sorting lower bound is Ω(n log n). Yes: Non-comparison-based sorting can achieve O(n).
+##Jan 29
 
-Comparison Model: algorithms make decisions based on comparison of two key values
-In the comparison model data can only be accessed in two ways: 
-	- comparing two elements
-	- moving elements around (e.g. copying, swapping)
+####O(nlogn) - lower bound for sorting
+- Can we do bettter? Can we do sorting in O(n)?
+- Answer: Yes and no! It depends on what we allow.
+- No: Comparison-based sorting lower bound is Ω(n log n). 
+- Yes: Non-comparison-based sorting can achieve O(n).
 
-Decision tree: is a binary tree thta can model the processing of any algorithm in the comparison model
+###Comparison Model: 
+- algorithms make decisions based on comparison of two key values
+- In the comparison model data can only be accessed in two ways: 
+ - comparing two elements
+ - moving elements around (e.g. copying, swapping)
+
+Decision tree:
+- a binary tree that can model the processing of any algorithm in the comparison model
+
+#INSERT PICTURE HERE
+
 (took picture of example of binary search decision tree with my phone)
 (and another pic of tree for sorting)
+
 Lower bounds for sorting 
 - thm: the lower bounds for sorting in the comparison model is omega(nlogn)
-- look at the sorting tree - if we have >=n leafs - the neight must be >= logn
+- look at the sorting tree - if we have >=n leafs - the height must be >= logn
 
-Talked about Counting Sort (pictures on phone):
-	First have Array A
-	Then find out how many of each id we have
-	Then find the indices of where those values start in the array
-	Then we can copy over whole objects from A into the array, based on those indices
+#MORE PICTURES
+
+Talked about Counting Sort:
+- First have Array A
+- Then find out how many of each id we have
+- Then find the indices of where those values start in the array
+- Then we can copy over whole objects from A into the array, based on those indices
+
 Pseudo-code:
+
 	pre: A[0...n-1] contianing integers from 0 to R-1
 	Post: Sorted A->B
 	//count how many of each type
@@ -1005,33 +1021,37 @@ Pseudo-code:
 	for i=1 to R-1 do
 		I[i] <- I[i-1] + C[i-1]
 	// copy, then move back in B (sorted)
-	B <- copy A
+	B <- copy A // we copy so that we can have the whole element 
+	            // (which might be more than just the integer we're using to compare)
 	for i=0 to n-1 do
 		A[I[B[i]]] <- B[i]
 		increment I[B[i]]
+
 This takes O(n+R) time
 
-***Radix sort***
-sort n integers in base R (R-radix)
-	# digits of n? in base R? = floor(log_R(n)) + 1
-Let's consider n numbers in base R with m digits
+###Radix sort
+- sort n integers in base R (R-radix)
+- # digits of n, in base R = floor(log_R(n)) + 1
+- Let's consider n numbers in base R with m digits
+
 MSD - most sigificant digit
-527, 368, 633, 401, 631, 301 -> MST
-[301, 368], [401], [527], [633, 631] -> next MSD
-[[301], [368]], [401], [[527], [[633, 631]] ->
-[[301], [368]], [401], [527], [[[633] [631]]]
-not a good algorithm! many recursions
-O(m(n+k))
+
+	527, 368, 633, 401, 631, 301 -> sort by MST
+	[301, 368], [401], [527], [633, 631] -> sort by next MSD
+	[[301], [368]], [401], [[527], [[633, 631]] -> etc.
+	[[301], [368]], [401], [527], [[[633] [631]]]
+	not a good algorithm! many recursions
+	O(m(n+k))
 
 try LSD-radix:
-A: array of size n, contains m-digit radix-R numbers
-for d ← m down to 1 do 
-	Sort A by dth digit
 
-"stable":
-	Sort-routine must be stable: equal items stay in original order.
-􏰶 	CountSort, InsertionSort, MergeSort are (usually) stable.
-􏰶 	HeapSort, QuickSort not stable as implemented.
+	A: array of size n, contains m-digit radix-R numbers
+	for d ← m down to 1 do 
+		Sort A by dth digit
+**stable**:
+- Sort-routine must be stable: equal items stay in original order.
+􏰶- CountSort, InsertionSort, MergeSort are (usually) stable.
+􏰶- HeapSort, QuickSort not stable as implemented.
 
 --
 Feb 3
