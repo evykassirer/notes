@@ -12,7 +12,8 @@ Classes:
 * [Jan 13](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-13)
 * [Jan 15](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-15)
 * [Jan 20](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-20)
-
+* [Jan 22](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-22)
+ 
 -----
 
 ##Jan 6
@@ -645,6 +646,11 @@ Lemma: Height of a heap with n nodes is Θ (log n).
 
 ----
 
+##Jan 19 - Tutorial
+* [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial2.pdf)
+
+----
+
 ##Jan 20
 
 ####Proving lemma: Height of a heap with n nodes is Θ (log n).
@@ -765,81 +771,103 @@ A careful analysis yields a worst-case complexity of Θ (n). A heap can be built
 - we start at the next to bottom row and bubble to the row below it
 
 ----
-Jan 22
+##Jan 22
+
+Solution 2 from last time - worst case run time?
+- look at the heap like a pyramid 
+ - the number of nodes in the bottom is 2^k, or n/2 
+ - the number of nodes in the second last row is n/4, etc..
+- each level has to bubble down to all the levels below
+so we have 
+
+	n/2^2 * 1 level    +    n/2^3 * 2    +   n/2^4 * 3 + ..... + n/2^(k+1) * k 
+	= sum from i=1..k   n/(2^(i+1)) * i
+	= 0.5n * sum i=1..k  0.5^i * i 
+	= ... use sum sheet on slides ... 
+	= (n/2)(2 - k+2/2^k) 
+        =(approx)n - logn/2 - 1 	(using k=logn)
+	which is linear time!
 
 
-worst case run time?
-look at the heap like a pyramid - the number of nodes in the bottom is 2^k, or n/2 - the number of nodes in the second last row is n/4, etc..
-each level has to bubble down to all the levels below
-so we have n/2^2 * 1 level    +    n/2^3 * 2    +   n/2^4 * 3 + ..... + n/2^(k+1) * k = sum from i=1..k   n/(2^(i+1)) * i
-= 0.5n * sum i=1..k  0.5^i * i = ... use sum sheet on slides ... = (n/2)(2 - k+2/2^k) approx(using k=logn)=   n - logn/2 - 1 which is linear time!
-
-
-**Sorts Using Heaps***
+####Sorts Using Heaps
 HeapSort (A)
+
 	initialize H to an empty heap 
 	for i ← 0 to n − 1 do
-		heapInsert (H , A[i ]) 
+		heapInsert (H , A[i]) 
 	for i ← 0 to n − 1 do
 	A[n − 1 − i] ← heapDeleteMax(H)
+
 Takes nlogn + n*logn = nlogn time
 
-HeapSort (A)
+HeapSort without making another array
+
 	heapify (A)
 	for i ← 0 to n − 1 do
-		A[n − 1 − i] ← heapDeleteMax(A)
+		A[n − 1 − i] ← heapDeleteMax(A) 	
+		(we can do this^ because as we delete max, 
+		there becomes space at end of array)
+
 takes n + n*logn  = nlogn time
 
 
-***Selection***
-Problem Statement: The kth-max problem asks to find the kth largest item in an array A of n numbers.
+###Selection
+Problem Statement: The **kth-max** problem asks to find the kth largest item in an array A of n numbers.
+
 Solution 1: 	
-	Make k passes through the array, deleting the maximum number each time.
-	Complexity: Θ(kn).
+- Make k passes through the array, deleting the maximum number each time.
+- Complexity: Θ(kn).
+
 Solution 2: 
-	First sort the numbers. Then return the kth largest number. 
-	Complexity: Θ(nlogn).
+- First sort the numbers. Then return the kth largest number. 
+- Complexity: Θ(nlogn).
+
 Solution 3: 
-	Scan the array and maintain the k largest numbers seen so far in a min-heap
-	e.g. if we want 3 elements, we keep a min-heap with 3 nodes (Start with the first 3 elementes in array), always balance like a min-heap with smallest element in root
-	compare root to each array element - if the root is smaller, then we replace the root with the element and heapify - in worst case we insert (logk) all n elements
-	Complexity: Θ(nlogk).
+- Scan the array and maintain the k largest numbers seen so far in a min-heap
+- e.g. if we want 3 elements, we keep a min-heap with 3 nodes (Start with the first 3 elements in array), always balance like a min-heap with smallest element in root
+- compare root to each array element - if the root is smaller, then we replace the root with the element and heapify - in worst case we insert (insert takes logk) all n elements
+- Complexity: Θ(nlogk).
+
 Solution 4: 
-	Make a max-heap by calling heapify(A). Call deleteMax(A) k times.
-	Complexity: Θ(n + k log n).
+- Make a max-heap by calling heapify(A). Call deleteMax(A) k times.
+- Complexity: Θ(n + k log n).
 
-For median selection, k = 􏰑 floor(n/2) 􏰒, giving cost Θ(n log n).
-This is the same cost as our best sorting algorithms. 
-Question: Can we do selection in linear time?
+For median selection, k =􏰑 floor(n/2)􏰒, giving cost Θ(n logn). 
+This is the same cost as our best sorting algorithms.
 
-The quick-select algorithm answers this question in the affirmative. 
-Observation: Finding the element at a given position is tough, but finding the position of a given element is simple.
+###Question: Can we do selection in linear time?
+- The quick-select algorithm answers this question in the affirmative. 
+- Observation: Finding the element at a given position is tough, but finding the position of a given element is simple.
 
-quick-select and the related algorithm quick-sort rely on two subroutines: 
-	choose-pivot(A): Choose an index i such that A[i] will make a good pivot (hopefully near the middle of the order).
-	partition(A, p): Using pivot A[p], rearrange A so that all items ≤ the pivot come first, followed by the pivot, followed by all items greater than the pivot.
+#####Quick-select
+- quick-select and the related algorithm quick-sort rely on two subroutines: 
+ - choose-pivot(A): Choose an index i such that A[i] will make a good pivot (hopefully near the middle of the order).
+ - partition(A, p): Using pivot A[p], rearrange A so that all items ≤ the pivot come first, followed by the pivot, followed by all items greater than the pivot.
 
 picking the pivot:
-	Ideally, we would select a median as the pivot. But this is the problem we’re trying to solve!
-	First idea: Always select first element in array. We will consider more sophisticated ideas later on.
+- Ideally, we would select a median as the pivot. But this is the problem we’re trying to solve!
+- First idea: Always select first element in array. We will consider more sophisticated ideas later on.
 
-artition(A, p)
-A: arrayofsizen, p: integers.t. 0≤p<n
-1. 	swap(A[0], A[p])
-2. 	i←1, j←n−1
-3. 	loop
-4. 		while i < n and A[i] ≤ A[0] do
-5. 			i←i+1
-6.		while j ≥ 1 and A[j] > A[0] do 
-7.			j←j−1 
-8. 		if j < i then break
-9.		else swap(A[i], A[j]) 
-10. end loop
-11. swap(A[0],A[j])
-12. return j
+partition(A, p)
+
+	A: arrayofsizen, p: integers.t. 0≤p<n
+	1. 	swap(A[0], A[p])
+	2. 	i←1, j←n−1
+	3. 	loop
+	4. 		while i < n and A[i] ≤ A[0] do
+	5. 			i←i+1
+	6.		while j ≥ 1 and A[j] > A[0] do 
+	7.			j←j−1 
+	8. 		if j < i then break
+	9.		else swap(A[i], A[j]) 
+	10. end loop
+	11. swap(A[0],A[j])
+	12. return j
+
 Idea: Keep swapping the outer-most wrongly-positioned pairs.
 
 e.g.
+
 	5 1 9 8 3 2 6 7
 	p   i     j
 	5 1 2 8 3 9 6 7
