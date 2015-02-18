@@ -13,7 +13,8 @@ Classes:
 * [Jan 15](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-15)
 * [Jan 20](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-20)
 * [Jan 22](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-22)
- 
+* [Jan 27](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-27)
+
 -----
 
 ##Jan 6
@@ -879,46 +880,53 @@ e.g.
 
 
 ----
-Jan 27
+
+##Jan 27
 
 We won't be talking about quick select any more in this course, only quick sort
-Quicksort(A, r, l)
-pre: l-r element array
-post: sorted A
-if(l>r)
-	p <- choose-pivot(r, l)
-	i = partition(A, r, l)
-	QuickSort(A, r, i-1)
-	QuickSort(A, i+1, l)
 
-Worst case:
-	claim: Tworst(n) <= c*n*(n+1)/2
-	proof: by induction
-	base case:
-		Tworst(1) = c = c*1*2/2
+###Quicksort(A, r, l)
+
+	pre: l-r element array
+	post: sorted A
+	
+	if(l>r)
+		p <- choose-pivot(r, l)
+		i = partition(A, r, l)
+		QuickSort(A, r, i-1)
+		QuickSort(A, i+1, l)
+
+#####Worst case:
+- claim: T_worst(n) <= c*n*(n+1)/2
+
+proof: by induction
+
+	base case: Tworst(1) = c = c*1*2/2
 	IH: assume Tworst(m) <= c*m*(m+1)/2 for all m <= n-1
 	IC:
-		Tworst(n) = {max value 0 <= i m= n-1}{Tworst(i-1) + Tworst(n-i))} + cn 
-		          <=  {max value 0 <= i m= n-1}{c*(i-1)*i/2 + (n-i)(n-i+1)/2} + cn 
-		          (max is when i=0 or i=n-1)
-		          <= c*(n-1)*n/2 + cn = cn(n+1)/2
-    so Tworst(n) is in O(n^2)
+	Tworst(n) = {max value 0 <= i m= n-1}{Tworst(i-1) + Tworst(n-i))} + cn 
+	          <=  {max value 0 <= i m= n-1}{c*(i-1)*i/2 + (n-i)(n-i+1)/2} + cn 
+	          (max is when i=0 or i=n-1)
+	          <= c*(n-1)*n/2 + cn = cn(n+1)/2
+        so Tworst(n) is in O(n^2)
 
-A is sorted: at least n^2 running time. T(n) = T(n-1) + cn    omega(n^2)
-											 = cn + (c(n-1) + T(n-2))
-											 = cn + c(n-1) + c(n-2) + ... + c + d
-											 = cn(n+1) + d <= cn(n+1)/2
+So worst case is when A is sorted: at least n^2 running time. 
 
-Best case for QuickSort: each pivot divides the array in half each time
-Tbest = {min 0 <= i <= n-1}(Tbest(i-1) + Tbest(n-i)) + cn
-     (let i = n/2)
-     >= T(n/2) + T(n/2) + cn
-     we recognize this recurrence as nlogn
+	T(n) = T(n-1) + cn    omega(n^2)
+	 = cn + (c(n-1) + T(n-2))
+	 = cn + c(n-1) + c(n-2) + ... + c + d
+	 = cn(n+1)/2 + d 
 
- QuickSort - worst case is worse than worst case of HeapSort or MergeSort, best case is worse than best case for Insertion Sort, average case is nlogn which is good!
+#####Best case for QuickSort
+- each pivot divides the array in half each time
+- Tbest = {min 0 <= i <= n-1}(Tbest(i-1) + Tbest(n-i)) + cn
+- for best case, we let i = n/2
+- Tbest >= T(n/2) + T(n/2) + cn
+- we recognize this recurrence as nlogn
 
-Average case for QuickSort:
-	Tavg(n) = sum_{all possible instance of array with size n} T(n)  /  n! (# of permutations)
+#####Average case for QuickSort:
+
+	Tavg(n) = sum_{all possible instance of array with size n} T(n)  /  n! (where n! # of permutations)
 	        = sum i=0..n-1 T(i) + T(n-i-1) + cn) / n
 	        	// we can say these are equal because we can divide the permutations of the
 	        	// array into n cases - where the first element will be moved to one of n 
@@ -926,31 +934,40 @@ Average case for QuickSort:
 	        	// at this point (we account for it in the next steps)
 	        = sum i=0..n-1 T(i) + sum i=0..n-1 T(n-i-1) + sum cn
 	        = 2/n sum T(i) + cn
-	Claim: Tavg(n) <=   D if n<=1    or   D*n*logn if n>=2
+
+Claim: Tavg(n) <=   D if n<=1    or   D\*n\*logn if n>=2
+
 	Proof: by induction
 		BC: n=0, 1
-			T(0) <= T(1) <= D
-			(should also show T(2) pretty sure!!)
-		IH: assume Tavg(m) <= D, if m<=1  and Dmlnm if m>=2 for all m <= n-1
+		  T(0) <= T(1) <= D
+		  (should also show T(2) pretty sure!!)
+		IH: assume Tavg(m) <= D, if m<=1  and D\*m\*lnm if m>=2 for all m <= n-1
 		IC:
-			Tavg(n) = 2/n sum T(i) + cn
-			        = 2/n (T(0) + T(1) + sum i=2..n-1 T(i) + cn)
-			        <= 2/n sum D*i*lni   + 2/n(D+ D) + cn
-			        <= 2D/n sum ilni + 4D/2 + cn
-			        <= 2D/n integral 2 to n xlnx dx
-			        = .... some calculus
-			        <= Dnlogn
-	There's something different on the slides, but this is probably too complex for our class
-	we see that H(n) ∈ O(log n).
-	Average cost is O(nH(n)) ∈ O(n log n).
-	Since best-case is Θ(n log n), average must be Θ(n log n).
+		  Tavg(n) = 2/n sum T(i) + cn
+		        = 2/n (T(0) + T(1) + sum i=2..n-1 T(i) + cn)
+		        <= 2/n sum D\*i\*lni   + 2/n(D+ D) + cn
+		        <= 2D/n sum ilni + 4D/2 + cn
+		        <= 2D/n integral 2 to n xlnx dx
+		        = .... some calculus
+		        <= Dnlogn
+
+- There's something different on the slides, but this problem is probably too complex for our class
+- we see that H(n) ∈ O(log n).
+- Average cost is O(nH(n)) ∈ O(n log n).
+- Since best-case is Θ(n log n), and average case has lower bound of n log n, so average must be Θ(n log n).
+
+Summary
+- worst case is worse than worst case of HeapSort or MergeSort
+- best case is worse than best case for Insertion Sort
+- average case is nlogn which is good!
 
 More notes on QuickSort
-	We can randomize by using choose-pivot2, giving Θ(n log n) expected time for quick-sort2.
-	We can use choose-pivot3 (along with quick-select3) to get quick-sort3 with Θ(n log n) worst-case time.
-	We can use tail recursion to save space on one of the recursive calls.
-		By making sure the other one is always smaller, the auxiliary space is Θ(log n) in the worst case, even for quick-sort1.
-	QuickSort is often the most efficient algorithm in practice.
+- We can randomize by using choose-pivot2, giving Θ(n log n) expected time for quick-sort2.
+- We can use choose-pivot3 (along with quick-select3) to get quick-sort3 with Θ(n log n) worst-case time.
+- **ASK ON PIAZZA ABOUT THESE OTHER CHOOSE PIVOTS?**
+- We can use tail recursion to save space on one of the recursive calls.
+- By making sure the other one is always smaller, the auxiliary space is Θ(log n) in the worst case, even for quick-sort1.
+- QuickSort is often the most efficient algorithm in practice.
 
 --
 Jan 29
