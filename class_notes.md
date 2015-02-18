@@ -68,8 +68,8 @@ let's count operations:
 - second line: assign to i then check if it`s in the range n-1, accessing value for n, we do this n times and the last time fails - constant * n
 - third line: accessing A[i], comapring, assigning, etc. --- constant * n-1
 - now we sum them up 
--- constant + constant * (2n-1) - we can simplify this
--- constant + constant * n 
+ - constant + constant * (2n-1) - we can simplify this
+ - constant + constant * n 
 - we get a function of n so it's O(n) running time, or linear running time
 
 ####Simplifying Comparisons
@@ -450,54 +450,72 @@ so we have running complexity:
 	  = θ(n) + θ(nlog(n))
 	  = θ(n logn)
 
----
-Jan 15  (was sick, didn't pay attention, notes made after)
+-----
+## Jan 15  
+(was sick, didn't pay attention, notes made after)
 
-***Mergesort and logn running time***
+### Sorts ct'd
+#### Mergesort and logn running time
+
 	input: Array A of n integers
 	Step 1: 
-		split A into two subarrays: AL consists of the first ceil(n/2) elements in A and AR consists of the rest of the elements - floor(n/2)of them
+		split A into two subarrays: 
+		AL consists of the first ceil(n/2) elements in A and 
+		AR consists of the rest of the elements - floor(n/2)of them
 	Step 2: 
 		Recursively run MergeSort on AL and AR .
 	Step 3: 
-		After AL and AR have been sorted, use a function Merge to merge them into a single sorted array. This can be done in time Θ(n).
+		After AL and AR have been sorted, use a function Merge 
+		to merge them into a single sorted array. 
+
+This can be done in time Θ(n).
+
 pseudo-code: MergeSort(A, n)
-	1. 	if n = 1 then
-	2. 		S←A
-	3. 	else
-	4. 		nL←⌈n/2⌉
-	5. 		nR←⌊n/2⌋
-	6. 		AL ← [A[1],...,A[nL]]
-	7. 		AR ←[A[nL +1],...,A[n]]
-	8. 		SL ← MergeSort (AL , nL )
-	9. 		SR ← MergeSort (AR , nR )
-	10.		S ← Merge(SL,nL,SR,nR)
-	11.	return S
+
+	if n = 1 then
+		S←A
+	 else
+	 	nL←⌈n/2⌉
+	 	nR←⌊n/2⌋
+	 	AL ← [A[1],...,A[nL]]
+	 	AR ←[A[nL +1],...,A[n]]
+	 	SL ← MergeSort (AL , nL )
+	 	SR ← MergeSort (AR , nR )
+		S ← Merge(SL,nL,SR,nR)
+	return S
+
 analyzing:
-	Let T(n) denote the time to run MergeSort on an array of length n.
-	Step 1 takes time Θ(n) (transfer elements into new arrays)
-	Step 2 takes time T 􏰁⌈n/2⌉ 􏰂+ T 􏰁⌊n/2⌋􏰂 
-	Step 3 takes time Θ(n) 
+- Let T(n) denote the time to run MergeSort on an array of length n.
+- Step 1 takes time Θ(n) (transfer elements into new arrays)
+- Step 2 takes time T(ciel(n/2)) + T(floor(n/2))􏰂 
+- Step 3 takes time Θ(n) 
+
 recurrence relation for T(n):
-	T(n) = T(⌈n/2⌉) 􏰂+ T(􏰁⌊n/2⌋􏰂) + Θ(n) if n>1
+
+	T(n) = T(ciel(n/2)) + T(floor(n/2)) + Θ(n) if n>1
 		 = Θ(1) if n=1
+
 exact recurrence with constants:
-	T(n) = T(⌈n/2⌉) 􏰂+ T(􏰁⌊n/2⌋􏰂) + cn if n>1
+	T(n) = T(ciel(n/2)) + T(floor(n/2)) + cn if n>1
 		 = d if n=1
+
 "sloppy recurrence" (floors and ceilings removed):
+
 	T(n) = 2T(n/2) 􏰂+ cn if n>1
 		 = d if n=1
-The exact and sloppy recurrences are identical when n is a multiple of 2
-If we solve it we get T(n) ∈ Θ(n logn)
-This is also true for all n, not just even n
 
+- The exact and sloppy recurrences are identical when n is a multiple of 2
+- If we solve it we get T(n) ∈ Θ(n logn)
+- This is also true for all n, not just even n
 
-Another example of logn time: binary search
-L(n) = L(n/2) + O(1) if n>=2
-     = O(1) if n <= 1
+#####Binary search: another example of logn time
 
-***Conditionals - varying runtime***
-Insertion sort (A, n)
+	L(n) = L(n/2) + O(1) if n>=2
+	     = O(1) if n <= 1
+
+###Conditionals - varying runtime
+####Insertion sort (A, n)
+
 	for i=1 ... n-1
 		key = A[i]
 		j=i-1
@@ -505,113 +523,122 @@ Insertion sort (A, n)
 			A[j+1] = A[j]
 			j--
 		A[j+1] = key
-the number	of executions depends on the input. It's between 1 and i.
 
-We assume worst case analysis when runtimes vary so wildly.
-	That is, compute an upper bound on the runtime
-	for insertion sort: 
-		runtime <= sum i=1..n-1 (i-1)O(1) = O(1)sum i=1..n-1 i which is O(n^2)
-	If you use upper bounds, alos show they are tight
-	To show that they are tight, give an instance (of size n) on which the runtime asymptotically actually occurs
-	e.g. consider an array in reverse-sorted order for insertion sort
+the number of executions depends on the input. It's between 1 and i.
+
+We assume **worst case analysis** when runtimes vary so wildly.
+- That is, compute an upper bound on the runtime
+- for insertion sort: runtime <= sum i=1..n-1 (i-1)O(1) = O(1)sum i=1..n-1 i which is O(n^2)
+- If you use upper bounds, also show they are **tight**
+- To show that they are tight, give an instance (of size n) on which the runtime asymptotically actually occurs
+- e.g. consider an array in reverse-sorted order for insertion sort
 
 "worst case":
+
 	T(n) = runtime of max instance I s.t. I has size n 
 	     = max {T(I)}
+
 "average case":
+
 	T(n) = sum of instances of size n / # instances of size n
+
 "best case":
+
 	T(n) = min {T(I)}
 
 
-*** Abstract Data Types (ADT) ****
-A description of information and a collection of operations on that information.
-The information is accessed only through the operations.
-We can have various realizations of an ADT, which specify: 
-	How the information is stored (data structure)
-	How the operations are performed (algorithms)
+###Abstract Data Types (ADT)
+- A description of information and a collection of operations on that information.
+- The information is accessed only through the operations.
+- We can have various realizations of an ADT, which specify: 
+ - How the information is stored (data structure)
+ - How the operations are performed (algorithms)
 
-e.g. Dynamic arrays
-Linked lists support O(1) insertion/deletion, but element access costs O(n).
-Arrays support O(1) element access, but insertion/deletion cost O(n).
-Dynamic arrays offer a compromise: O(1) element access, and O(1) insertion/deletion at the end.
-Two realizations of dynamic arrays:
-	Allocate one HUGE array, and only use the first part of it.
-	Allocate a small array initially, and double its size as needed. (Amortized analysis is required to justify the O(1) cost for insertion/deletion at the end — take CS 341/466!)
+####e.g. Dynamic arrays
+- Linked lists support O(1) insertion/deletion, but element access costs O(n).
+- Arrays support O(1) element access, but insertion/deletion cost O(n).
+- Dynamic arrays offer a compromise: O(1) element access, and O(1) insertion/deletion at the end.
+- Two realizations of dynamic arrays:
+ -Allocate one HUGE array, and only use the first part of it.
+ -Allocate a small array initially, and double its size as needed. (Amortized analysis is required to justify the O(1) cost for insertion/deletion at the end — take CS 341/466!)
 
-e.g. Stack ADT
-Stack: collection of items with operations: 
-	push: inserting an item
-	pop: removing the most recently inserted item
-Items are removed in LIFO (last-in first-out) order. 
-We can have extra operations: size, isEmpty, and top
-Applications: 
-	Addresses of recently visited sites in a Web browser
-	procedure calls
-Realizations of Stack ADT 
-	using arrays
-	using linked lists
+####e.g. Stack ADT
+- collection of items with operations: 
+ - push: inserting an item
+ - pop: removing the most recently inserted item
+- Items are removed in **LIFO** (last-in first-out) order. 
+- We can have extra operations: size, isEmpty, and top
+- Applications: 
+ - Addresses of recently visited sites in a Web browser
+ - procedure calls
+- Realizations of Stack ADT 
+ - using arrays
+ - using linked lists
 
-Queue ADT
-Queue: a collection of items with operations: 
-	enqueue: inserting an item
-	dequeue: removing the least recently inserted item
-Items are removed in FIFO (first-in first-out) order. Items enter the queue at the rear and are removed from the front. 
-We can have extra operations: size, isEmpty, and front
-Realizations of Queue ADT:
-	using (circular) arrays 
-	using linked lists
+####Queue ADT
+- a collection of items with operations: 
+ - enqueue: inserting an item
+ - dequeue: removing the least recently inserted item
+- Items are removed in **FIFO** (first-in first-out) order. Items enter the queue at the rear and are removed from the front. 
+- We can have extra operations: size, isEmpty, and front
+- Realizations of Queue ADT:
+ - using (circular) arrays 
+ - using linked lists
 
-Priority Queue ADT
-Priority Queue: a collection of items (each having a priority) with operations:
-	insert: inserting an item tagged with a priority
-	deleteMax: removing the item of highest priority deleteMax is also called extractMax.
-Applications: 
-	typical “todo” list
-	simulation systems
-The above definition is for a maximum-oriented priority queue. 
-A minimum-oriented priority queue is defined in the natural way, by replacing the operation deleteMax by deleteMin.
+####Priority Queue ADT
+- Priority Queue: a collection of items (each having a priority) with operations:
+ -insert: inserting an item tagged with a priority
+ - deleteMax: removing the item of highest priority deleteMax is also called extractMax.
+- Applications: 
+ - typical “todo” list
+ - simulation systems
+- The above definition is for a **maximum-oriented** priority queue. 
+- A **minimum-oriented** priority queue is defined in the natural way, by replacing the operation deleteMax by deleteMin.
 
-Using a Priority Queue to Sort: PQ − Sort(A)
+#####Using a Priority Queue to Sort: PQ − Sort(A)
 initialize PQ to an empty priority queue 
-for i ← 0 to n − 1 do
-	PQ .insert (A[i ], A[i ]) 
-for i ← 0 to n − 1 do
-	A[n − 1 − i] ← PQ.deleteMax()
 
-Realizations of Priority Queues
-	Attempt 1: Use unsorted arrays 
-		insert: O(1)
-		deleteMax: O(n)
-		Using unsorted linked lists is identical.
-		This realization used for sorting yields selection sort.
-	Attempt 2: Use sorted arrays 
-		insert: O(n)
-		deleteMax: O(1)
-		Using sorted linked-lists is identical.
-		This realization used for sorting yields insertion sort.
-	Third Realization: Heaps
-		A heap is a certain type of binary tree. 
-		Our goal with heaps is to get insertion and deletion to be O(logn)
+	for i ← 0 to n − 1 do
+		PQ.insert (A[i], A[i]) 
+	for i ← 0 to n − 1 do
+		A[n − 1 − i] ← PQ.deleteMax()
 
-Recall binary trees:
-	A binary tree is either 
-		empty, or
-		consists of three parts: a node and two binary trees (left subtree and right subtree).
-	Terminology: root, leaf, parent, child, level, sibling, ancestor, descendant, etc. 
+#####Realizations of Priority Queues
 
-Heaps
-	A max-heap is a binary tree with the following two properties:
-		Structural Property: 
-			All the levels of a heap are completely filled, except (possibly) for the last level. The filled items in the last level are left-justified.
-		Heap-order Property: 
-			For any node i, key (priority) of parent of i is larger than or equal to key of i.
-	A min-heap is the same, but with opposite order property. 
-	Lemma: Height of a heap with n nodes is Θ (log n).
+Attempt 1: Use unsorted arrays 
+- insert: O(1)
+- deleteMax: O(n)
+- Using unsorted linked lists is identical.
+- This realization used for sorting yields selection sort.
+
+Attempt 2: Use sorted arrays 
+- insert: O(n)
+- deleteMax: O(1)
+- Using sorted linked-lists is identical.
+- This realization used for sorting yields insertion sort.
+	
+Third Realization: Heaps
+- A heap is a certain type of binary tree. 
+- Our goal with heaps is to get insertion and deletion to be O(logn)
+
+####Recall binary trees:
+- A binary tree is either 
+ - empty, or
+ - consists of three parts: a node and two binary trees (left subtree and right subtree).
+- Terminology: root, leaf, parent, child, level, sibling, ancestor, descendant, etc. 
+
+###Heaps
+A max-heap is a binary tree with the following two properties:
+- Structural Property: All the levels of a heap are completely filled, except (possibly) for the last level. The filled items in the last level are left-justified.
+- Heap-order Property: For any node i, key (priority) of parent of i is larger than or equal to key of i.
+
+A min-heap is the same, but with opposite order property. 
+
+Lemma: Height of a heap with n nodes is Θ (log n).
 
 ----
 
-Jan 20
+##Jan 20
 
 Note that level k (starting counting at 1 at the top)  has 2^(k-1) nodes 
 And if we have k levels, the number of nodes we have total is *at least* sum i=0..k-2 2^i + 1 and *at most* sum i=0..k-1 2^i
