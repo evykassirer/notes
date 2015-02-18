@@ -101,83 +101,105 @@ note that inside the loop it takes c(1+2+3+4+...+n-1) time = c(n-1)n/2 <= n^2
 
 -----
 
-Jan 8
+##Jan 8
 
-Better algorithm? S[i-1] = A[0] + A[1] + ... + A[i-1]   /   i
-Then S[i] = i*S[i-1] + A[i]    /   i+1
+Better algorithm to achieve the results of example 2 from last class? 
+
+	S[i-1] = (A[0] + A[1] + ... + A[i-1]) / i
+	Then S[i] = (i*S[i-1] + A[i]) /  (i+1)
+
 algorithm 2: prefixAvg2
+
 	Pre: the n-elem array A
 	Post: the n-elem array S, S[i] = sum j=0..i A[j]  /  (i+1)
-pseudo-code:
-	s <- 0					constant
-	for i<-0 to n-1 do		constant*n
-		s <- s + A[i]		constant*n
-		S[i] = s/(i+n)		constant*n
+	pseudo-code:
+		s <- 0					constant
+		for i<-0 to n-1 do		constant*n
+			s <- s + A[i]		constant*n
+			S[i] = s/(i+n)		constant*n
 
 Comparing times:
-T_A1(n) = c_1 n^2 + c_2 n + c3
-T_A2(n) = C_4 n + c_5
-you can graph a linear function and a quadratic function to see approximately how much more time one would take than the other as n grows
+- the first algorithm takes quadratic time - T_A1(n) = c1 n^2 + c2 n + c3
+- the second takes linear time - T_A2(n) = c4 n + c5
+- you can graph a linear function and a quadratic function to see approximately how much more time one would take than the other as n grows
 
+###Sorting Algorithms
+#####Bubble Sort (increasing)
+- go through left to write and compare two elements at a time - swap if they're in the wrong order 
+- at the end of each iteration one more element at the end is in the right place 
 
-*** Sorting Algorithms ***
-Bubble Sort (increasing)
-	go through left to write and compare two elements at a time - swap if they're in the wrong order 
-	at the end of each iteration one more element at the end is in the right place 
-	pseudo-code:
-		for i<-0 to n-1 do
-			swaps<-0
-			for j<-0 to n-i-2 do
-				if A[j] > A[j+1]
-					swap A[j] with A[j+1]
-					swaps++;
-			if swaps=0
-				break;
+pseudo-code:
 
-if we have one element - 0 swaps
-if we have two elements - 0 or 1 swaps
-if we have three - 0, 1, 2, 3 swaps
-if we have four - 0 to 6 swaps
+	for i<-0 to n-1 do
+		swaps<-0
+		for j<-0 to n-i-2 do
+			if A[j] > A[j+1]
+				swap A[j] with A[j+1]
+				swaps++;
+		if swaps=0
+			break;
+
+- if we have one element - 0 swaps
+- if we have two elements - 0 or 1 swaps
+- if we have three - 0, 1, 2, 3 swaps
+- if we have four - 0 to 6 swaps
 
 linear in best case (only go once), quadratic in worst case O(n^2), average case n^2
 
 
-*** ORDER NOTATION ***
-O-notation: f(n) ∈ O(g(n)) if there exist constants c > 0 and n_0 > 0 such that  0 ≤ f(n) ≤ c*g(n) for all n ≥ n_0
-	(<=) worst case
-	to figure out what n_0 is, find an intersection point --- n_0 has to be a natural number
-	note that this means if something is O(n) it's also O(n^2)
+####ORDER NOTATION
+O-notation: 
+- f(n) ∈ O(g(n)) if there exist constants c > 0 and n_0 > 0 such that  0 ≤ f(n) ≤ c*g(n) for all n ≥ n_0
+- like <= in math
+- g(n)is worst case time of f(n)
+- to figure out what n_0 is, find an intersection point --- n_0 has to be a natural number
+- note that this means if something is O(n) it's also O(n^2)
 
-Ω-notation: f (n) ∈ Ω(g(n)) if there exist constants c > 0 and n_0 > 0 such that 0 ≤ c*g(n) ≤ f(n) for all n ≥ n_0
-	(>=) opposite - best case
+Ω-notation: 
+- f (n) ∈ Ω(g(n)) if there exist constants c > 0 and n_0 > 0 such that 0 ≤ c*g(n) ≤ f(n) for all n ≥ n_0
+- like >= in math
+- opposite of O-notatoion - g(n) is best case time of f(n)
 
-Θ-notation: f (n) ∈ Θ(g(n)) if there exist constants c1, c2 > 0 and n_0 > 0 such that 0 ≤ c1*g(n) ≤ f (n) ≤ c2*g(n) for all n ≥ n_0
-	(=) grows at same rate
+Θ-notation: 
+- f (n) ∈ Θ(g(n)) if there exist constants c1, c2 > 0 and n_0 > 0 such that 0 ≤ c1*g(n) ≤ f (n) ≤ c2*g(n) for all n ≥ n_0
+- =
+- grows at same rate
 
-o-notation: f (n) ∈ o(g(n)) if for ALL constants c > 0, there exists a constant n_0 > 0 such that 0 ≤ f(n) < c*g(n) for all n ≥ n_0
-	(<)
+o-notation: 
+- f (n) ∈ o(g(n)) if for ALL constants c > 0, there exists a constant n_0 > 0 such that 0 ≤ f(n) < c*g(n) for all n ≥ n_0
+- <
 
-ω-notation: f (n) ∈ ω(g(n)) if for ALL constants c > 0, there exists a constant n_0 > 0 such that 0 ≤ c g(n) < f (n) for all n ≥ n_0
-	(>)
+ω-notation: 
+- f (n) ∈ ω(g(n)) if for ALL constants c > 0, there exists a constant n_0 > 0 such that 0 ≤ c g(n) < f (n) for all n ≥ n_0
+- >
 
+#####example: show that n ∈ o(n^2)
 
-example: show that n < n^2
-for any c, let n_0 = 1/c + 1
-then 0 <= (1/c + 1) < c(1/c + 1) = 1/c + 2 + c
+	for any c, let n_0 = 1/c + 1
+	then 0 <= (1/c + 1) 
+	       < c(1/c + 1) 
+	       = 1/c + 2 + c
 
-example: to show 2n^2 + 3n + 11 ∈ O(n^2), show 0 ≤ 2n^2 + 3n + 11 ≤ c*n2 for all n ≥ n0
-0 ≤ 2n^2 + 3n + 11 
-  ≤ 2n^2 + 3n^2 + 11n^2  (just showed)
-  ≤ 16n^2
-true for n >= 1, so n_0 = 1
+#####example: show 2n^2 + 3n + 11 ∈ O(n^2)
+we do this by showing 0 ≤ 2n^2 + 3n + 11 ≤ c*n2 for all n ≥ n0
 
-example: Prove that 2010n^2 + 1388n ∈ o(n^3) from first principles
-use l'hopital's rule to show lim n->inf f(n)/g(n) = 0
+	0 ≤ 2n^2 + 3n + 11 
+	  ≤ 2n^2 + 3n^2 + 11n^2  (just showed)
+	  ≤ 16n^2
+	true for n >= 1, so n_0 = 1
 
-lim n->inf 2010n^2 + 1388n / n^3 = lim n->inf 4020n + 1388 / 3n^2  = lim n->inf 4020/6n  = 0
-by definition of the limit for all epsilon>0, there exists delta>0 such that for all n>=delta, (2010n^2 + 1388n / n^3) < epsilon ---> 0 < 2010n^2 + 1388n < epsilon*n^3 
-so delta is our n_0 (and epsilon is like c)
+#####example: Prove that 2010n^2 + 1388n ∈ o(n^3) from first principles
+we use l'hopital's rule - show lim n->inf f(n)/g(n) = 0
 
+	  lim n->inf    (2010n^2 + 1388n) / n^3 
+	= lim n->inf    (4020n + 1388) / 3n^2  
+	= lim n->inf     4020/6n  
+	= 0
+	by definition of the limit, 
+	for all epsilon>0, there exists delta>0 such that 
+	for all n>=delta, (2010n^2 + 1388n) / n^3 < epsilon
+	so 0 < 2010n^2 + 1388n < epsilon*n^3 
+	so delta is our n_0 (and epsilon is like c)
 
 ---------
 
