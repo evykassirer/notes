@@ -201,84 +201,101 @@ we use l'hopital's rule - show lim n->inf f(n)/g(n) = 0
 	so 0 < 2010n^2 + 1388n < epsilon*n^3 
 	so delta is our n_0 (and epsilon is like c)
 
----------
+-----
 
-TUTORIAL - Monday Jan 12
+##TUTORIAL - Monday Jan 12
+https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf
 
-***Latex***
-compile .tex
-newline: \\
-space: \hspace{x mm}
-       \vspace{x mm}
-to make:
+####Latex
+- compile .tex
+- newline: \\
+- space: \hspace{x mm}  and  \vspace{x mm}
+- to make:
+
 	25x+5 = 10
         x = 1/5
+
 write:
+
 	\begin{align*}
 		20x+5 &= 10\\
 		x &= \fract{1}{5}
 	\end{align*}
 
-math mode: in-line $...$ or \(...\)
-	  	   centered: $$...$$ or \[...\]
+math mode: 
+- in-line $...$ or \(...\)
+- centered: $$...$$ or \[...\]
 
-
-***BIG O***
+####Order notation
+#####BIG O
 show 12n^3+11n^2+10 ∈ O(n^3)
-12n^3+11n^2+10 <= 21n^3 + 11n^3 + 10n^3 (if n>0) = 33n^3
-so c = 33, and n_o = 1
 
-***BIG omega***
+	   12n^3+11n^2+10 
+	<= 21n^3 + 11n^3 + 10n^3 (if n>0) 
+	= 33n^3
+	so c = 33, and n_o = 1
+
+#####BIG omega
 show n^2 - 3m ∈ Ω(n^2)
-cn^2 < n^2-3n
-c <= 1 - 3/n
-you can choose multiple combinations of values
-e..g choose c = 1/2, then n_0 must be 6
 
-***BIG θ***
-find c1 from big o, c2 from big omega - name them
+	cn^2 < n^2-3n
+	c <= 1 - 3/n
 
-***little o***
+- you can choose multiple combinations of values, e.g. choose c = 1/2, then n_0 must be 6
+
+#####BIG θ
+- definitions or from first principals means you can’t just say O and Ω → Θ. Must have values for c1, c2, n0.
+- find c1 from big o, c2 from big omega - name them
+
+#####little o
 show 1000n ∈ Θ(nlog(n))
-1000n <= cnlog(n)
-1000 <= clog(n)
-1000/c <= log(n)
-e^(1000/c) <= n
-so n_0 = 2^(1000/c)
-** you only get partial marks if you stop here - you have to show it works
-so for all n >= n_0,
-cnlog(n) >= cnlog(n_0) = cnlog(e^(1000/c)) = cn(1000/c) = 1000n
 
-***little omega***
+	1000n <= cnlog(n)
+	1000 <= clog(n)
+	1000/c <= log(n)
+	e^(1000/c) <= n
+	so n_0 = 2^(1000/c)
+
+you only get partial marks if you stop here - you have to show it works
+
+	so for all n >= n_0,
+	cnlog(n) >= cnlog(n_0) = cnlog(e^(1000/c)) = cn(1000/c) = 1000n
+
+#####little omega
 show 3^n ∈ w(2^n)
-3^n >= c*2^n
-(3/2)^n >= c
-n >= log_(3/2)(c)
-so n_0 = log_(3/2)(c)
-----
-so for all n >= n_0
-3^n = (3/2)^n * 2^n
-3^n >= (3/2)^n_0 * 2^n
-3^n >= (3/2)^log_(3/2)(c) * 2^n
-3^n >= c * 2^n ******************** why don't I remember this math
+
+	3^n >= c*2^n
+	(3/2)^n >= c
+	n >= log_(3/2)(c)
+	so n_0 = log_(3/2)(c)
+
+so...
+
+	for all n >= n_0
+	3^n = (3/2)^n * 2^n
+	3^n >= (3/2)^n_0 * 2^n
+	3^n >= (3/2)^log_(3/2)(c) * 2^n
+	3^n >= c * 2^n 
 
 
-***loop analysis***
-cs = 0
-for i from 1 to 3m
-	cs *= 4
-	for j from 1388 to 2010
-		for k from 4i to 6i
-			cs += k
+####loop analysis
+
+	cs = 0
+	for i from 1 to 3m
+		cs *= 4
+		for j from 1388 to 2010
+			for k from 4i to 6i
+				cs += k
 
 looking at:
-  sum{i=1..3m} sum{j=1388..2010} sum{k=4i..6i} 1 
-= sum{i=1..3m} sum{j=1388..2010} 2i 
-= 2 sum{i=1..3m} sum{j=1..623} i 
-= 2 sum{i=1..3m} 623i
-= 2*623*(3m)(3m+1)/2
-= 5607m^2 + 1869m 
-∈ Θ(m^2)
+
+	  sum{i=1..3m} sum{j=1388..2010} sum{k=4i..6i} 1 
+	= sum{i=1..3m} sum{j=1388..2010} 2i 
+	= 2 sum{i=1..3m} sum{j=1..623} i 
+	= 2 sum{i=1..3m} 623i
+	= 2*623*(3m)(3m+1)/2
+	= 5607m^2 + 1869m 
+	∈ Θ(m^2)
 
 
 ----------
