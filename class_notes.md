@@ -14,6 +14,8 @@ Classes:
 * [Jan 20](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-20)
 * [Jan 22](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-22)
 * [Jan 27](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-27)
+* [Jan 29](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-29)
+* [Feb 3](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
 
 -----
 
@@ -1054,103 +1056,114 @@ try LSD-radix:
 􏰶- CountSort, InsertionSort, MergeSort are (usually) stable.
 􏰶- HeapSort, QuickSort not stable as implemented.
 
---
-Feb 3
+-----
 
-***Dictionary ADT***
+##Feb 3
+
+###Dictionary ADT
 - contains n distinct KVP (key value pairs)
 - search efficiently
 - Insertion/deletion efficiently
-A dictionary is a collection of items, each of which contains a key and some data
-and is called a key-value pair (KVP). Keys can be compared and are (typically) unique.
-Operations: 
-	- search(k )
-	- insert(k , v )
-	- delete(k )
-	- optional: join, isEmpty, size, etc.
-Examples: symbol table, license plate database
+- "A dictionary is a collection of items, each of which contains a key and some data
+and is called a key-value pair (KVP). Keys can be compared and are (typically) unique."
+- Operations: 
+- search(k)
+ - insert(k , v)
+ - delete(k)
+ - optional: join, isEmpty, size, etc.
+- Examples: symbol table, license plate database
 
-Implementations of Dictionaries
-unsorted array/linked list (size n)
+###Implementations of Dictionaries
+
+#####unsorted array/linked list (size n)
 - search Θ(n) 
 - insert Θ(1)
 - delete Θ(n) (need to search)
 
-Ordered array
+#####Ordered array
 - search Θ(logn) 
-- insert Θ(n)   (logn search and then move n)
+- insert Θ(n)   (logn search and then shifting everything takes n)
 - delete Θ(n)	(similar to insert)
 
-Sorted linked list
+#####Sorted linked list
 - Search O(n)
 - Insert O(n)
 - Delete O(n)
 
-BST (binary search tree)
+##### BST (binary search tree)
 - either empty or contains KVP at root, left subtree, right subtree
 - keys in left subtree are smaller than the key at root
 - keys in right subtree are bigger than key at root
 - search: if found return value, else go left/right - O(h)
 - insert: O(h)
 - delete x in BST:
-	search for x
-	if x is a leaf, delete it
-	if x is a node with 1 child then delete x and bring subtree one level up
-	if x has 2 children, we swap it with the successor (go left and then all the way down right) or predecessor (go right and all the way left) and delete x
-  O(h)
+ - search for x
+ - if x is a leaf, delete it
+ - if x is a node with 1 child then delete x and bring subtree one level up
+ - if x has 2 children, we swap it with the successor (go left and then all the way down right) or predecessor (go right and all the way left) and delete x
+ - O(h)
 - height will depend - worst case n, best case logn, average logn (like quicksort)
 
 Exercise:
-	BST (property) + Heaps (stored in array)
-	sort the array (could take O(n) time) =, then we get perfectly balanced
+- BST (property) + Heaps (stored in array)
+- sort the array (could take O(n) time), then we get perfectly balanced
 
-AVL Trees
+#####AVL Trees
 - Introduced by Adel’son-Vel’ski ̆ı and Landis in 1962,
 - BST with an additional structural property: The heights of the left and right subtree differ by at most 1. (The height of an empty tree is defined to be −1.)
 - At each non-empty node, we store height(R) minus height(L) ∈ {−1, 0, 1}:
- 	−1 means the tree is left-heavy
-	0 means the tree is balanced
-	1 means the tree is right-heavy
+ - −1 means the tree is left-heavy
+ - 0 means the tree is balanced
+ - 1 means the tree is right-heavy
 - We could store the actual height, but storing balances is simpler and more convenient.
 
 Each node stores:
 - KVP
 - left subtree
 - right subtree
-- height of subtree at the node / (h(R)-h(L))
+- height of subtree at the node = h(R)-h(L)
 
 Insert x into AVL
 - Search for its place
 - Insert
 - Recompute the heights (balances) going up
 - Check the AVL property, if violated fix by rotations
+
 Pseudocode:
-Pre - AVL tree not containing x
-Post - AVL after inserting x
-set height(x) = 0
-while(height(parent(x)) = height(x)
-	height(parent(x))++
-	if((height(x)-height(sibling(x)) > 1) rebalance(parent(x))
-	x = parent(x);
 
-Rotating (See pictures in slides)
-rotate-right(T )
-	T: AVL tree
-	returns rotated AVL tree
-	1. newroot ← T .left
-	2. T .left ← newroot.right
-	3. newroot.right ← T
-	4. return newroot
-rotate-left(T )
-	T: AVL tree
-	returns rotated AVL tree
-	1. newroot ← T .right
-	2. T .right ← newroot.left
-	3. newroot.left ← T
-	4. return newroot
+	Pre - AVL tree not containing x
+	Post - AVL after inserting x
+	set height(x) = 0
+	while(height(parent(x)) = height(x)
+		height(parent(x))++
+		if((height(x)-height(sibling(x)) > 1) rebalance(parent(x))
+		x = parent(x);
 
-fix(T )
+Rotating (See 
+#PICTURES IN SLIDES
+
+rotate-right(T)
+
+		T: AVL tree
+		returns rotated AVL tree
+		1. newroot ← T .left
+		2. T .left ← newroot.right
+		3. newroot.right ← T
+		4. return newroot
+
+rotate-left(T)
+
+		T: AVL tree
+		returns rotated AVL tree
+		1. newroot ← T .right
+		2. T .right ← newroot.left
+		3. newroot.left ← T
+		4. return newroot
+
+fix(T)
+
 T : AVL tree with T .balance = ±2 returns a balanced AVL tree
+
 	if T.balance = −2 then
 		if T.left.balance = 1 then
 			T.left ← rotate-left(T.left) 
