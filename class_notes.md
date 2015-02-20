@@ -26,7 +26,7 @@ Tutorials:
 * [Jan 26](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial3.pdf)
 * [Feb 2](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial4.pdf)
 * [Feb 9](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial5.pdf)
-* 
+
 -----
 
 ##Jan 6
