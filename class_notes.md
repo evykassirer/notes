@@ -1269,92 +1269,104 @@ Def 2-3 tree
 
 Restriction: all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
 
-Search(x):
+----
+
+##Feb 10
+
+###2-3 Trees ct'd
+
+#####Search(x):
 - almost same as in BST
 - compare x with the key (root)
 - if found, break
 - else find the unique subtree where we should look for x
 - if subtree empty, return (not found)
-
---
-Feb 10
-
-Searching in a 2-3 tree
-- compare x with keys at current node
-- if key found, break
-- else find unique subtree where x might be
-- if subtree is empty, break
 - else recurse on the root of the subtree
+
 Running time O(height)
 
-Insertion
+#####Insertion
 - First, we search to find the lowest internal node where the new key belongs.
 - If the node has only 1 KVP, just add the new one to make a 2-node.
 - Otherwise, order the three keys as a < b < c.
 - Split the node into two 1-nodes, containing a and c,
 - (recursively) insert b into the parent along with the new link
 
-Deletion
+(see examples in the lecture and tutorial slides)
+
+#####Deletion
 - As with BSTs and AVL trees, we first swap the KVP with its successor, so that we always delete from a leaf.
+
 Say we’re deleting KVP x from a node V : 
 - If V is a 2-node, just delete x.
 - ElseIf V has a 2-node immediate sibling U, perform a transfer:
-	Put the “intermediate” KVP (key that differentates between two children) in the parent between V and U into V , and replace it with the adjacent KVP from U.
-	This is kinda like a rotation
-- Otherwise, merge V, immediate sibling U, and the corresponding KVP from parent into a node (at the same level), then recurisvely "fix" parent - if parent is an empty root, just delete
+ - Put the “intermediate” KVP (key that differentates between two children) in the parent between V and U into V , and replace it with the adjacent KVP from U.
+ - This is kinda like a rotation
+- Otherwise:
+ - merge immediate 1-node sibling U, and the corresponding KVP from parent into a node where V was, then recurisvely "fix" parent by performing delete on it - if parent is an empty root, just remove it
+
+(this is tricky to understand - review lecture and tutorial example slides)
 
 runtime deletion?
-O(height)
-n - number of item (KVP) - not nodes!
+- O(height)
+- note that n is number of items (KVP) - NOT nodes!
 
-Let T be a 2-3 tree of fixed height h - what is min number of KVP's that T can contain?
-It would be a binary tree 
-	showed in assignment that h <= log(n+1) -1
-lower bound for h? each node has three children - ternary tree
-	2*3^0 kvp on level 1 ... 2*3^h on level h+1
-	take sum and get n <= 3^(h+1) - 1 --- h >= log3(n+1) -1
-so both upper and lower bound are logn
+#####Let T be a 2-3 tree of fixed height h - what is min number of KVP's that T can contain?
+- It would be a binary tree 
+ - we showed in assignment that h <= log(n+1) -1
+- lower bound for h? each node has three children - ternary tree
+ - 2*3^0 kvp on level 1 ... 2*3^h on level h+1
+ - take sum and get n <= 3^(h+1) - 1 --- h >= log3(n+1) -1
+- so both upper and lower bound are logn
 
-***(a,b) trees***
+###(a,b) trees
+
 The 2-3 Tree is a specific type of (a, b)-tree:
+
 An (a, b)-tree of order M is a search tree satisfying:
-Each internal node has at least a children, **unless it is the root**. The root has at least 2 children
-Each internal node has at most b children.
-If a node has k children, then it stores k-1 key-value pairs (KVPs). Leaves store no keys and are at the same level.
+- Each internal node has at least a children, **unless it is the root**. The root has at least 2 children
+- Each internal node has at most b children.
+- If a node has k children, then it stores k-1 key-value pairs (KVPs). Leaves store no keys and are at the same level.
 
-a B-tree of order M is a (dM/2e,M)-tree. A 2-3 tree has M = 3
-height of tree with n nodes is theta((log n)/(log M))
+a B-tree of order M is a (ciel(M/2),M)-tree. A 2-3 tree has M = 3
 
-a-b trees have h in O(log_a n) and omega(log_b n)
-search in a-b tree - O(b loga n) -- b-1 KVPs in one node, log_a n height
-using arrays for KVPs of a node, the use binary search - now takes O(logb * log_a n)
+height
+- height of tree with n nodes is theta((log n)/(log M)) 
+- we can find this similarily to how we've found bounds for heights of trees previously.
+- a-b trees have h ∈ O(log_a n) and ∈ omega(log_b n)
+
+search in a-b tree 
+- b-1 KVPs in one node, log_a n height
+- O(b loga n) 
+- optimize using arrays for KVPs of a node, then use binary search - now takes O(logb * log_a n)
 
 
-***memory***
-when using big data, it may not fitin the internal memory -> use external memory
+###Memory
 
-pyramid - fastest most expensive at top, slowest least expensive at bottom
-MAIN (primary,internal memory)
-- CPU register
-- Cache L1
-- Cache L2
-- Cache L3
-- RAM
-external memory
-- hard drive
-- cloud storage
+When using big data, it may not fit in the internal memory -> use external memory
 
-Tree-based data structures have poor memory locality: If an operation accesses m nodes, then it must access m spaced-out memory locations.
-Observation: Accessing a single location in external memory (e.g. hard disk) automatically loads a whole block (or “page”).
-In an AVL tree or 2-3 tree, theta(log n) pages are loaded in the worst case. If M is small enough so an M-node fits into a single page,
-then a B-tree of order M only loads theta((log n)/(log M)) pages. This can result in a huge savings: memory access is often the largest time cost in a computation.
+Pyramid - fastest + most expensive at top, slowest + least expensive at bottom
+
+	MAIN (primary,internal memory)
+	 - CPU register
+	 - Cache L1
+	 - Cache L2
+	 - Cache L3
+	 - RAM
+	external memory
+	 - hard drive
+	 - cloud storage
 
 External memory model: transfers of data between internal memory layers are ignored
+
 Our goal: minimize the number of disk transfer from external to internal memory
 
+- Tree-based data structures have poor memory locality: If an operation accesses m nodes, then it must access m spaced-out memory locations.
+- Observation: Accessing a single location in external memory (e.g. hard disk) automatically loads a whole block (or “page”).
+- In an AVL tree or 2-3 tree, theta(log n) pages are loaded in the worst case. If M is small enough so an M-node fits into a single page, then a B-tree of order M only loads theta((log n)/(log M)) pages. This can result in a huge savings: memory access is often the largest time cost in a computation.
 
 --
-Feb 12
+##Feb 12
 
 B-tree requires O(logn/logB) disk transfers
 B-tree of order M is a ciel(M/2) - M tree
