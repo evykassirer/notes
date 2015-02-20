@@ -1126,6 +1126,10 @@ Each node stores:
 - right subtree
 - height of subtree at the node = h(R)-h(L)
 
+Examples of AVL trees (and not AVL trees):
+
+![AVL and not](/Feb3_AVL_not.jpg)
+
 Insert x into AVL
 - Search for its place
 - Insert
@@ -1144,8 +1148,6 @@ Pseudocode:
 
 Rotating 
 
-#PICTURES IN SLIDES
-
 rotate-right(T)
 
 		T: AVL tree
@@ -1154,6 +1156,9 @@ rotate-right(T)
 		2. T .left ← newroot.right
 		3. newroot.right ← T
 		4. return newroot
+
+![Right rotation](/Feb3_right_rotation.png)
+
 
 rotate-left(T)
 
@@ -1164,9 +1169,12 @@ rotate-left(T)
 		3. newroot.left ← T
 		4. return newroot
 
+![Left rotation](/Feb3_left_rotation.png)
+
+
 fix(T)
 
-T : AVL tree with T .balance = ±2 returns a balanced AVL tree
+	T : AVL tree with T .balance = ±2 returns a balanced AVL tree
 
 	if T.balance = −2 then
 		if T.left.balance = 1 then
@@ -1190,7 +1198,6 @@ T : AVL tree with T .balance = ±2 returns a balanced AVL tree
  - insert a new key in AVL tree - fix will be called at most once - O(height)
  - If after inserting a new key a node z is unbalanced, then rebalance the tree with root z using one of the 4 types of rotation (right left, rightleft, leftright)
 
-#I took some pics of the rotations
 
 Lemma:
 - let z be an unbalanced node and all its descendents are balanced
@@ -1207,7 +1214,9 @@ Lemma:
 
 Example of delete:
 
-#pictures
+![Pre-delete](/Feb5_pre_delete.png)
+
+![Post-delete](/Feb5_post_delete.png)
 
 Note that we can't just rotate right because then the right half of the tree would be taller than the left half - still a problem. This is why we need to rotate the left half before rotating the whole thing.
 
@@ -1256,7 +1265,7 @@ Def 2-3 tree
 - contains one KVP and 2 children which are 2-3 trees
 - two KVP and 3 children which are 2-3 trees
 
-#see slides for picture of what that would look like
+![example](/Feb5_23_example.png)
 
 Restriction: all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
 
