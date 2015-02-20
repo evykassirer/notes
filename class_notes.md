@@ -16,6 +16,9 @@ Classes:
 * [Jan 27](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-27)
 * [Jan 29](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-29)
 * [Feb 3](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
+* [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
+* [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
+* [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
 
 -----
 
@@ -1139,7 +1142,8 @@ Pseudocode:
 		if((height(x)-height(sibling(x)) > 1) rebalance(parent(x))
 		x = parent(x);
 
-Rotating (See 
+Rotating 
+
 #PICTURES IN SLIDES
 
 rotate-right(T)
@@ -1173,70 +1177,94 @@ T : AVL tree with T .balance = ±2 returns a balanced AVL tree
 			T.right ← rotate-right(T.right) 
 		return rotate-left(T)
 
----
-Feb 5
+----
 
-Search:
-	search for a key in AVL tree - just like BST - O(height)
-Insert:
-	insert a new key in AVL tree - fix will be called at most once - O(height)
-	If after inserting a new key a node z is unbalanced, then rebalance the tree with root z using one of the 4 types of rotation (right left, rightleft, leftright)
-	I took some pics of the rotations
+##Feb 5
+
+###AVL trees ct'd
+
+#####Search: 
+- search for a key in AVL tree - just like BST - O(height)
+
+#####Insert:
+ - insert a new key in AVL tree - fix will be called at most once - O(height)
+ - If after inserting a new key a node z is unbalanced, then rebalance the tree with root z using one of the 4 types of rotation (right left, rightleft, leftright)
+
+#I took some pics of the rotations
 
 Lemma:
-let z be an unbalanced node and all its descendents are balanced.
+- let z be an unbalanced node and all its descendents are balanced
 - applying one of the rotations on z balances z and its descendents
-- if imbalance comes from insertion, then reblaancing z balances the entire tree
+- if imbalance comes from insertion, then rebalancing z balances the entire tree
 
-Delete:
-	1) delete as in BST
-	2) Parse upward from where you removed the node and recompute the balances of nodes
-	3) if a node is unbalanced then rebalance using rotations
-	4) keep updating balance up to the root
-	fix might be called O(height) times
+#####Delete:
+
+1. delete as in BST
+2. Parse upward from where you removed the node and recompute the balances of nodes
+3. if a node is unbalanced then rebalance using rotations
+4. keep updating balance up to the root
+ - fix might be called O(height) times
+
+Example of delete:
+
+#pictures
+
+Note that we can't just rotate right because then the right half of the tree would be taller than the left half - still a problem. This is why we need to rotate the left half before rotating the whole thing.
 
 Exercises:
-1) given an AVL tree of height h, what is the possible level of the leaves?
-2) Given an AVL tree of height h, what is the maximum number of nodes?
+
+1. given an AVL tree of height h, what is the possible level of the leaves?
+2. Given an AVL tree of height h, what is the maximum number of nodes?
 
 Delete is done in O(height)
-claim: any AVL tree has its height O(logn)
-h <= clogn, c>0
-2^h <= 2^(clogn)
-2^h <= (2^logn)^c = n^c
-so thihs also means n >= 2^(h/c)
 
-Equivalent form: For a given AVL tree of fixed height h, find the minimum number of nodes. Let N(h) = the samllest number ofnodes for an AVL tree of height h
+##### claim: any AVL tree has its height O(logn)
+
+	h <= clogn, c>0
+	2^h <= 2^(clogn)
+	2^h <= (2^logn)^c = n^c
+	so this also means n >= 2^(h/c)
+
+Equivalent form: For a given AVL tree of fixed height h, find the minimum number of nodes. Let N(h) = the smallest number of nodes for an AVL tree of height h
+
 One subtree must have height at least h−1, the other at least h−2:
-N(h) = 1+N(h−1)+N(h−2), h≥1
-N(h) = 1, h=0
-N(h) = 0, h = −1
-This is the fibinacci sequence!
-N(h) = (h+3)th fibinacci number -1
-N(h) > N(h−1)+N(h−2) > 2N(h−2) >= 2(N(h-3) + N(h-4) + 1)) > 4N(h−4) > 8N(h−6) > ··· 
-     > 2iN(h−2i) = 2^⌊h/2⌋ N(h-2⌊h/2⌋) ≥ 2^(h/2)
 
-from this we can get h <= 2logn
-thus an AVL tree with n nodes has height O(logn). 
-also, n ≤ 2h+1 − 1, so the height is Θ(log n).
+	N(h) = 1 + N(h−1) + N(h−2), h≥1
+	N(h) = 1, h = 0
+	N(h) = 0, h = −1
+	This is the fibinacci sequence! (ish)
+	N(h) = (h+3)th fibinacci number - 1 
+	     (except not actually - I had copied this from the board, but if we're adding 1
+	      *each time* then it would be (h+3)th fibinacci number + h-1   --- I think?
+	      anyways this wouldn't change the result)
+	N(h) > N(h−1)+N(h−2) 
+	     > 2N(h−2) 
+	     >= 2(N(h-3) + N(h-4) + h-3)) 
+	     > 4N(h−4) > 8N(h−6) > ··· 
+	n    > 2iN(h−2i) = 2^⌊h/2⌋ N(h-2⌊h/2⌋) ≥ 2^(h/2)
 
+	from this we can get h <= 2logn
 
-***2-3 Trees***
+Thus an AVL tree with n nodes has height O(logn). Also, n ≤ 2h+1 − 1, so the height is Θ(log n).
+
+###2-3 Trees
+
 idea: rebalancing by relaxing the degree=2 condition
+
 Def 2-3 tree
 - empty (NIL)
 - contains one KVP and 2 children which are 2-3 trees
 - two KVP and 3 children which are 2-3 trees
-see slides for picture of what that would look like
 
-Restrictions:
-- all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
+#see slides for picture of what that would look like
+
+Restriction: all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
 
 Search(x):
 - almost same as in BST
 - compare x with the key (root)
 - if found, break
-- else find the unique subtree where we should ook for x
+- else find the unique subtree where we should look for x
 - if subtree empty, return (not found)
 
 --
