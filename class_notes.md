@@ -20,6 +20,13 @@ Classes:
 * [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-10)
 * [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-12)
 
+Tutorials:
+* [Jan 12](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf)
+* [Jan 19](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial2.pdf)
+* [Jan 26](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial3.pdf)
+* [Feb 2](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial4.pdf)
+* [Feb 9](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial5.pdf)
+* 
 -----
 
 ##Jan 6
@@ -217,8 +224,8 @@ we use l'hopital's rule - show lim n->inf f(n)/g(n) = 0
 
 -----
 
-##TUTORIAL - Monday Jan 12
-https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf
+##Jan 12 - Tutorial
+* [slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf)
 
 ####Latex
 - compile .tex
@@ -885,7 +892,6 @@ e.g.
 
 ---
 ##Jan 26 - tutorial
-
 * [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial3.pdf)
 
 ----
@@ -1058,6 +1064,10 @@ try LSD-radix:
 - Sort-routine must be stable: equal items stay in original order.
 􏰶- CountSort, InsertionSort, MergeSort are (usually) stable.
 􏰶- HeapSort, QuickSort not stable as implemented.
+
+-----
+##Feb 2 - Tutorial
+* [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial4.pdf)
 
 -----
 
@@ -1268,6 +1278,10 @@ Def 2-3 tree
 ![example](/Feb5_23_example.png)
 
 Restriction: all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
+
+---
+##Feb 9 - Tutorial
+* [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial5.pdf)
 
 ----
 
