@@ -16,9 +16,9 @@ Classes:
 * [Jan 27](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-27)
 * [Jan 29](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-29)
 * [Feb 3](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
+* [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-5)
+* [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-10)
+* [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-12)
 
 -----
 
@@ -1365,72 +1365,85 @@ Our goal: minimize the number of disk transfer from external to internal memory
 - Observation: Accessing a single location in external memory (e.g. hard disk) automatically loads a whole block (or “page”).
 - In an AVL tree or 2-3 tree, theta(log n) pages are loaded in the worst case. If M is small enough so an M-node fits into a single page, then a B-tree of order M only loads theta((log n)/(log M)) pages. This can result in a huge savings: memory access is often the largest time cost in a computation.
 
+### B-tree variations
+- Max size M: Permitting one additional KVP in each node - allows insert and delete to avoid backtracking via pre-emptive splitting and pre-emptive merging.
+- Red-black trees: Identical to a B-tree with minsize 1 and maxsize 3,but each 2-node or 3-node is represented by 2 or 3 binary nodes, and each node holds a “color” value of red or black.
+- B+-trees: All KVPs are stored at the leaves (interior nodes just have keys), and the leaves are linked sequentially.
+
 --
 ##Feb 12
 
 B-tree requires O(logn/logB) disk transfers
+
 B-tree of order M is a ciel(M/2) - M tree
 - let B be the size of a block
 - choose M s.t. a node fits into a single disk block
 - search O(logn/log(M/2))
 
 Theorem: In any comparison based dictioanary ADT, search(k) is done in omega(logn)
-Proof: decision tree
-any binary tree (yes, no branches) with N leaves has the height logN
-the decision tree has at least n+1 leaves then the height >= log(n+1)
 
-consider a dictionary with n KVPs - if the keys are exactly 0, ..., n-1
-then the item (K1, V1) wll be stored in A[K1]
-Search(x) - x is A[x]
-now search/insert/delete is theta(1)
+	Proof: decision tree
+	any binary tree (yes, no branches) with N leaves has the height logN
+	the decision tree has at least n+1 leaves then the height >= log(n+1)
+
+####consider a dictionary with n KVPs - if the keys are exactly 0, ..., n-1
+- then the item (K1, V1) wll be stored in A[K1]
+- Search(x) - x is A[x]
+- now search/insert/delete is theta(1)
 
 Disadvantages:
 - huge array
 - initialization (slow)
--  only for integer keys
+- only for integer keys
 
-***Hashing***
-U - universe of n keys
-find a mapping of U in {0, ..., M-1} (natural numbers)
-then we have an array with indices 0 to M-1
-we're putting our keys into a smaller array of size M
-
-Hacher in french means cut into small pieces
+###Hashing
+- (Hacher in french means cut into small pieces)
+- U - universe of n keys
+- find a mapping of U in {0, ..., M-1} (natural numbers)
+- then we have an array with indices 0 to M-1
+- we're putting our keys into a smaller array of size M
 
 e.g. hash function - h(k) = k mod 9
-e.g. 18, 11, 5, 16, 31, 9
-Insert(18) - at index h(18) = 0
-Insert(11) - index 2
+
+	18, 11, 5, 16, 31, 9
+	Insert(18) - at index h(18) = 0
+	Insert(11) - index 2
 
 Problem: 
-multiple items land on the same slot in the hashing table T (collision)
+- multiple items land on the same slot in the hashing table T (collision)
+
 To solve problem:
+
 1. chaining - we allow multiple item on a single spot in T (linked list) (M<=n)
 2. open addessing - if the slot is occupied, move to next slot in T (M>=n)
 
-with chaining:
+####chaining:
 - h(k) is theta(1)
 - Worst-case: all KVPs are in same slot in T - fix by choosing a better hash function
 - Ideally, h is a uniform function
-	P(k is T[h(k)]) = 1/M
-	Think of h as a random uniform function over {0, ..., M-1}
-	#items/#slots in T = n/M = alpha - load factor
-	choose M then choose h, trying to keep alpha>=1 small
-- Search(x)   O(1+alpha)
+ - P(k is T[h(k)]) = 1/M
+ - Think of h as a random uniform function over {0, ..., M-1}
+- (#items)/(#slots in T) = n/M = the symbol alpha = load factor
+ - choose M then choose h, trying to keep alpha>=1 small
+- Search(x) is O(1+alpha)
 - Insert is theta(1)
-- Delete(search+delete) = O(1+alpha)
+- Delete(search+delete) is O(1+alpha)
 
-***Open addressing***
-each slot of T has at most one KVP
-Search(x) in this case will try to find the *probe sequence*
-	<h(k,0), h(k,1), h(k,2), ... , h(k, M-1)>
-	if h(k) is not X, then search h(k)+1
-	you keep looking down the line until you find what you're looking for
-	if you find empty place, break - you haven't found it
+####Open addressing
+- each slot of T has at most one KVP
+
+Search(x) in this case will try to find the *probe sequence* <h(k,0), h(k,1), h(k,2), ... , h(k, M-1)>
+- if h(k) is not X, then search h(k)+1
+- you keep looking down the line until you find the key you're looking for
+- if you find empty place, break - you haven't found it
+
 Deletion:
-	problem - neeed to distinguish between empty spot and deleted spot, so that search still works
-	user a marker for deleted items
-	seach(x): search through T[(h(k,0)], 1, ... M-1 until x found or empty (unmarked) slo found
-	Insert(x): search for empty (marked or unmarked) among T ...
-	for open addressing alpha <= 1 (M>=n)
-	Run-time for search O(M)
+- problem: neeed to distinguish between empty spot and deleted spot, so that search still works
+- solution: user a marker for deleted items
+
+improved Seach(x): 
+- search through T[(h(k,0)], 1, ... M-1 until x found or empty (unmarked) found
+
+Insert(x): search for empty (marked or unmarked) among T[(h(k,0)], T[(h(k,1)], ...
+- for open addressing alpha <= 1 (M>=n)
+- Run-time for search O(M)
