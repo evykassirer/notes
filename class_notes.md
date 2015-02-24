@@ -19,6 +19,7 @@ Classes:
 * [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-5)
 * [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-10)
 * [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-12)
+* [Feb 24](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-24)
 
 Tutorials:
 * [Jan 12](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf)
@@ -1461,3 +1462,59 @@ improved Seach(x):
 Insert(x): search for empty (marked or unmarked) among T[(h(k,0)], T[(h(k,1)], ...
 - for open addressing alpha <= 1 (M>=n)
 - Run-time for search O(M)
+
+----
+##Feb 24
+
+Recall: 
+- Searching in a comparison based model is omega(logn)
+- We want to search faster in dictionaries - use hashing
+- Collisions - 2 or more items land in the same slot
+- Open hashing: the item can "go out" of the hash table (e.g. Chaining)
+- Closed hashing: items remain in the hash table (e.g. Open Addressing)
+
+Chaining - worst case O(n), average O(alpha) for search - Insert is theta(1) - Delete is O(d)
+
+####Problem with Open Addressing is **clustering** 
+
+clustering - a bunch of values in the array adjacent to each other
+- large clusters grow faster than small clusters (because we're more likely to land there)
+
+idea: change the jump size p>1 
+- if h(k,0) is occupied, jump p bins 
+- h(k, i) = h(k, i-1) + p
+- does not improve at all - will still get clusters
+
+Quadratic hashing?
+- h(k, i) = h(k) + c1*i + c2*i^2 for positive cs
+- jumps around more, but still not great
+
+####Double Hashing (rehashing)
+- h(k,i) = h1(k) + i*h2(k) mod M
+- the two hash functions are indepdent
+- h1 determines the initial bin, h2 determines the jump size
+- search, delete, insert, work same as linear probing (open addressing)
+
+e.g.
+- M=10 -- h1(k) = k mod 10 -- h2(k) = 7 - kmod7
+- h(k,i) = h1(k) + ih2(k)   mod10
+- insert some elements:
+ - h(89,0)=h1(89)=9
+ - h(18,0)=8
+ - h(49,0)=9 - collison
+ - h(49,1)=6
+ - h(8,0)=8 collision
+ - h(8,1)=4
+ - h(28,0) collision
+ - h(28,1)=5
+ - etc
+ 
+Problem - if we end up with a loop where we're skipping over empty spaces 
+- we fix this by taking 2M and finding nex prime, then making jump size and M primes between them
+- ??????????????
+
+####Cuckoo Hashing
+
+- h1, h2 are independent hash functions
+- insert - k is inserted into h1(k) - if it's later kicked out it'll go to h2(k) - if it's kicked out again goes back to h1(k0
+- this makes it easier to search!
