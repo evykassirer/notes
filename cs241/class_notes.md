@@ -1,16 +1,18 @@
 CS 241
+
 Foundations of Sequential Programs
-Ashif Harji (i's are EE)
 
-------
+Ashif Harji (i prounced as EE)
 
-Jan 6
+-----
+##Jan 6
 
-Foundations: we want to understand how sequential programs "work". We want to know how we get from the program we write to the program that the compiler runs.
-Sequential programs: not multi-threaded or concurrent
+Foundations of Sequential Programs
+* Foundations: we want to understand how sequential programs "work". We want to know how we get from the program we write to the program that the compiler runs.
+* Sequential programs: not multi-threaded or concurrent
 
 
-*** Administrative stuff ***
+###Administrative stuff
 
 Assignments
 - 11 assignments each with multiple parts ~8
@@ -30,115 +32,122 @@ We'll be using piazza
 
 no required textbook
 
-
-*** Introduction ***
+###Introduction
 
 What happens when you compile and run a program?
 
 What is a compiler?
-   high-level language ->[compiler]-> lower-level language
-     - this is common, but not always the case
-   more generally: 
-   source language ->[compiler]-> target language
-   source program ->[compiler]-> target program (equivalent, for some definition of equivalent)
+- high-level language ->[compiler]-> lower-level language
+ - this is common, but not always the case
+- more generally: 
+ - source language ->[compiler]-> target language
+ - source program ->[compiler]-> target program (equivalent, for some definition of equivalent)
 
-Why do we need a compiler?
-	humans write code
-	easier for people to understand and program
-	lets you choose the right language for the job you want to do
-	safety - compiler helps you, lets you know if you're doing bad things
-	abstraction - can write programs without understanding how everrrything works
+Why do we need a compiler? - helping humans write code
+- easier for people to understand and program
+- lets you choose the right language for the job you want to do
+- safety - compiler helps you, lets you know if you're doing bad things
+- abstraction - can write programs without understanding how everrrything works
 
 Why do we need a compiler? - why can't computer just run the source language directly?
-	slower
-	low-level language is hardware specific (machine dependent) - optimized to run well on specific hardware - however the source code is machine independent
+- slower
+- low-level language is hardware specific (machine dependent) - optimized to run well on specific hardware - however the source code is machine independent
 
-A closer look at the compiler (the CS241 compiler - not neccesarily true for every compiler)
+###A closer look at the compiler 
+
+(the CS241 compiler - not neccesarily true for every compiler)
+
 	source program -> [scanning/lexical analysis] -> tokens 
-							normalizes input e.g. normalizes whitespace - example could be an if statement gets the token "IF"
-				   -> [parsing] -> parse tree     
-				   			note these first two steps are the syntactic analysis
-				   -> [semantic analysis] -> parse tree and symbol table
-				   -> [code generation] -> assembly code   
-				   			example assembly code: add $3 $5 $7     jr $31
-	assembly code -> [assembler] -> machine code (1s and 0s)
-		note the assembler is a specifc type of compiler that translates between assembly code and machine code
+        	       -> [parsing] -> parse tree 
+        	       -> [semantic analysis] -> parse tree and symbol table 
+        	       -> [semantic analysis] -> parse tree and symbol table 
+        	       -> [code generation] -> assembly code assembly code 
+        	       -> [assembler] -> machine code (1s and 0s) 
 
-we're going to be coding this entire process!
+- scanning normalizes input e.g. normalizes whitespace - example could be an if statement gets the token "IF"
+- the first two steps are the syntactic analysis
+- example assembly code: add $3 $5 $7     jr $31
+- note the assembler is a specifc type of compiler that translates between assembly code and machine code
 
-
-*** Bits ***
-
-Binary number
-Bit: 0 or 1. Abstraction of high/low voltages or magnets
-Byte: 8-bits e.g. 11001001
-	There are 256 (2^8) possible bytes
-Word: machine specific grouping of bytes
-	4 or 8 bytes (32-bit or 64-bit)
-	we are going to use a 32-bit word - this matters when we generate and assemble assembly code
-Nibble: 4 bits. Half a byte
+We're going to be coding this entire process!
 
 
-*** Bytes ***
+###Bits
+- Binary number
+- Bit: 0 or 1. Abstraction of high/low voltages or magnets
+- Byte: 8-bits e.g. 11001001
+ - There are 256 (2^8) possible bytes
+- Word: machine specific grouping of bytes
+ - 4 or 8 bytes (32-bit or 64-bit)
+ - we are going to use a 32-bit word - this matters when we generate and assemble assembly code
+- Nibble: 4 bits. Half a byte
+
+
+#### Bytes
 
 Given a byte in the computer's memory, what does it mean? For example: 11001001
-	It could be a number. Conventionally in binary it is 2^0 + 2^3 + 2^6 + 2^7 = 1 + 8 + 64 + 128 = 201
-	It is an unsigned value. 
-Wait, how do we represent negative numbers?
 
-Negative numbers - simple approach: sign-magnitude representation. 
-	Reserve first bit to represnt the sign. 0 means positive, 1 means negative - the rest of the bits are the magnitude
-	e.g. 11001001 is a negative number with magnitude 1001001 = 73 -- so our value is -73
-	For 8-bit, it can represent numbers form -127 to 127
-	0 is both 00000000 and 10000000 - two representations for zero! need to comparisons for NULL - not good
-	another downside - arithmetic is tricky. 
-		If we have to positive or two negative values, do the normal addition for magntiudes and use the common sign. 
-		But what if signs are different? Subtract the smaller value from the larger value and use the sign of the larger
-		Overly-complicated. Not good.
+It could be a number. Conventionally in binary it is 2^0 + 2^3 + 2^6 + 2^7 = 1 + 8 + 64 + 128 = 201
+
+It is an unsigned value. Wait, how do we represent negative numbers?
+
+#####Negative numbers 
+
+Simple approach: sign-magnitude representation. 
+- Reserve first bit to represnt the sign. 0 means positive, 1 means negative - the rest of the bits are the magnitude
+- e.g. 11001001 is a negative number with magnitude 1001001 = 73 -- so our value is -73
+- For 8-bit, it can represent numbers form -127 to 127
+- 0 is both 00000000 and 10000000 - two representations for zero! need to comparisons for NULL - not good
+- another downside - arithmetic is tricky. 
+ - If we have to positive or two negative values, do the normal addition for magntiudes and use the common sign.
+ - But what if signs are different? Subtract the smaller value from the larger value and use the sign of the larger - overly-complicated. Not good.
 
 Negative numbers - better approach - 2s compliment
-	To interpret an n-bit value
-	1) interpret the number as unsigned
-	2) if the first bit is zero, then done
-	3) Else, subtract 2^n
-	e.g. n = 3: 011 = 3
-	e.g. 111 = 7 -> first bit is not 0 -> subtract 2^3 -> = -1
-	e.g. 101 = 5 -> first bit is not 0 -> subtract 2^3 -> -3
 
-	To get the twos compliment negation of an n-bit number, subtract the number from 2^n. Alterntaively, flip the bits (0->1, 1->0) and add one.
-	e.g. 110
+- interpret the number as unsigned
+- if the first bit is zero, then done
+- else, subtract 2^n
+- e.g. 
+ - n = 3: 011 = 3
+ - 111 = 7 -> first bit is not 0 -> subtract 2^3 -> = -1
+ - 101 = 5 -> first bit is not 0 -> subtract 2^3 -> -3
+ - 1100100 from before is now -55
+- To get the twos compliment negation of an n-bit number, subtract the number from 2^n. 
+ - Alterntaively, flip the bits (0->1, 1->0) and add one.
+
+e.g. 110
+
 	1000    110->001
 	-110         + 1 
 	 010         010
 
-	Binary 	000 	001		010		011		110 	101 	110 	111
-	Decimal	0 		1 		2 		3 		-4		-3 		-2 		-1
+Binary <-> Decimal
 
-	For 8 bits, this gives -128 to 127
-	Only one zero
-	Arithmetic is clear. Arithmetic is mod 2^n (you can just add them like you usually would)
+	Binary 	000 	001	010	011	110 	101 	110 	111
+	Decimal	0 	1 	2 	3 	-4	-3 	-2 	-1
 
-	e.g. 1100100 from before is now -55
+- For 8 bits, this gives -128 to 127
+ - note: -128 has no negation as 128 has no representation
+ - e.g. with 3 bits: 100 -> 011 + 1 = 100 (we get the same thing - no representation for its negation)
+- Only one zero
+- Arithmetic is clear. Arithmetic is mod 2^n (you can just add them like you usually would)
 
-	note: -128 has no negation as 128 has no representation
-	e.g. with 3 bits: 100 -> 011 + 1 = 100 (we get the same thing - no representation for its negation)
-
-*** Hexadecimal Notation ***
-Base 16: 0..9, and A-F (case doesn't matter)
-Each hex digit is 4 bits, so 11001001(subscript 2) = C9(subscript 16)
-	subscipt 2 means it's in base 2
-	convert binary to hex by taking 4 digit chunks - the first 4 digits 1100 = 4+8=12=C and the last four digits 1001=1+8=9
-
-0x - hex prefix  0xC9
+#### Hexadecimal Notation
+- Base 16: 0..9, and A-F (case doesn't matter)
+- Each hex digit is 4 bits, so 11001001(subscript 2) = C9(subscript 16)
+ - subscipt 2 means it's in base 2
+- convert binary to hex by taking 4 digit chunks 
+ - e.g 11001001 - break into 1100 1011 -> 1100=4+8=12=C  1001=1+8=9 -> C9
+- use 0x as the hex prefix e.g. 0xC9
 
 Given a byte how can we tell which interpretation is correct? (unisnged, sign-magnitude, twos complement)
-We can't really know. We need to remember our intent when we stored the byte
+- We can't really know. We need to remember our intent when we stored the byte
 
 But wait! We don't even know if it is a number
 
-*** Back to Bytes ***
-It could be a character - depends on the character coding you're using.
-We will assume a convention ASCII (American standard code for Information Interchange)
+####Back to Bytes
+- It could be a character - depends on the character coding you're using.
+- We will assume a convention ASCII (American standard code for Information Interchange)
 
 
 ----
