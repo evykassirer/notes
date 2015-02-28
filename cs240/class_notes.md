@@ -16,9 +16,17 @@ Classes:
 * [Jan 27](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-27)
 * [Jan 29](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-29)
 * [Feb 3](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
+* [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-5)
+* [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-10)
+* [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-12)
+* [Feb 24](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-24)
+
+Tutorials:
+* [Jan 12](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf)
+* [Jan 19](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial2.pdf)
+* [Jan 26](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial3.pdf)
+* [Feb 2](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial4.pdf)
+* [Feb 9](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial5.pdf)
 
 -----
 
@@ -217,8 +225,8 @@ we use l'hopital's rule - show lim n->inf f(n)/g(n) = 0
 
 -----
 
-##TUTORIAL - Monday Jan 12
-https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf
+##Jan 12 - Tutorial
+* [slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf)
 
 ####Latex
 - compile .tex
@@ -885,7 +893,6 @@ e.g.
 
 ---
 ##Jan 26 - tutorial
-
 * [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial3.pdf)
 
 ----
@@ -1058,6 +1065,10 @@ try LSD-radix:
 - Sort-routine must be stable: equal items stay in original order.
 􏰶- CountSort, InsertionSort, MergeSort are (usually) stable.
 􏰶- HeapSort, QuickSort not stable as implemented.
+
+-----
+##Feb 2 - Tutorial
+* [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial4.pdf)
 
 -----
 
@@ -1269,159 +1280,244 @@ Def 2-3 tree
 
 Restriction: all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
 
-Search(x):
+---
+##Feb 9 - Tutorial
+* [Slides](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial5.pdf)
+
+----
+
+##Feb 10
+
+###2-3 Trees ct'd
+
+#####Search(x):
 - almost same as in BST
 - compare x with the key (root)
 - if found, break
 - else find the unique subtree where we should look for x
 - if subtree empty, return (not found)
-
---
-Feb 10
-
-Searching in a 2-3 tree
-- compare x with keys at current node
-- if key found, break
-- else find unique subtree where x might be
-- if subtree is empty, break
 - else recurse on the root of the subtree
+
 Running time O(height)
 
-Insertion
+#####Insertion
 - First, we search to find the lowest internal node where the new key belongs.
 - If the node has only 1 KVP, just add the new one to make a 2-node.
 - Otherwise, order the three keys as a < b < c.
 - Split the node into two 1-nodes, containing a and c,
 - (recursively) insert b into the parent along with the new link
 
-Deletion
+(see examples in the lecture and tutorial slides)
+
+#####Deletion
 - As with BSTs and AVL trees, we first swap the KVP with its successor, so that we always delete from a leaf.
+
 Say we’re deleting KVP x from a node V : 
 - If V is a 2-node, just delete x.
 - ElseIf V has a 2-node immediate sibling U, perform a transfer:
-	Put the “intermediate” KVP (key that differentates between two children) in the parent between V and U into V , and replace it with the adjacent KVP from U.
-	This is kinda like a rotation
-- Otherwise, merge V, immediate sibling U, and the corresponding KVP from parent into a node (at the same level), then recurisvely "fix" parent - if parent is an empty root, just delete
+ - Put the “intermediate” KVP (key that differentates between two children) in the parent between V and U into V , and replace it with the adjacent KVP from U.
+ - This is kinda like a rotation
+- Otherwise:
+ - merge immediate 1-node sibling U, and the corresponding KVP from parent into a node where V was, then recurisvely "fix" parent by performing delete on it - if parent is an empty root, just remove it
+
+(this is tricky to understand - review lecture and tutorial example slides)
 
 runtime deletion?
-O(height)
-n - number of item (KVP) - not nodes!
+- O(height)
+- note that n is number of items (KVP) - NOT nodes!
 
-Let T be a 2-3 tree of fixed height h - what is min number of KVP's that T can contain?
-It would be a binary tree 
-	showed in assignment that h <= log(n+1) -1
-lower bound for h? each node has three children - ternary tree
-	2*3^0 kvp on level 1 ... 2*3^h on level h+1
-	take sum and get n <= 3^(h+1) - 1 --- h >= log3(n+1) -1
-so both upper and lower bound are logn
+#####Let T be a 2-3 tree of fixed height h - what is min number of KVP's that T can contain?
+- It would be a binary tree 
+ - we showed in assignment that h <= log(n+1) -1
+- lower bound for h? each node has three children - ternary tree
+ - 2*3^0 kvp on level 1 ... 2*3^h on level h+1
+ - take sum and get n <= 3^(h+1) - 1 --- h >= log3(n+1) -1
+- so both upper and lower bound are logn
 
-***(a,b) trees***
+###(a,b) trees
+
 The 2-3 Tree is a specific type of (a, b)-tree:
+
 An (a, b)-tree of order M is a search tree satisfying:
-Each internal node has at least a children, **unless it is the root**. The root has at least 2 children
-Each internal node has at most b children.
-If a node has k children, then it stores k-1 key-value pairs (KVPs). Leaves store no keys and are at the same level.
+- Each internal node has at least a children, **unless it is the root**. The root has at least 2 children
+- Each internal node has at most b children.
+- If a node has k children, then it stores k-1 key-value pairs (KVPs). Leaves store no keys and are at the same level.
 
-a B-tree of order M is a (dM/2e,M)-tree. A 2-3 tree has M = 3
-height of tree with n nodes is theta((log n)/(log M))
+a B-tree of order M is a (ciel(M/2),M)-tree. A 2-3 tree has M = 3
 
-a-b trees have h in O(log_a n) and omega(log_b n)
-search in a-b tree - O(b loga n) -- b-1 KVPs in one node, log_a n height
-using arrays for KVPs of a node, the use binary search - now takes O(logb * log_a n)
+height
+- height of tree with n nodes is theta((log n)/(log M)) 
+- we can find this similarily to how we've found bounds for heights of trees previously.
+- a-b trees have h ∈ O(log_a n) and ∈ omega(log_b n)
+
+search in a-b tree 
+- b-1 KVPs in one node, log_a n height
+- O(b loga n) 
+- optimize using arrays for KVPs of a node, then use binary search - now takes O(logb * log_a n)
 
 
-***memory***
-when using big data, it may not fitin the internal memory -> use external memory
+###Memory
 
-pyramid - fastest most expensive at top, slowest least expensive at bottom
-MAIN (primary,internal memory)
-- CPU register
-- Cache L1
-- Cache L2
-- Cache L3
-- RAM
-external memory
-- hard drive
-- cloud storage
+When using big data, it may not fit in the internal memory -> use external memory
 
-Tree-based data structures have poor memory locality: If an operation accesses m nodes, then it must access m spaced-out memory locations.
-Observation: Accessing a single location in external memory (e.g. hard disk) automatically loads a whole block (or “page”).
-In an AVL tree or 2-3 tree, theta(log n) pages are loaded in the worst case. If M is small enough so an M-node fits into a single page,
-then a B-tree of order M only loads theta((log n)/(log M)) pages. This can result in a huge savings: memory access is often the largest time cost in a computation.
+Pyramid - fastest + most expensive at top, slowest + least expensive at bottom
+
+	MAIN (primary,internal memory)
+	 - CPU register
+	 - Cache L1
+	 - Cache L2
+	 - Cache L3
+	 - RAM
+	external memory
+	 - hard drive
+	 - cloud storage
 
 External memory model: transfers of data between internal memory layers are ignored
+
 Our goal: minimize the number of disk transfer from external to internal memory
 
+- Tree-based data structures have poor memory locality: If an operation accesses m nodes, then it must access m spaced-out memory locations.
+- Observation: Accessing a single location in external memory (e.g. hard disk) automatically loads a whole block (or “page”).
+- In an AVL tree or 2-3 tree, theta(log n) pages are loaded in the worst case. If M is small enough so an M-node fits into a single page, then a B-tree of order M only loads theta((log n)/(log M)) pages. This can result in a huge savings: memory access is often the largest time cost in a computation.
+
+### B-tree variations
+- Max size M: Permitting one additional KVP in each node - allows insert and delete to avoid backtracking via pre-emptive splitting and pre-emptive merging.
+- Red-black trees: Identical to a B-tree with minsize 1 and maxsize 3,but each 2-node or 3-node is represented by 2 or 3 binary nodes, and each node holds a “color” value of red or black.
+- B+-trees: All KVPs are stored at the leaves (interior nodes just have keys), and the leaves are linked sequentially.
 
 --
-Feb 12
+##Feb 12
 
 B-tree requires O(logn/logB) disk transfers
+
 B-tree of order M is a ciel(M/2) - M tree
 - let B be the size of a block
 - choose M s.t. a node fits into a single disk block
 - search O(logn/log(M/2))
 
 Theorem: In any comparison based dictioanary ADT, search(k) is done in omega(logn)
-Proof: decision tree
-any binary tree (yes, no branches) with N leaves has the height logN
-the decision tree has at least n+1 leaves then the height >= log(n+1)
 
-consider a dictionary with n KVPs - if the keys are exactly 0, ..., n-1
-then the item (K1, V1) wll be stored in A[K1]
-Search(x) - x is A[x]
-now search/insert/delete is theta(1)
+	Proof: decision tree
+	any binary tree (yes, no branches) with N leaves has the height logN
+	the decision tree has at least n+1 leaves then the height >= log(n+1)
+
+####consider a dictionary with n KVPs - if the keys are exactly 0, ..., n-1
+- then the item (K1, V1) wll be stored in A[K1]
+- Search(x) - x is A[x]
+- now search/insert/delete is theta(1)
 
 Disadvantages:
 - huge array
 - initialization (slow)
--  only for integer keys
+- only for integer keys
 
-***Hashing***
-U - universe of n keys
-find a mapping of U in {0, ..., M-1} (natural numbers)
-then we have an array with indices 0 to M-1
-we're putting our keys into a smaller array of size M
-
-Hacher in french means cut into small pieces
+###Hashing
+- (Hacher in french means cut into small pieces)
+- U - universe of n keys
+- find a mapping of U in {0, ..., M-1} (natural numbers)
+- then we have an array with indices 0 to M-1
+- we're putting our keys into a smaller array of size M
 
 e.g. hash function - h(k) = k mod 9
-e.g. 18, 11, 5, 16, 31, 9
-Insert(18) - at index h(18) = 0
-Insert(11) - index 2
+
+	18, 11, 5, 16, 31, 9
+	Insert(18) - at index h(18) = 0
+	Insert(11) - index 2
 
 Problem: 
-multiple items land on the same slot in the hashing table T (collision)
+- multiple items land on the same slot in the hashing table T (collision)
+
 To solve problem:
+
 1. chaining - we allow multiple item on a single spot in T (linked list) (M<=n)
 2. open addessing - if the slot is occupied, move to next slot in T (M>=n)
 
-with chaining:
+####chaining:
 - h(k) is theta(1)
 - Worst-case: all KVPs are in same slot in T - fix by choosing a better hash function
 - Ideally, h is a uniform function
-	P(k is T[h(k)]) = 1/M
-	Think of h as a random uniform function over {0, ..., M-1}
-	#items/#slots in T = n/M = alpha - load factor
-	choose M then choose h, trying to keep alpha>=1 small
-- Search(x)   O(1+alpha)
+ - P(k is T[h(k)]) = 1/M
+ - Think of h as a random uniform function over {0, ..., M-1}
+- (#items)/(#slots in T) = n/M = the symbol alpha = load factor
+ - choose M then choose h, trying to keep alpha>=1 small
+- Search(x) is O(1+alpha)
 - Insert is theta(1)
-- Delete(search+delete) = O(1+alpha)
+- Delete(search+delete) is O(1+alpha)
 
-***Open addressing***
-each slot of T has at most one KVP
-Search(x) in this case will try to find the *probe sequence*
-	<h(k,0), h(k,1), h(k,2), ... , h(k, M-1)>
-	if h(k) is not X, then search h(k)+1
-	you keep looking down the line until you find what you're looking for
-	if you find empty place, break - you haven't found it
+####Open addressing
+- each slot of T has at most one KVP
+
+Search(x) in this case will try to find the *probe sequence* <h(k,0), h(k,1), h(k,2), ... , h(k, M-1)>
+- if h(k) is not X, then search h(k)+1
+- you keep looking down the line until you find the key you're looking for
+- if you find empty place, break - you haven't found it
+
 Deletion:
-	problem - neeed to distinguish between empty spot and deleted spot, so that search still works
-	user a marker for deleted items
-	seach(x): search through T[(h(k,0)], 1, ... M-1 until x found or empty (unmarked) slo found
-	Insert(x): search for empty (marked or unmarked) among T ...
-	for open addressing alpha <= 1 (M>=n)
-	Run-time for search O(M)
+- problem: neeed to distinguish between empty spot and deleted spot, so that search still works
+- solution: user a marker for deleted items
+
+improved Seach(x): 
+- search through T[(h(k,0)], 1, ... M-1 until x found or empty (unmarked) found
+
+Insert(x): search for empty (marked or unmarked) among T[(h(k,0)], T[(h(k,1)], ...
+- for open addressing alpha <= 1 (M>=n)
+- Run-time for search O(M)
+
+----
+##Feb 24
+
+Recall: 
+- Searching in a comparison based model is omega(logn)
+- We want to search faster in dictionaries - use hashing
+- Collisions - 2 or more items land in the same slot
+- Open hashing: the item can "go out" of the hash table (e.g. Chaining)
+- Closed hashing: items remain in the hash table (e.g. Open Addressing)
+
+Chaining - worst case O(n), average O(alpha) for search - Insert is theta(1) - Delete is O(d)
+
+####Problem with Open Addressing is **clustering** 
+
+clustering - a bunch of values in the array adjacent to each other
+- large clusters grow faster than small clusters (because we're more likely to land there)
+
+idea: change the jump size p>1 
+- if h(k,0) is occupied, jump p bins 
+- h(k, i) = h(k, i-1) + p
+- does not improve at all - will still get clusters
+
+Quadratic hashing?
+- h(k, i) = h(k) + c1*i + c2*i^2 for positive cs
+- jumps around more, but still not great
+
+####Double Hashing (rehashing)
+- h(k,i) = h1(k) + i*h2(k) mod M
+- the two hash functions are indepdent
+- h1 determines the initial bin, h2 determines the jump size
+- search, delete, insert, work same as linear probing (open addressing)
+
+e.g.
+- M=10 -- h1(k) = k mod 10 -- h2(k) = 7 - kmod7
+- h(k,i) = h1(k) + ih2(k)   mod10
+- insert some elements:
+ - h(89,0)=h1(89)=9
+ - h(18,0)=8
+ - h(49,0)=9 - collison
+ - h(49,1)=6
+ - h(8,0)=8 collision
+ - h(8,1)=4
+ - h(28,0) collision
+ - h(28,1)=5
+ - etc
+ 
+Problem - if we end up with a loop where we're skipping over empty spaces 
+- we fix this by taking 2M and finding nex prime, then making jump size and M primes between them
+- ??????????????
+
+####Cuckoo Hashing
+
+- h1, h2 are independent hash functions
+- insert - k is inserted into h1(k) - if it's later kicked out it'll go to h2(k) - if it's kicked out again goes back to h1(k0
+- this makes it easier to search!
 
 --- 
 ##Feb 26
@@ -1430,3 +1526,6 @@ Don't really wanna copy from slides today
 
 Similar to B-trees, for hashing, when hash table is too big, use extendable hashing
 Extendable Hash Table order d is a directory of 2^d references (slots) to blocks (pages) that contain in total up to M items with keys. The items in each block have the first k bits equal and he diretory contains 2^(d-k) pointers to the block
+
+
+--- and then I fell asleep, but we were just using slides ---
