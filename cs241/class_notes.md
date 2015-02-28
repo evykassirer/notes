@@ -351,7 +351,7 @@ c++:
 	int sum = 0;
 	for (int i=13; i!=0; i-=1) { sum+=1; }
 
-What if we can't use loop constructs? - goto!
+What if we cannot use loop constructs? - goto!
 
 	int sum=0;
 	int i=13;
@@ -378,10 +378,12 @@ Assembly:
 
 
 ----
-Jan 15
+##Jan 15
 
 Last Time: Assembly Programming
+
 sum integers 1..13, store in $3 and return
+
 	add $3, $0, $0
 	lis $2
 	.word 13
@@ -393,86 +395,91 @@ sum integers 1..13, store in $3 and return
 	bne $2, $0, -5 (loop!)
 	jr $31
 
-***Programs with RAM***
-
-lw is the load word instruction
-	loads a word from RAM into a register.
-	syntax: lw $a, i($b)
-	loads the word at MEM[$b+i] into $a
-	$b is base register, i is offset
-sw is the store word instruction
-	stores a word from register into RAM.
-	syntax: sw $a, i($b)
-	stores the word at $a into the memory location MEM[$b+i]
+###Programs with RAM
+- lw is the load word instruction
+ - loads a word from RAM into a register.
+ - syntax: lw $a, i($b)
+ - loads the word at MEM[$b+i] into $a
+ - $b is base register, i is offset
+- sw is the store word instruction
+ - stores a word from register into RAM.
+ - syntax: sw $a, i($b)
+ - stores the word at $a into the memory location MEM[$b+i]
 
 Example: $1 holds the address of an array, and $2 holds the length of the array. Retrieve the element with index 5, and store it in register $3.
+
 	lw $3, 20($1)  ; 5*4 = 20
 	jr $31
 
-Let's do it again, but we will do it more abstractly.
-In this case, the index is not known. We need:
-mult: the multiply instruction. 
-	Since multiplying two 32-bit numbers might result in a 64-bit number, the results are stored in two special registers hi and lo.
-	syntax: mult $a, $b
-div: the divide instruction
-	The quotient is stroed in lo, and the remainder is stored in hi.
-	syntax: div $a, $b
-mfhi and mflo: move from HI and move from LO instructions
-	move the values from hi or lo respectively into a given register.
-	syntax: mfhi $d, mflo $d
+Now we do it again, but more abstractly. In this case, the index is not known. We need:
+- mult: the multiply instruction. 
+ - Since multiplying two 32-bit numbers might result in a 64-bit number, the results are stored in two special registers hi and lo.
+ - syntax: mult $a, $b
+- div: the divide instruction
+ - The quotient is stroed in lo, and the remainder is stored in hi.
+ - syntax: div $a, $b
+- mfhi and mflo: move from HI and move from LO instructions
+ - move the values from hi or lo respectively into a given register.
+ - syntax: mfhi $d, mflo $d
 
 assembly code:
+
 	lis $5  ; load the arbitrary index into $5
 	.word ___
 	lis $4  ; load the value 4, the size of a word, into $4
 	.word 4
-	mult $5, $4  ; this is the offset to the array's address
+	mult $5, $4  ; this is the offset to the array address
 	mflo $5  ; move this offset value into register 5
 	add $5, $1, $5  ; add the offset to the address of the array, which was stored at $1
 	lw $3, 0($5)  ; load from memory the address we need, into $3
 	jr $31
 
-
-Labels: revisiting the loop
-	recall the loop we had (Sum the integers 1..13, store in $3, then return) the lis command was within our loop, which could be moved outside.
-	This is fine, but now the bne at the end has an improper immediate (should be -3). In nester loops, this is a nightmare. This is because we used explicit branching, adding/removing instructions means we must change branch offsets.
-	Instead, the assembler allows labeled instructions:
-		label: instruction
-	The assembler associates that name (label) with the instruction
-	when the assembler sees a label, it computes the difference between PC and top, in terms of words: 
-		label-PC / 4  = 0x14 -0x20 / 4 = -0xC/4 = -12/4 = -3
+###Labels: revisiting the loop
+- recall the loop we had (Sum the integers 1..13, store in $3, then return) 
+- the lis command was within our loop, which could be moved outside.
+- This is fine, but now the bne at the end has an improper immediate (should be -3)
+- In nester loops, this is a nightmare. This is because we used explicit branching, adding/removing instructions means we must change branch offsets.
+- Instead, the assembler allows labeled instructions:
+ - syntax is   label: instruction
+ - The assembler associates that name (label) with the instruction
+- when the assembler sees a label, it computes the difference between PC and top, in terms of words: 
+ - e.g. above: label-PC / 4  = 0x14 -0x20 / 4 = -0xC/4 = -12/4 = -3
 
 Now we can rewrite the loop example with a label:
+
 	0x00 add $3, $0, $0
 	0x04 lis $2
 	0x08 .word 13
 	0x0c lis $1
 	0x10 .word 1
-	    top:  ; the value of `top` is 0x14
+	     top:  ; the value of `top` is 0x14
 	0x14 add $3, $3, $2
 	0x18 sub $2, $2, $1
 	0x1c bne $2, $0, top  ; `top` is provided, rather than an explicit offset
 	0x20 jr $31
 
-***Procedures***
-Procedures in assembly allows us to reuse code.
-We have two problems to solve:
-1) Call and return: How do we transfer control into and out of the procedure, parameter passing, etc.
-2) Registers: How do we make sure that procedures do not overwrite important data?
+###Procedures
+Procedures (functions) in assembly allows us to reuse code.
 
-Let's start with the second problem.
-We could reserve registers for the prodcedure f, and some for mainline with no overlap, but if procedures call other procedures or themselves, we run out of registers.
-Instead, we will allow procedures to do whatever they want with registers, as long as it puts them back to their original values on exit.
-This we need to use RAM. How do we keep procedures from using the same RAM?
-To prevent procedures from using the same RAM addresses, we use a stack pointer. The stack pointer is located at register $30, which is the other restricted register that we previously discussed.
-Essentially, we allocate memory from the top or bottom of free RAM, and somehow keep track of what RAM isn't used.
-The machine helps us out: $30 is initialized (by the lowader) to just past the last word of memory.
-We use $30 as a "bookmark" to separate used and unused RAM, if we allocate from the bottom.
-We use RAM like a stack, moving up on function calls and down on returns.
-Our strategy: each procedure pushes the registers it will use onto the stack and pops the origin values from the stack when finished.
-$30, the stack pointer, contains the address of the top of the stack.
+We have two problems to solve:
+
+1. Call and return: How do we transfer control into and out of the procedure, parameter passing, etc.
+2. Registers: How do we make sure that procedures do not overwrite important data?
+
+We will start with the second problem.
+- We could reserve registers for the prodcedure f, and some for mainline with no overlap, but if procedures call other procedures or themselves, we run out of registers.
+- Instead, we will allow procedures to do whatever they want with registers, as long as it puts them back to their original values on exit.
+- Thus we need to use RAM. How do we keep procedures from using the same RAM?
+- To prevent procedures from using the same RAM addresses, we use a stack pointer. The stack pointer is located at register $30, which is the other restricted register that we previously discussed.
+- Essentially, we allocate memory from the top or bottom of free RAM, and somehow keep track of what RAM is not used.
+- The machine helps us out: $30 is initialized (by the lowader) to just past the last word of memory.
+- We use $30 as a "bookmark" to separate used and unused RAM, if we allocate from the bottom.
+- We use RAM like a stack, moving up on function calls and down on returns.
+
+Our strategy: each procedure pushes the registers it will use onto the stack and pops the origin values from the stack when finished. $30, the stack pointer, contains the address of the top of the stack.
 
 Template for Procedures:
+
 	Push registers function will modify onto the stack.
 	Decrement stack pointer ($30) accordingly.
 	Execute function, which should only change the saved registers.
@@ -481,28 +488,30 @@ Template for Procedures:
 	Return.
 
 Example: Suppose a function f only uses $2 and $3.
-f: 
-    ; store registers we'll be using into memory
-    sw $2, -4($30)
-    sw $3, -8($30)
 
-    ; decrement stack pointer
-    lis $3
-    .word 8
-    sub $30, $30, $3
+	f: 
+	    ; store registers we will be using into memory
+	    sw $2, -4($30)
+	    sw $3, -8($30)
+	
+	    ; decrement stack pointer
+	    lis $3
+	    .word 8
+	    sub $30, $30, $3
+	
+	    ; FUNCTION BODY GOES HERE
+	    ; can use $2, $3
+	    ; ...
+	
+	    ; pop registers off stack
+	    ; move stack pointer back, load stored registers, return
+	    add $30, $30, $3
+	    lw $3, -8($30)
+	    lw $2, -4 ($30)
+	    jr $31
 
-    ; FUNCTION BODY GOES HERE
-    ; can use $2, $3
-    ; ...
+Why do we save the registers and ***then*** adjust the stack pointer?
 
-    ; pop registers off stack
-    ; move stack pointer back, load stored registers, return
-    add $30, $30, $3
-    lw $3, -8($30)
-    lw $2, -4 ($30)
-    jr $31
-
-Why do we save the registers and then adjust the stack pointer?
 Because once the registers are saved, we can use one to hold the stack adjustment vlaue.
 
 
