@@ -1422,3 +1422,11 @@ Deletion:
 	Insert(x): search for empty (marked or unmarked) among T ...
 	for open addressing alpha <= 1 (M>=n)
 	Run-time for search O(M)
+
+--- 
+##Feb 26
+
+Don't really wanna copy from slides today
+
+Similar to B-trees, for hashing, when hash table is too big, use extendable hashing
+Extendable Hash Table order d is a directory of 2^d references (slots) to blocks (pages) that contain in total up to M items with keys. The items in each block have the first k bits equal and he diretory contains 2^(d-k) pointers to the block
