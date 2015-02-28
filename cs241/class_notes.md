@@ -152,120 +152,116 @@ But wait! We don't even know if it is a number
 
 ----
 
-
-Jan 8
+##Jan 8
 
 what does 11001001 represent? 
-	number: unisnged, sign-magnitude, two's compliment
-	it could be a character
-		ASCII
-		- bit representation - so we don't know what character that is - we'll be using words still but with first bit 0
-		- what chracter is 01001001?   I
-	could be address
-	random flags
-	instruction, or part of one (our instructions are 32-bit)
-	we can't really know. we need to remember our intent when we stored the byte
+- number: unisnged, sign-magnitude, two's compliment
+- it could be a character
+ - ASCII
+ - bit representation - so we don't know what character that is - we'll be using words still but with first bit 0
+ - what chracter is 01001001?   I
+- could be address
+- random flags
+- instruction, or part of one (our instructions are 32-bit)
+- we can't really know. we need to remember our intent when we stored the byte
 
+###Machine Language - MIPS
+- What does an instruction look like?
+- What instructions are there?
+- We will use MIPS (simplified) : 18 different 32-bit instruction types
 
-*** Machine Language - MIPS ***
-What does an instruction look like?
-Waht instructions are there?
-We will use MIPS (simplified) : 18 different 32-bit instruction types
+###The hardware and datapath
 
-
-				CPU 								  Main Memory (RAM)
- ---------------------------------------				 __________
-|                      registers  	 	|				|          | 0x000
-|     --------         _____       	 	|				|          | 0x004
-|    |  ALU   |       |  $0 |   [HI]   	|				|          | 0x008
-|    |        |        -----    [LO]  	|				|          | 0x00C
-|     ________        |  $1 |      		|				|          | 0x010
-|                      -----      [MAR]	| <=== BUS ===> |		   |   .
-|    --------         | ... |     [MDR]	|				|          |   .
-|   | control|         -----       		|   	        |		   |   .
-|   | unit   |        | $31 |      		|				|          |
-|   |        |         -----       		|				|          |
-|    --------                      		|				|          |                    
-| 					    [PC]			|				|		   |
-| 						[IR]			|				|		   |
-| 										|				|		   |
- --------------------------------------- 				 ----------
+	               CPU                                    Main Memory (RAM)
+	 ---------------------------------------                 __________
+	|                      registers        |               |          | 0x000
+	|     --------         _____            |               |          | 0x004
+	|    |  ALU   |       |  $0 |   [HI]    |               |          | 0x008
+	|    |        |        -----    [LO]    |               |          | 0x00C
+	|     ________        |  $1 |           |               |          | 0x010
+	|                      -----      [MAR] | <=== BUS ===> |          |   .
+	|    --------         | ... |     [MDR] |               |          |   .
+	|   | control|         -----            |               |          |   .
+	|   | unit   |        | $31 |           |               |          |
+	|   |        |         -----            |               |          |
+	|    --------                           |               |          |                    
+	|               [PC]                    |               |          |
+	|               [IR]                    |               |          |
+	|                                       |               |          |
+	 ---------------------------------------                 ----------
 
 
 CPU
-	The brains of the computer
-	1) Control unit: 
-		Fetches and decodes instructions. 
-		Coordinates iput and output. 
-		Dispatches to other parts of the computer to carry them output
-	2) ALU: Arithmetic and Logic Unit
-		Responsible for math, logical operations and comparisons
+- The brains of the computer
+- Control unit: 
+ - Fetches and decodes instructions. 
+ - Coordinates iput and output. 
+ - Dispatches to other parts of the computer to carry them output
+- ALU: Arithmetic and Logic Unit
+ - Responsible for math, logical operations and comparisons
 
 Memory:
+
 	FAST ------------------------------------------------------------------------------- SLOW
-   		Registers   	Cache    	Main Memory (RAM)    	Secondary storage (hard disk)
-   		    *							   *					(tape, network, ...)			
+   	   Registers    Cache            Main Memory (RAM)       Secondary storage (hard disk)
+   	     *                                  *                  (tape, network, ...)	
 
 MIPS 32 General purpose registers
-$0 is always 0
-$30 and $31 are special by convention
-
-
-An example register operation
-"Add the contents of registers s and t, and store the result in d"
-represented by $d <- $s + $t
-32 registers, 5 bits per register (2^5)
-3 registers => 15 bits set aside for registers.
-17 bits leftover to encode the operation
+- $0 is always 0
+- $30 and $31 are special by convention
+- An example register operation
+ - "Add the contents of registers s and t, and store the result in d"
+ - represented by $d <- $s + $t
+- 32 registers, 5 bits per register (2^5)
+- 3 registers for an instruction => 15 bits set aside for registers => 17 bits leftover to encode the operation
 
 multiplication gives 64 bit result - first 32 bits are in HI and second 32 bits are in LO
-	HI and LO store results but you can't write to them directly - there are ops to move values out of high and low
-	HI can also store remainder from division and LO quotient 
+- HI and LO store results but you can't write to them directly - there are ops to move values out of high and low
+- HI can also store remainder from division and LO quotient 
 
 RAM - Random Access Memory
-	This is the main memory of the computer
-	This is a large amount of memory stored away from the CPU
-	The data travels between the CPU and RAM and the bus We think of the bus as 64 wires connecting the two components.
-	The RAM is just a big array of n bytes n ~ 10^9 (a Gigabyte). Each byte has an address, running from to n-1, but we group
-	everything on the order of a word, so we will use addresses divisible by 4, and each 4-byte block is a word. Words have address 
-	0x0, 0x4, 0x8, 0xC, 0x10, 0x14, 0x18, 0x1C, 0x20 etc.
+- This is the main memory of the computer
+- This is a large amount of memory stored away from the CPU
+- The data travels between the CPU and RAM and the bus 
+ - We think of the bus as 64 wires connecting the two components.
+- The RAM is just a big array of n bytes n ~ 10^9 (a Gigabyte). 
+- Each byte has an address, running from to n-1, but we group everything on the order of a word, so we will use addresses divisible by 4, and each 4-byte block is a word. 
+ - Words have address 0x0, 0x4, 0x8, 0xC, 0x10, 0x14, 0x18, 0x1C, 0x20 etc.
 
 Moving data between RAM and CPU
-	Load: 
-		Transfer a word from a specified address to a specified register.
-		The dsired address goes into the MAR (memory address register), then goes
-		out onto the bus. When it arrives at the RAM, the associated data is sent
-		back on the bus and goes into the MDR (memory data register). THe contents
-		of MDR are moved to the destination register.
-	Store: exactly like load, but in reverse
+- Load: 
+ - Transfer a word from a specified address to a specified register.
+ - The desired address goes into the MAR (memory address register), then goes out onto the bus. 
+ - When it arrives at the RAM, the associated data is sent back on the bus and goes into the MDR (memory data register). 
+ - The contents of MDR are moved to the destination register.
+- Store: exactly like load, but in reverse
 
 
-*** Programs ***
-How does the computer know which words contain instructions and which contain data?
-Surprise! It doesn't. 
-There is a special register called PC (program counter) which holds the address of the NEXT instruction to run. 
-By convention, we guarantee that some fixed address (say 0) contains code and then initialize PC to 0.
-Then the control unit runs the fetch-execute cycle.
+###Programs
+- How does the computer know which words contain instructions and which contain data? Surprise! It doesn't. 
+- There is a special register called PC (program counter) which holds the address of the NEXT instruction to run. 
+- By convention, we guarantee that some fixed address (say 0) contains code and then initialize PC to 0.
+- Then the control unit runs the fetch-execute cycle.
 
-PC <- 0
-loop
-	IR <- MEM[PC] // instruction counter (register)
-	PC <- PC+4
-	decode and execute instruction in IR
-end loop
-(this program never ends)
+fetch-execute cycle:
 
-This is a program to execute your program.
+	PC <- 0
+	loop
+		IR <- MEM[PC] // instruction counter (register)
+		PC <- PC+4
+		decode and execute instruction in IR
+	end loop
+	(this program never ends, but gives you the idea)
+
 How does a program get executed? 
-	There is a program called the loader, which puts the program in memory and sets PC
-	to the address of the first instruction in the program. 
+- There is a program called the loader, which puts the program in memory and sets PC to the address of the first instruction in the program. 
+
 What happens when the program ends?
-	We need to return control to the loader; PC is set to the address of the next instruction in the loader.
-	Which instruction is that? $31 will always store the correct address to return to, so we just need to set PC to $31
-	We will use the 'jump register' command (jr) to update the value of the PC.
-	Note the use of $31 is convention.
-
-
+- We need to return control to the loader; PC is set to the address of the next instruction in the loader.
+- Which instruction is that? 
+ - $31 will always store the correct address to return to, so we just need to set PC to $31
+ - Note the use of $31 is convention.
+- We will use the 'jump register' command (jr) to update the value of the PC.
 
 ----
 Jan 13
