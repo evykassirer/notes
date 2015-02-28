@@ -264,98 +264,112 @@ What happens when the program ends?
 - We will use the 'jump register' command (jr) to update the value of the PC.
 
 ----
-Jan 13
+##Jan 13
 
 Last time:
-	- hardware architecture
-	- machine language
-	- main memory vs registers
-	- 32 general purpose registers
-	- $0 always 0
-	- $31 return address - on program start set to return address of loader, our programs shoudl always end by jumping to that return address ($31) using the jump register command (jr)
-	- $30 ?? (we don't know yet)
-	- PC - program counter - holds the address of the next isntruction to execute
+- hardware architecture
+- machine language
+- main memory vs registers
+- 32 general purpose registers
+- $0 always 0
+- $31 return address - on program start set to return address of loader, our programs should always end by jumping to that return address ($31) using the jump register command (jr)
+- $30 is ?? (we do not know yet)
+- PC - program counter - holds the address of the next isntruction to execute
 
 Example: add 2 values in registers 5 and 7, storing the result in register 3, then return
-assembly: 
-	add $3 $5 $7 	0x0000
-	jr $31 			0x0004
-add
-	0000 00ss ssst tttt dddd d000 0010 0000 
-	0000 0000 1010 0111 0001 1000 0010 0000
-	0x00a71820
-jr 
-	0000 00ss sss0 0000 0000 0000 0000 1000
-	0000 0011 1110 0000 0000 0000 0000 1000
-	0x03e00008
+
+	assembly: 
+		add $3 $5 $7 0x0000
+		jr $31 0x0004
+	assembling add instruction:
+		0000 00ss ssst tttt dddd d000 0010 0000 
+		0000 0000 1010 0111 0001 1000 0010 0000
+		0x00a71820
+	assembling jr instruction: 
+		0000 00ss sss0 0000 0000 0000 0000 1000
+		0000 0011 1110 0000 0000 0000 0000 1000
+		0x03e00008
 
 Example: add 42 and 52, store sum in $3 and return the result in register 3, then return.
-	lis $5 			0x000 		0000 0000 0000 0000 0010 1000 0001 0100 	0x00002814
-	.word 42 		0x000 		0000 0000 0000 0000 0000 0000 0010 1010 	0x0000002a
-	lis $7 			0x008 		0000 0000 0000 0000 0011 1000 0001 0100 	0x00003814
-	.word 52    	0x00C 		0000 0000 0000 0000 0000 0000 0011 0100 	0x00000034
-	add $3 $5 $7 	0x010 		0000 0000 1010 0111 0001 1000 0010 0000 	0x00a71820
-	jr $31  		0x014		0000 0011 1110 0000 0000 0000 0000 1000 	0x03e00008
+
+	lis $5         0x000       0000 0000 0000 0000 0010 1000 0001 0100       0x00002814
+	.word 42       0x000       0000 0000 0000 0000 0000 0000 0010 1010       0x0000002a
+	lis $7         0x008       0000 0000 0000 0000 0011 1000 0001 0100       0x00003814
+	.word 52       0x00C       0000 0000 0000 0000 0000 0000 0011 0100       0x00000034
+	add $3 $5 $7   0x010       0000 0000 1010 0111 0001 1000 0010 0000       0x00a71820
+	jr $31         0x014       0000 0011 1110 0000 0000 0000 0000 1000       0x03e00008
 
 xxd -cols 4 add1.mips
-	will show hex code
+- this command will show hex code
+
 xxd -cols 4 -bits add1.mips
-	shows binary
+- adding the bits option shows binary
 
 the .mips file size is # instructions * 4 bytes
 
+###Assembly Language
+- We will begin writing our programs not in binary and hex, but with simple mnemonics.
+- There is a translation back to the required binary (assembler). Each assembly instruction corresponds to one machine instruction (almost).
 
-***Assembly Language***
-We wil begin writing ourprograms not in binary and hex, but with simple mnemonics.
-There is a translation back to the required binary (assembler). Each assembly instruction corresponds to one machine instruction (almost).
-We will revisit the preivous example
-	lis $5 			($5<-42)
-	.word 42 		(not an instruction, a directive that says the next word in the binary should be literally 42)
-	lis $7 			($7<-52)
+We will revisit the previous example
+
+	lis $5              ($5<-42)
+	.word 42            (not an instruction, a directive that says the next word 
+	                     in the binary should be literally 42)
+	lis $7              ($7<-52)
 	.word 52
-	add $3 $5 $7 	($3 <- $5+$7)
-	jr $31 			(pc <-$31)
+	add $3 $5 $7        ($3 <- $5+$7)
+	jr $31              (pc <-$31)
 
-***Branching***
-beq: go somewhere else if two registers are equal
-bne: go somewhere else if two registers are not equal
-both instruction increment the PC by a given number of words (forward or backward). 
-What is the value of PC before the branch is executed? (it's already at the next instructiion! So branch 1 forward skips an instruction)
-Based on fetch-execute cycle, PC has already been incremented to point at the next instruction before the instruction has been decoded and executed.
-Hence, offset is relative to the next instruction.
+####Branching
+- beq: go somewhere else if two registers are equal
+- bne: go somewhere else if two registers are not equal
+- both instruction increment the PC by a given number of words (forward or backward). 
+- What is the value of PC before the branch is executed? 
+ - Based on fetch-execute cycle, PC has already been incremented to point at the next instruction before the instruction has been decoded and executed.
+ - Hence, offset is relative to the next instruction.
 
-slt - set less than. slt $a $b $c -> $a<-1 if $b < $c, 0 otherwise
+####Another command:
+slt - set less than
+- slt $a $b $c 
+- $a<-1 if $b < $c, $a set to 0 otherwise
 
-Example: compute the absolute value of $1, store itin $1 and return. 
-To do this we need to use branches and jumps to modify the PC
-Let's start with the c++ version:
-	if (x < 0) x=-x;
+**Example**: compute the absolute value of $1, store it in $1 and return. 
+- To do this we need to use branches and jumps to modify the PC
+- how about we start with the c++ version: if (x < 0) x=-x;
+
 assembly:
+
 	slt $2, $1, $0  ; (compare $1 < 0)
 	beq $2 $0 1000  ; (if false, skip over)
 	sub $1 $0 $1 	; (negate $1)
 	jr $31 			; (return)
 
-Example: sum the integers 1..13, store in $3 and return
+**Example**: sum the integers 1..13, store in $3 and return
 c++:
+
 	int sum = 0;
 	for (int i=13; i!=0; i-=1) { sum+=1; }
+
 What if we can't use loop constructs? - goto!
+
 	int sum=0;
 	int i=13;
 	top:
 		sum+=i;
 		i-=1;
 		if(i!=0) goto top;
+
 Assembly:
+
 	add $3 $0 $0   ($3 <- 0)
-	lis $2 			($2 <- 13)
+	lis $2 	       ($2 <- 13)
 	.word 13
-	add $3 $3 $2 	($3 += $2)
-	lis $1 			($1 <- 1)
+	add $3 $3 $2   ($3 += $2)
+	lis $1 	       ($1 <- 1)
 	.word 1 		
 	sub $2, $2, $1  ($2 -= $1)
- 	bne $2 $0 -5 	(loops! why 5?)
+ 	bne $2 $0 -5    (loops! why 5?)
  	jr $31
 
  Branch offset -5 because PC is pointing at next instruction.
