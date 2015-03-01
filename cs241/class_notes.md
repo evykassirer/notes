@@ -1184,14 +1184,14 @@ e.g. from last time L = {car, cat, cow}
 
 An abstraction of this program:
 
-![cat](/Feb5-cat.jpg)
+![cat](/cs241/Feb5-cat.jpg)
 
 Circles are states - configurations of the program based on input seen. 
 - The double circles are accepting if the program halts there.
 
 Example - mips operators:
 
-![mips](/Feb5-mips.jpg)
+![mips](/cs241/Feb5-mips.jpg)
 
 Since programming langagues don't usually admit only a finite many programs, finite languages are not much use
 
@@ -1239,10 +1239,10 @@ Can we harness what we learned about recognizing finite languages? LOOPS!
 
 Consider our example {a^(2n)b | n >=0}
 
-![ ](/Feb5-ab.jpg)
+![ ](/cs241/Feb5-ab.jpg)
 
 e.g. MIPS labels
-![ ](/Feb5-mipslabels.jpg)
+![ ](/cs241/Feb5-mipslabels.jpg)
 
 These 'machines' are called Deterministic Finite Automata (DFAs)
 - Always a start state
@@ -1253,7 +1253,7 @@ What is missing?
 - What if there is no transition? Consider the ab example - what if our input is ab? If we fall off the machine, reject. More formally, an implicit error state exists; all unlabelled transitions go there. An error state has an all input loop back to itself and is non-accepting
 
 Example: String over {a,b} with an even number of a's and an odd number of b's
-![ ](/Feb5-example1.jpg)
+![ ](/cs241/Feb5-example1.jpg)
 
 Formal definition of  DFA: a DFA is a 5-tuple (Σ, Q, q0, A, delta), where
 - Σ is a finite non empty set (alphabet)
@@ -1327,7 +1327,7 @@ Currently, our DFA takes an input string and returns yes/no whether the given st
 
 DFAs with actions can attach computation to the arcs of a DFA. For example, consider L = {binary numbers with no leading zeros}, where we compute the value of the number.
 
-![ ](/Feb10-binary.jpg)
+![ ](/cs241/Feb10-binary.jpg)
 
 (sorry for horrible quality)
 
@@ -1337,7 +1337,7 @@ another possible action would be "emit a token" - here we emit the current value
 What do we gain by making our DFAs more complex?
 e.g. L={w in {a,b}\*|w ends in abb}
 
-![ ](/Feb10-complexDFA.jpg)
+![ ](/cs241/Feb10-complexDFA.jpg)
 
 What if we allowed more than one arc (edge) with the same label from the same state?
 - The machine choses one (this is non-deterministic)
@@ -1380,7 +1380,7 @@ And we accept if delta\*({q0},w) union A != 0
 
 work with the following NFA, we will simulate baabb
 
-![ ](/Feb10-example1.jpg)
+![ ](/cs241/Feb10-example1.jpg)
 
     Read Input	    Unread input     	States 		Name
     empty           baabb				{1} 		A
@@ -1410,7 +1410,7 @@ Last time
 
 Consider L={cab} U {strings over {a,b,c} with an even # of a's}. We can draw an NFA
 
-![ ](/Feb12-example1NFA.jpg)
+![ ](/cs241/Feb12-example1NFA.jpg)
 
 The DFA is much harder to produce. Let's do a trace
 
@@ -1423,7 +1423,7 @@ The DFA is much harder to produce. Let's do a trace
     caba 	 	empty 		{6}
 
 Now we build the DFA via the *subset construction*
-![ ](/Feb12-example1DFA.jpg)
+![ ](/cs241/Feb12-example1DFA.jpg)
 
 Accepting state are any states that includes an accepting state from the original NFA.
 Every NFA hs an equivilent DFA, and NFAs recognize the same class of languages.
@@ -1435,7 +1435,7 @@ What if we let ourselves change state without consuming a character? We call the
 - This makes it easy to glue smaller automa together.
 
 Revisiting the above example, 
-![ ](/Feb12-example2.jpg)
+![ ](/cs241/Feb12-example2.jpg)
 
 
     Read 		Unread 		States
@@ -1456,9 +1456,9 @@ Yes, DFAs and NFAs are finite state machines and the class of languages accepted
 
 The below pictures show empty languages, epsilon languages, single caracter, alternation, concatenation, repetiton:
 
-![ ](/Feb12-rules1.jpg)
+![ ](/cs241/Feb12-rules1.jpg)
 
-![ ](/Feb12-rules2.jpg)
+![ ](/cs241/Feb12-rules2.jpg)
 
 Thus every regular language has an equivalent epsilon NFA, which has an equivalent DFA and the conversion can be automated
 
@@ -1474,7 +1474,7 @@ Ordinary DFA can only tell us if a word is in a language. We need something that
 Consider L={valid C tokens} is regular.
 
 Let M\_L be the DFA that recoginizes L. Then the second representation M\_{LL\*} which is a nonempty sequence of tokens is NFA modified from the NFA for M\_L - using the rules from above for * 
-![ ](/Feb12-tokenizing.jpg)
+![ ](/cs241/Feb12-tokenizing.jpg)
 
 We can add an action to each each epsilon-move such as output a token. Our machine is non-deterministic. epsilon-moves are optional
 
@@ -1621,7 +1621,7 @@ We are showing too much information, since this information doesn't matter and t
 
 Example: consider abcba
 
-![ ](/Feb24-abcba.jpg)
+![ ](/cs241/Feb24-abcba.jpg)
 
 For the leftmost derivation, there is a unique corresponding parse tree and vice versa.
 
@@ -1648,11 +1648,11 @@ What is the RE for this langugae?
 
 Leftmost derivation for a+bxc: S => S Op S => a Op S => a + S => a + S Op S => a + b Op S => a + b x S => a + b x c
 
-![ ](/Feb26-leftmost.jpg)
+![ ](/cs241/Feb26-leftmost.jpg)
 
 Or, expand the first S first: S => S Op S => S Op S Op S => a Op S Op S => a + S Op S => a + b Op S => a + b x S => a + b x c
 
-![ ](/Feb26-rightmost.jpg)
+![ ](/cs241/Feb26-rightmost.jpg)
 
 These correspond to DIFFERENT parse trees. A grammar for which the same word has more than one distinct parse tree is called **ambiguous**. The grammar we defined above is ambiguous. If we only care about whether a string is in the language, the ambiguity doesn't matter.
 
