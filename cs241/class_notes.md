@@ -1032,37 +1032,43 @@ example ESD Entry:
 
 MERL now contains code, relocator addresses, addresses and names of ESR and EDR entries
 
---
-Feb 3
+-----
+##Feb 3
 
-***Last time***
-Note that .word instructions referring to external symbols must also be relocated. 
-Augment MERL files to help linker. 
-MERL: Header + Code + Relocation and External Symbol Table
-Symbol table contains relocatable addresses, adresses and names of ESR (imports) and ESD (exports)
+####Last time
+- Note that .word instructions referring to external symbols must also be relocated. 
+- Augment MERL files to help linker. 
+- MERL: Header + Code + Relocation and External Symbol Table
+- Symbol table contains relocatable addresses, adresses and names of ESR (imports) and ESD (exports)
 
-
-***The linker***
+####The linker
 Given two MERl files m1.merl, m2.merl - how do we link them? What are the steps?
-1. relocate m2.code
+
+1) relocate m2.code
+
 	a <- m1.codelen-12   
-	  -- we want to subtract the header from m2 and then push forward by length of m1 code(=)
+	// we want to subtract the header from m2 and then push forward by length of m1 code (a)
 	relocate m2.code by a
 	add a to every address in m2.symboltable
 
-2. resolve symbols (and check for duplicates in exports - ERROR)
-	if m1.exports.lables and m2.exports.labels != 0 then ERRROR
+2) resolve symbols (and check for duplicates in exports - ERROR)
+
+	if (m1.exports.labels AND m2.exports.labels) != 0 then ERRROR
 	for all <addr1, label> in m1.imports do
 		if exists <addr2, label> in m2.exports then
 			m1.code[addr1] <- addr2
 			remove <addr1, label> from m1.imports
 			add addr1 to m1.relocates
 	for all <addr2, label> ... same
-3. merge symbol tables
+
+3) merge symbol tables
+
 	imports = m1.imports and m2.imports
 	exports = m1.exports and m2.exports
-	relocaes = m1.relocates and m2.relocates
-4. output linked program (with new header)
+	relocates = m1.relocates and m2.relocates
+
+4) output linked program (with new header)
+
 	output MERL cookie
 	output totalCodeLen + total(imports, exports, relocates) + 12
 	output totalCodeLen + 12
@@ -1070,17 +1076,22 @@ Given two MERl files m1.merl, m2.merl - how do we link them? What are the steps?
 	output m2.code
 	output imports, exports, relocates
 
-***Compiler***
+###Compiler
+
 Assembly language has a simple structure, is easy to parse, straightforward and unambiguous.
-Now we turn our attention to the compiler.
-	Source program -> [compiler] -> assembly code (equivalent meaning)
-First step of our compiler:
-	source program->[scanner/lexical analysis]->tokens
+
+Now we turn our attention to the compiler. Source program -> [compiler] -> assembly code (equivalent meaning)
+
+First step of our compiler: source program->[scanner/lexical analysis]->tokens
+
 A high-level language is a more complex structure. It is harder to recognize, and we have no single translation to machine code. To convert to machine language we use a compiler.
-How does a compiler recognize if a given program is valid? Note we're not asking if it's logically correct (a much harder program), but just whether the sequence of characters forms and allowed program based on the specifications of the language. 
+
+How does a compiler recognize if a given program is valid? Note we're not asking if it's logically correct (a much harder problem), but just whether the sequence of characters forms and allowed program based on the specifications of the language.
+
 Eventually, once the compiler can recognize whether a program is valid, how do we translate the program into an equivalent program in the target language? (usually lower-level).
 
 Is this a valid c++ program?
+
 	int main() {
 		int a = 1;
 		int b = 2;
@@ -1089,48 +1100,57 @@ Is this a valid c++ program?
 		cout << c << " " << a << " " << b << endl;
 	}
 	output: 3 2 2
+
+yes - a++ + b
+
 what about the same program with a+++++b (5 +s)
-	no! it will be parsed as a++ ++ b which is invalid
+- no! it will be parsed as a++ ++ b which is invalid
+
 what about a++ +++b 
-	nope, same interpretation as above
+- nope, same interpretation as above
+
 what's the fix?
-	a++ + ++b
+- a++ + ++b
 
-How can we handle the complexity?
-We want a formal theory of string recognition - general principles that work in the context of any programming language.
+How can we handle this complexity?
+- We want a formal theory of string recognition - general principles that work in the context of any programming language.
 
-***Definitions:***
-	- αbet: finite set of symbols (e.g. {a,b,c}) typically denoted Σ = {a,b,c,}
-	- String(word): finite sequence of symbols from Σ. a, abc, cbca, etc.
-	- Length: |w| = # of symbols in w
-	- Empty string: ε is the empty string, not a symbol. |ε| = 0
-	- Language: a set of strings (e.g. {a^(2n)b | n >= 0}, b, aab, aaaab ....)
+###Definitions:
+- alphabet: finite set of symbols (e.g. {a,b,c}) typically denoted Σ = {a,b,c,}
+- String(word): finite sequence of symbols from Σ. a, abc, cbca, etc.
+- Length: |w| = # of symbols in w
+- Empty string: ε is the empty string, not a symbol. |ε| = 0
+- Language: a set of strings (e.g. {a^(2n)b | n >= 0}, b, aab, aaaab ....)
+
 Notes: 
-	- ε is the empty word, while {} = Ø is the empty language.
-	- {ε} is a singleton language containig only the empty word
+- ε is the empty word, while {} = Ø is the empty language.
+- {ε} is a singleton language containing only the empty word
 
-***Language Complexities***
-{a^(2n)b | n >= 0} - this is easy
-{valid MIPS assembly programs} - harder
-{valid Java programs} - way harder
--some languages (all programs without bugs) - impossible
+###Language Complexities
+- {a^(2n)b | n >= 0} - this is easy
+- {valid MIPS assembly programs} - harder
+- {valid Java programs} - way harder
+- some languages (all programs without bugs) - impossible
 
 How can we automatically recognize whether a given string belongs to a given language? This is mindblowing, and depends on how complex the language is. Since the answer is dependent on language complexity, we will charactertize languages according to how hard recognition process is; we will create classes of languages based on the difficulty of recognition. This is based on Chomsky Hierarchy
-Finite: easy
-Regular: not so easy
-Context-free: pretty decent
-Context-sensitive: challenging
-Recursive: difficult
-anything-else: impossible
+
+####Chomsky Hierarchy
+- Finite: easy
+- Regular: not so easy
+- Context-free: pretty decent
+- Context-sensitive: challenging
+- Recursive: difficult
+- anything-else: impossible
 
 We want to study high-level languages at as easy a class level as possible, and move down when we have to.
 
-***Finite Languages***
-These languages have finitely many words.
-Write code to answer w ∈ L such that w is scanned exactly once, without storing previously seen characters.
-We can recognize a word by comparing each word in the finite set of words - but we won't use that approach.
+###Finite Languages
+- These languages have finitely many words.
+- Write code to answer w ∈ L such that w is scanned exactly once, without storing previously seen characters.
+- We can recognize a word by comparing each word in the finite set of words - but we won't use that approach.
 
 Exercise: L = {cat, cat, cow}
+
 	if firstchar != c, reject
 	if secondchar = a
 		if thirdchar=r
@@ -1144,7 +1164,6 @@ Exercise: L = {cat, cat, cow}
 			if input not empty, reject
 			else accept
 	else reject
-
 
 ----
 Feb 5
