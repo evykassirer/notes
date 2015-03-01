@@ -1166,115 +1166,123 @@ Exercise: L = {cat, cat, cow}
 	else reject
 
 ----
-Feb 5
+##Feb 5
 
-***Last time***
+####Last time
 - started compiler
 - formal languages
 - chomsky hierarchy
-- finite C regular C context-free C
-- context sensitive C recrusive
+ - finite  
+ - regular  
+ - context-free 
+ - context sensitive  
+ - recrusive
 
-very losely, recursive means that there is an alogirthm or program to determine whether any given input is a member of the language
+very losely, recursive means that there is an algorithm or program to determine whether any given input is a member of the language
 
 e.g. from last time L = {car, cat, cow} 
+
 An abstraction of this program:
-start -c-> "seen c" -a-> seen "ca" -t-> [seen "cat"]
-								   -r-> [seen "car"]
-					-o-> seen "co" -w-> [seen "cow"]
-	on the board, this is drawn with states in circles and the arrows between them labelled, and end states have double circles around them (square brackets here) - I took a pic
 
-Circles are states - configurations of the program based on input seen. The double circles are accepting if the program halts there.
+![cat](/Feb5-cat.jpg)
 
-Example - mips operators (took picture)
+Circles are states - configurations of the program based on input seen. 
+- The double circles are accepting if the program halts there.
+
+Example - mips operators:
+
+![mips](/Feb5-mips.jpg)
+
 Since programming langagues don't usually admit only a finite many programs, finite languages are not much use
 
-***Regular languages***
-These languages are built from finite languages, but also support the following operations
-- union 
-	L1 U L2 = {x | x in L1 or x in L2}
-	e.g. L1 = {dog}, L2={cat} L1 U L2 = {dog, cat}
-- concatenation
-	L1·L2 = {xy | x in L1, y in L2}
-	e.g. L1 = {dog, cat} L2={fish, emptystring}
-	then L1·L2 = {dogtfish, catfish, dog, cat}
+###Regular languages
+
+These languages are built from finite languages, but also support the following operations:
+
+union
+- L1 U L2 = {x | x in L1 or x in L2}
+- e.g. L1 = {dog}, L2={cat} L1 U L2 = {dog, cat}
+
+concatenation
+- L1·L2 = {xy | x in L1, y in L2}
+- e.g. L1 = {dog, cat} L2={fish, emptystring} ---> then L1·L2 = {dogtfish, catfish, dog, cat}
 - Repetition 
-	L^* = union i=0...infinity L^i = L^0 U L^1 U L^2 ... = {emptystring} U L U LL U LLL ...
-	In other words, it is 0 or more occurrences of L
-	e.g. L={a,b}
-	L^*  = {emptystring, a, b, aa, ab, ba, bb, aaa, aab, aba, abb, etc.}
+- L^* = union i=0...infinity L^i = L^0 U L^1 U L^2 ... = {emptystring} U L U LL U LLL ...
+- In other words, it is 0 or more occurrences of L
+- e.g. L={a,b} ---> L^*  = {emptystring, a, b, aa, ab, ba, bb, aaa, aab, aba, abb, etc.}
 
 Example: show that {a^2n b | n >= 0} is regular
-We see that ({aa})^* · {b} defines this set.
+* We see that ({aa})^* · {b} defines this set.
 
-This syntax is very tedious. We have *Regular Expressions*
+This syntax is very tedious. We have **Regular Expressions**
 
-***Regular Expressions***
-Expression 			Language
----------------------------------------
-null set			{} - empty language
-epsilon				{epsilon} - language consisting of the empty string
-aaa 				{aaa} - singleton language
-E1|E2				L1 U L2 - alternation (union)
-E1 E2				L1·L2 - concatenation
-E^*					L^* - repetition
+####Regular Expressions
 
-Question - is C regular?
-We have IDs [a-zA-Z]([a-zA-Z0-9_])^*
-A C program is a sequence of tokens, each of which come from a regular language
-How can we define which sequences of tokens are valid? We don't know yet. 
-Thus, our answer is maybe
+        Expression 			Language
+        --------------------------------------------
+        null set			{} - empty language
+        epsilon				{epsilon} - language consisting of the empty string
+        aaa 				{aaa} - singleton language
+        E1|E2				L1 U L2 - alternation (union)
+        E1 E2				L1·L2 - concatenation
+        E^*      			L^* - repetition
+
+Question - is the language C regular?
+- We have IDs [a-zA-Z]([a-zA-Z0-9_])^*
+- A C program is a sequence of tokens, each of which come from a regular language
+- How can we define which sequences of tokens are valid? We don't know yet. 
+- Thus, our answer is maybe
 
 Can we recognize arbitrary languges automatically?
+
 Can we harness what we learned about recognizing finite languages? LOOPS!
+
 Consider our example {a^(2n)b | n >=0}
-	->()-a->()
-		<-a-
-		-b>[()]
-	this is hard to type - took another pic
+
+![cat](/Feb5-ab.jpg)
 
 e.g. MIPS labels
-->()- a-zA-Z ->()-:->[()]
-				-this loops to itself with a-zA-Z0-9_
-again, I took a pic
+![cat](/Feb5-mipslabels.jpg)
 
 These 'machines' are called Deterministic Finite Automata (DFAs)
-- ALways a start state
+- Always a start state
 - For each character in the input follow the corresponding arc to the next state
 - If in an accepting state when input is exhausted, accept - else reject
 
 What is missing?
-What if there is no transition? Consider the ab example - what if our input is ab? If we fall off the machine, reject. More formally, an implicit error state exists; all unlabelled transitions go there. AN error state has an all input loop back to itself and is non-accepting
+- What if there is no transition? Consider the ab example - what if our input is ab? If we fall off the machine, reject. More formally, an implicit error state exists; all unlabelled transitions go there. An error state has an all input loop back to itself and is non-accepting
 
 Example: String over {a,b} with an even number of a's and an odd number of b's
-(took a pic)
+![cat](/Feb5-example1.jpg)
 
-Formal definitino of  DFA: a DFA is a 5-tuple (Σ, Q, q0, A, delta), where
-- Σ is a finite non empty set (αbet)
+Formal definition of  DFA: a DFA is a 5-tuple (Σ, Q, q0, A, delta), where
+- Σ is a finite non empty set (alphabet)
 - Q is a finite, non-empty set (states)
 - q0 is an element of Q (start state)
 - A is a subset of Q (accepting states / end states)
 
-delta(QxΣ) -> Q (Transition function state and rinput symbol and gives next state)
-delta consumes a single character of input 
-we can extend delta to a function thtat consumes an entire word
+delta(QxΣ) -> Q (Transition function state and input symbol and gives next state)
+- delta consumes a single character of input 
+- we can extend delta to a function that consumes an entire word
 
 define:
 - delta* (q, empty string) = q
 - delta* (q, cw) = delta* (delta(q,c), w)
+
 Thus, a DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta* (q0, w) is in A
 
-example from before (see new picture with labels)
+example from before 
 - Σ = {a,b}
 - Q = {ee, oe, eo, oo}
 - q0 = ee
 - A = {eo}
-delta      ee  oe  eo oo
--------------------------
-a          oe  ee  oo  eo 
-b 		   eo  oo  ee  oe
 
---
+        delta      ee  oe  eo oo
+        -------------------------
+        a          oe  ee  oo  eo 
+        b          eo  oo  ee  oe
+
+----
 Feb 10
 
 Last time: Regular Expressions
