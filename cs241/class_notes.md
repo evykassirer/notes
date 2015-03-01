@@ -921,61 +921,75 @@ Loader Relocation Algorithm:
 
 
 ---
-Jan 29
+##Jan 29
 
-This works in general but can still be broken.
+What we came up with last class works in general but can still be broken.
+
 	lis $2
 	.word 12
 	jr $2
 	jr $31
-If we jumpt to a consatnt address or do math on a label, we are in trouble. However, this is bad practice. 
+
+If we jump to a consatnt address or do math on a label, we are in trouble. However, this is bad practice. 
+
 This is a shift in the role of labels; when introduced they were a convenience, but now they are a necessity. Essentially, if you want relocatable code, use labels.
 
-***Linkers***
+###Linkers
+
 We often find it convenient to split MIPS programs into smaller units, for the same reason as with higher-level languages. There is a major issue. How can an assembler resolve a reference to a label in a different file?
 
 We have a.asm, b.asm, and c.asm with shared labels.
 
 Solution: to assemble, concatenate the files and then assemble:
-	cat a.asm b.asm c.asm | java cs241.binasm > abc.mips
-	This works, but it doesn't save us any work if I make a small change in a.asm but b.asm is huge.
-	Also, I may only want to give someone the binary (not the source). We want to compile first then link after.
+- cat a.asm b.asm c.asm | java cs241.binasm > abc.mips
+- This works, but it doesn't save us any work if I make a small change in a.asm but b.asm is huge.
+- Also, I may only want to give someone the binary (not the source). We want to compile first then link after.
 
 Solution 2: Can we assemble first and then cat 
-	header + binary + reloc table
-	No, they are all assembled to start at address 0, but the second two would need to relocatable. Tus we need to assemble to MERL, not just MIPS. However, if we cat two MERL files, we don't get a MERL file. 
+- header + binary + reloc table
+- No, they are all assembled to start at address 0, but the second two would need to relocatable. 
+- Thus we need to assemble to MERL, not just MIPS. However, if we cat two MERL files, we don't get a MERL file. 
 
-Solution: we need a tool smarter than cat. It must be able to understand MERL files and put them together intelligently. Such a tool is called a *linker*. And yet what should an assembler do with references to lable sit cannot find? We will need to change the assembler.
+Solution: we need a tool smarter than cat. 
+- It must be able to understand MERL files and put them together intelligently. 
+- Such a tool is called a *linker*. 
+- And yet what should an assembler do with references to lables it cannot find? 
+- We will need to change the assembler.
 
-Aside:
-what happens (conceptually) when I run g++ asm.cc kind.cc lexer.cc
-			asm.o kind.o lexer.o --> a.out (assembler out!)
-	1. Compiler generates asm.o, kind.o, lexer.o 
-		- .o extention used to represent object files
-	2. linker combines the .o files into an executable
+Aside: what happens (conceptually) when I run g++ asm.cc kind.cc lexer.cc
+- asm.o kind.o lexer.o --> a.out (assembler out!)
+- Compiler generates asm.o, kind.o, lexer.o 
+- .o extention used to represent object files
+- linker combines the .o files into an executable
 
-***Import and Export***
+####Import and Export
+
 We lose a valuable error-check
-If a label is not defined, then our old assembler assumes an error, but now we just expect to find it within a linked-in file. Howe can an assembler tell between errors and intentional behaviour?
+- If a label is not defined, then our old assembler assumes an error
+- but now we just expect to find it within a linked-in file
+- How can an assembler tell between errors and intentional behaviour?
 
 The new assembler directive:
 - .import id: tells the assembler to ask for id to be linked in. This does not assemble to a word MIPS
-- if label abc and it does not occur and no .import abc, then we have an error
+- if we have a label abc, and that label does not occur, and no .import abc, then we have an error
 
 Format code 0x11 means External Symbol Reference (ESR)
-- we need the name of the symbol, the address of use (where hte blank needs to be filled in)
+- we need the name of the symbol, the address of use (where the blank needs to be filled in)
 
-ESR Entry
-word 1: 0x11
-word 2: location of where symbol is used
-word 3: length of symbol in chars (n)
-word 4->3+n: ASCII chars in the symbol name (one word per char)
+ESR entry contains
+- word 1: 0x11
+- word 2: location of where symbol is used
+- word 3: length of symbol in chars (n)
+- word 4->3+n: ASCII chars in the symbol name (one word per char)
 
-.import abc
-lis $1
-.word abc
+example use:
 
-ESR entry:
+	.import abc
+	lis $1
+	.word abc
+
+example ESR entry:
+
 	0x11
 	0x10 ;location of abc = 0x4 + 0xc
 	0x03 ;length of name
@@ -983,27 +997,32 @@ ESR entry:
 	0x62 ; 'b'
 	0x63 ; 'c'
 
-one.asm      		two.asm 				three.asm
-.import abc 		abc: 					...
-lis $1 				  sw $3, -4($30) 		abc:	
-.word abc 			  ... 					  add $3, $3, $2
-					  jr $31 				  ...
-					;abc is a  procedure  	  beq $2, $0, abc ; this abc is a loop	
+Another problem:
 
-How do we know which vsion of abc to use?
-We can't assume labels won't be duplicated
+	one.asm      		two.asm         		three.asm
+	.import abc 		abc:            		...
+	lis $1 	    		sw $3, -4($30) 			abc:	
+	.word abc   		...             		add $3, $3, $2
+	            		jr $31          		...
+	            		;abc is a  procedure	beq $2, $0, abc ; this abc is a loop	
+
+How do we know which vsion of abc to use? We can't assume labels won't be duplicated
+
 Another directive:
-	.export id    makes id available for linking - this does not assemble to a word of MIPS
-				  tells the assembler to make an entry in the MERL table
+- .export id    
+- makes id available for linking - this does not assemble to a word of MIPS
+- tells the assembler to make an entry in the MERL table
 
 MERL entry tpe: External Symbol Defintion (ESD)
-ESD Entry:
-word 1: 0x05
-word 2: address the symbol represents
-word 3: length of symbol name (n)
-word 4-3+n: ASCII name
 
-ESD Entry:
+ESD entry contains:
+- word 1: 0x05
+- word 2: address the symbol represents
+- word 3: length of symbol name (n)
+- word 4-3+n: ASCII name
+
+example ESD Entry:
+
 	0x05 ;format code
 	0xc ;address of abc
 	0x3 ;length of abc
