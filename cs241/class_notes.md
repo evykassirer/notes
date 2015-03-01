@@ -684,116 +684,135 @@ Assembly Trace:
     	beyond:
 
 -----
-Jan 22
+##Jan 22
 
-***Last day***
-jalr for call
-jr for return
-Assembler 2 passes
-	assembly code -> [lexer(given to us)] -> tokens -> [pass 1] -> symbol table + intermediate representation -> [pass 2] -> machine code
+Last time
+- jalr for call
+- jr for return
+- Assembler 2 passes  assembly code -> [lexer(given to us)] -> tokens -> [pass 1] -> symbol table + intermediate representation -> [pass 2] -> machine code
 
-***Two passes***
+####Two passes
 Pass 1:
-	group tokens into instructions and build symbol table
-	look at the assembly trace above (from end of last class)
+- group tokens into instructions and build symbol table
+look at the assembly trace above (from end of last class)
+
 		label 	|	address
 		--------------------
 		main    |    0x0
 		top     |    0xC
-	to find the addresses, it's easiest if you write them in beside each line of assembly
+
+- to find the addresses, it's easiest if you write them in beside each line of assembly
+
 Pass 2:
-	translate each instruction 
-	e.g. lis $2 -> 0x00000104
-	.word 13 -> 0x0000000d
-	...
-	bne $2, $0, top -> look up top in symbol table. calculate (top-PC)/4 = (0xC-0x20)/4 = 12-32 / 4 = -20/4 = -5 -> 0x1440fffb
+- translate each instruction 
+- e.g. lis $2 -> 0x00000104    .word 13 -> 0x0000000d
+- ...
+
+e.g. bne $2, $0, top 
+- look up top in symbol table 
+- calculate (top-PC)/4 = (0xC-0x20)/4 = 12-32 / 4 = -20/4 = -5 
+- we get 0x1440fffb
+
 Side note:
-	to negate a two's compliment value, flip the bits and add one
-	example: 5 = 0000 0000 0000 0101
-	        -5 = 1111 1111 1111 1010 + 1
-	             1111 1111 1111 1011
-	             f    f    f    b
+- to negate a two's compliment value, flip the bits and add one
 
-***Bit-shifts:***
-To assemble bne $2, $0, top (top <- -5), we look at: 0001 01ss ssst tttt iiii iiii iiii iiii
-opcode: 000101 = 5
-first reg = 2 = 00010
-second reg = 0 = 0000
-offset = -5
+example: 
+
+	5 = 0000 0000 0000 0101
+	-5 = 1111 1111 1111 1010 + 1
+	1111 1111 1111 1011
+	f    f    f    b
+
+###Bit-shifts:
+- To assemble bne $2, $0, top (top <- -5), we look at: 0001 01ss ssst tttt iiii iiii iiii iiii
+ - opcode: 000101 = 5
+ - first reg = 2 = 00010
+ - second reg = 0 = 0000
+ - offset = -5
+
 Problem: we need to assemble the 6 bit opcode, the two 5-bits of regiters and the 16 bits of immediate value into a 32-bit instruction. How?
-unsigned int instr;
-c/c++: 5 <<26
-racket: (arithmetic-shift 5 -26)
+- unsigned int instr;
+- c/c++: 5 <<26
+- racket: (arithmetic-shift 5 -26)
 
-5<<26 = 00010100 0000 0000 0000 0000 0000 0000
-2<<21 = 0000 0000 0100 0000 0000 0000 0000 0000
-0<<16 - 000....
+e.g.
+
+	5<<26 = 00010100 0000 0000 0000 0000 0000 0000
+	2<<21 = 0000 0000 0100 0000 0000 0000 0000 0000
+	0<<16 - 000....
+	
 problem: -5 = 0xfffffffb, we only have room for 16-bits
 
-bit-wise AND:
-	two 1s give a 1, anything else gives 0
-		  10111001
-	  AND 01100011
-		  --------
-		  00100001
-	when we bitwise-and with a 1, the input is unchanged. when we bitwise-and with a 0 the result is 0. Thus we an use it to turn bits off.	  
+bit-wise AND: two 1s give a 1, anything else gives 0
+
+	    10111001
+	AND 01100011
+	    --------
+	    00100001
+
+- when we bitwise-and with a 1, the input is unchanged. when we bitwise-and with a 0 the result is 0. Thus we an use it to turn bits off.	  
+
 bit-wise OR:
-		  10111001
-	  OR  01100011
-		  --------
-		  11111011
-	when we bitwise-or with a 1, the result is 1. when we bitwise-or with a 0 the input is unchanged. Thus we an use it to turn bits on
+
+	    10111001
+	OR  01100011
+	    --------
+	    11111011
+
+- when we bitwise-or with a 1, the result is 1. when we bitwise-or with a 0 the input is unchanged. Thus we an use it to turn bits on
 
 To fix -5, we can do a bitwise-and with 0xffff
--5 & 0xffff = 0xfffb
-This turns off the bits more significant than we need (only keep the last 16 bits)
+- -5 & 0xffff = 0xfffb
+- This turns off the bits more significant than we need (only keep the last 16 bits)
 
-unsigned int instruc;
-instr = (5<<26)|(2<<21)|(0<<16)|(-5 & 0xffff)
+our code:
 
-cout << instr;
+	unsigned int instruc;
+	instr = (5<<26)|(2<<21)|(0<<16)|(-5 & 0xffff)
+	cout << instr;
+
 Unfortunately we output 339804155, which is the decimal representation and is 72-bits. This is bad. When we print an int, it figures out the digits and then prints them. If we print a char, we print out the ASCII code exactly. Unfortunately, chars are only 8 bits, (we print the fb of 1440ffffb which was desired) so we convert instructions to 4 chars.
 
-char c = instr>>24;
-cout << c;
-c = instr>>16;
-cout << c;
-c = instr>>8;
-cout << c;
-c = instr
-cout << c; ;no newlines ever
-remember to pipe | xxd to see hex
+	char c = instr>>24;
+	cout << c;
+	c = instr>>16;
+	cout << c;
+	c = instr>>8;
+	cout << c;
+	c = instr
+	cout << c; ;no newlines ever
+	// remember to pipe output | xxd to see hex
 
 in racket: use write-byte and, for example,(bitwise-and -5 #xfff))
 
 It is possible to create a solution using unions and bitfields. It is not as portable as the previous solution, but very elegant.
 
-Error checking - include the string ERROR somewhere in the error statements.
-In Racket - (error "ERROR")
+Error checking - include the string ERROR somewhere in the error statements. In Racket - (error "ERROR")
 
-***The Loader***
+##The Loader
 Let's start by writing an operating system.
+
 repeat:
+
 	p <- next program to run
 	*copy p into memory, starting at 0x00
 	jalr $0
 	beq $0, $0, repeat
+
 the star is essentially a loader. mips.twoints and mips.array do this
 
-The 0S is also a program. Where does it sit in memory? Other progams may be running as well. Where are they in memory?
-More generally, there may be other code in memory e.g. libraries
- - we can choose a different starting address for programs at assembly
+The 0S is also a program. Where does it sit in memory? Other progams may be running as well. Where are they in memory? And more generally, there may be other code in memory e.g. libraries
 
- BUT then how does the loader know where to load them? What if two addresses are the same? 
- We can't load programs anywhere. Lables may resolve to the wrong address (.word or bne/beq)
- The load will need to somehow fix .word id : add α
- 	the program is going to be loaded at α - id represents an absolute address
- .word constant ; this is fine, we don't need to fix it
- What about branches with an id - no, because the assembler calcualtes a relative offset based on PC, so relocation is unnecessary.
+We can choose a different starting address for programs at assembly
+- BUT then how does the loader know where to load them? What if two addresses are the same? 
+- We cannot load programs anywhere. Labels may resolve to the wrong address (.word or bne/beq)
+ - The load will need to somehow fix .word id  --- we add α
+ - the program is going to be loaded at α
+ - id represents an absolute address
 
-----
+.word constant ; this is fine, we do not need to fix it
 
-Tutorial questions/answers posted online
+What about branches with an id - no, because the assembler calcualtes a relative offset based on PC, so relocation is unnecessary.
 
 ----
 Jan 27
