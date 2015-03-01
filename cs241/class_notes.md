@@ -1207,12 +1207,12 @@ concatenation
 - L1·L2 = {xy | x in L1, y in L2}
 - e.g. L1 = {dog, cat} L2={fish, emptystring} ---> then L1·L2 = {dogtfish, catfish, dog, cat}
 - Repetition 
-- L^* = union i=0...infinity L^i = L^0 U L^1 U L^2 ... = {emptystring} U L U LL U LLL ...
+- L^\* = union i=0...infinity L^i = L^0 U L^1 U L^2 ... = {emptystring} U L U LL U LLL ...
 - In other words, it is 0 or more occurrences of L
-- e.g. L={a,b} ---> L^*  = {emptystring, a, b, aa, ab, ba, bb, aaa, aab, aba, abb, etc.}
+- e.g. L={a,b} ---> L^\*  = {emptystring, a, b, aa, ab, ba, bb, aaa, aab, aba, abb, etc.}
 
 Example: show that {a^2n b | n >= 0} is regular
-* We see that ({aa})^* · {b} defines this set.
+* We see that ({aa})^\* · {b} defines this set.
 
 This syntax is very tedious. We have **Regular Expressions**
 
@@ -1228,7 +1228,7 @@ This syntax is very tedious. We have **Regular Expressions**
         E^*      			L^* - repetition
 
 Question - is the language C regular?
-- We have IDs [a-zA-Z]([a-zA-Z0-9_])^*
+- We have IDs [a-zA-Z]([a-zA-Z0-9_])^\*
 - A C program is a sequence of tokens, each of which come from a regular language
 - How can we define which sequences of tokens are valid? We don't know yet. 
 - Thus, our answer is maybe
@@ -1266,10 +1266,10 @@ delta(QxΣ) -> Q (Transition function state and input symbol and gives next stat
 - we can extend delta to a function that consumes an entire word
 
 define:
-- delta* (q, empty string) = q
-- delta* (q, cw) = delta* (delta(q,c), w)
+- delta\* (q, empty string) = q
+- delta\* (q, cw) = delta\* (delta(q,c), w)
 
-Thus, a DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta* (q0, w) is in A
+Thus, a DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta\* (q0, w) is in A
 
 example from before 
 - Σ = {a,b}
@@ -1283,19 +1283,19 @@ example from before
         b          eo  oo  ee  oe
 
 ----
-Feb 10
+##Feb 10
 
 Last time: Regular Expressions
 
 Handy to know precedence (highest to lowest)
 - (x)
-- x*
+- x\*
 - xy
 - x|y
 
-Example: a|bc*  is (a)|(b(c*))
+Example: a|bc\*  is (a)|(b(c\*))
 
-A DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta* (q0, w) is in A
+A DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta\* (q0, w) is in A
 
 If M is a DFA, we denote L(M) ("the language of M"), the set of all words accepted by M: L(M) = {w | M accepts w}
 
@@ -1335,7 +1335,7 @@ another possible action would be "emit a token" - here we emit the current value
 
 ####Non-Deterministic Finite Automata
 What do we gain by making our DFAs more complex?
-e.g. L={w in {a,b}*|w ends in abb}
+e.g. L={w in {a,b}\*|w ends in abb}
 
 ![ ](/Feb10-complexDFA.jpg)
 
@@ -1362,11 +1362,11 @@ Q = {a,b,c}
 
 We want to accept if some path through the NFA lead to an accepting state, and reject if no such path exists.
 
-delta* for NFAs sets of states x Σ -> sets of states
-- delta*(P, empty) = P, where P is a set of states
-- delta*(P, cw) = delta*(union of delta(q,c) for all q in P , w)
+delta\* for NFAs sets of states x Σ -> sets of states
+- delta\*(P, empty) = P, where P is a set of states
+- delta\*(P, cw) = delta\*(union of delta(q,c) for all q in P , w)
 
-And we accept if delta*({q0},w) union A != 0
+And we accept if delta\*({q0},w) union A != 0
 
 ##NFA Simulation Procedure
 
@@ -1403,111 +1403,128 @@ note if we draw this it looks just like our DFA from before!
 Holy cow, we have a DFA because D contains an accepting state
 
 ---
-Feb 12
+##Feb 12
 
-***Last time***
-NFAs
-
-last time his notation was incorrect! 
-Powerset of {a,b,c} is {{}, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c}
+Last time
+- NFAs
 
 Consider L={cab} U {strings over {a,b,c} with an even # of a's}. We can draw an NFA
-(see picture)
+
+![ ](/Feb12-example1NFA.jpg)
+
 The DFA is much harder to produce. Let's do a trace
 
-Read 		Unread 		States
---------------------------------
-empty 		caba		{1}
-c 			aba 		{2,6}
-ca  		ba  		{3,5}
-cab  		a 			{4,5}
-caba 	 	empty 		{6}
+    Read 		Unread 		States
+    --------------------------------
+    empty 		caba		{1}
+    c 		    aba 		{2,6}
+    ca  		ba  		{3,5}
+    cab  		a 		    {4,5}
+    caba 	 	empty 		{6}
 
 Now we build the DFA via the *subset construction*
-(see picture)
+![ ](/Feb12-example1DFA.jpg)
 
 Accepting state are any states that includes an accepting state from the original NFA.
 Every NFA hs an equivilent DFA, and NFAs recognize the same class of languages.
 
-***epsilon-NFA***
-What if we let ourselves change state without consuming a character? We call these epsilon transitions. (we label the arrow as epsilon)
-This is a free pass to a new state without reading a character.
-This makes it easy to glue smaller automa together.
-Revisiting the above example, (see picture)
+###epsilon-NFA
 
-Read 		Unread 		States
---------------------------------
-epsilon 	caba 		{1,2,6}
-c 			aba 		{3,6}
-ca  		ba 			{4,7}
-cab 		a 			{5,7}
-caba 		epsilon 	{6}
+What if we let ourselves change state without consuming a character? We call these epsilon transitions. (we label the arrow as epsilon)
+- This is a free pass to a new state without reading a character.
+- This makes it easy to glue smaller automa together.
+
+Revisiting the above example, 
+![ ](/Feb12-example2.jpg)
+
+
+    Read 		Unread 		States
+    --------------------------------
+    epsilon 	caba 		{1,2,6}
+    c 			aba 		{3,6}
+    ca  		ba 			{4,7}
+    cab 		a 			{5,7}
+    caba 		epsilon 	{6}
 
 By the same renaming trick as before (ie the subset construction) every epsilon-NFA has an equivilent DFA. Thus, epsilon-NFAs and DFAs recognize the same class of languages.
 
 Yes, DFAs and NFAs are finite state machines and the class of languages accepted by FSM are regular languages.
 
-Proof of Kleene's theorem (one way)
-L is regular if L = L(M) for some DFA M. If we can find an epsilon-NFA for every regular expression, then we have proved one direction of Kleene's theorem.
+###Proof of Kleene's theorem (one way)
+- L is regular if L = L(M) for some DFA M. 
+- If we can find an epsilon-NFA for every regular expression, then we have proved one direction of Kleene's theorem.
 
-empty languages 		epsilon language 		single character
-->()				    ->[()] 					->()-a->[()]
-E1|E2   epsilon transition from start to E1 and E2
-E1E2  	epsilon transition from ending states of E1 to starting states for E2
-E* 		epsilon transition from ending states of E to starting states for E
-(I took pictures of all these)
+The below pictures show empty languages, epsilon languages, single caracter, alternation, concatenation, repetiton:
+
+![ ](/Feb12-rules1.jpg)
+
+![ ](/Feb12-rules2.jpg)
 
 Thus every regular language has an equivalent epsilon NFA, which has an equivalent DFA and the conversion can be automated
 
-***Scanning***
+###Scanning
+
 Is C a regular language?
 - C keywords, identifiers, literals, operators, comments, punctuation
 
-These are all regular languages, and sequences of these are also regular, so we can use finite automata to do tokenization (Scanning, lexical analysis)
-Ordinary DFA can only tell us if a word is in a language. We need something that takes an input string w, beaking w into w1,w2,...,wn such that wi is in L and then output each wi
+These are all regular languages, and sequences of these are also regular, so we can use finite automata to do tokenization (scanning, lexical analysis)
+
+Ordinary DFA can only tell us if a word is in a language. We need something that takes an input string w, breaking w into w1,w2,...,wn such that each wi is in L and then output each wi
 
 Consider L={valid C tokens} is regular.
-Let M_L be the DFA that recoginizes L. Then the second representation M_LL* which is a nonempty sequence of tokens is NFA modified from the NFA for M_L - using the rules from above for * (I took a picture)
+
+Let M\_L be the DFA that recoginizes L. Then the second representation M\_{LL\*} which is a nonempty sequence of tokens is NFA modified from the NFA for M\_L - using the rules from above for * 
+![ ](/Feb12-tokenizing.jpg)
 
 We can add an action to each each epsilon-move such as output a token. Our machine is non-deterministic. epsilon-moves are optional
 
 The question: does the current setup guarantee a unique decomposition w = w1 w2 ... 2n? The answer is no.
 
 Consider just the portion of the machine that does IDs
-->()--a-zA-Z-->[()]--a-zA-Z0-9-->(back to ending state)
-epsilon /output token from ending state back to start state
+- ->()--a-zA-Z-->[()]--a-zA-Z0-9-->(back to ending state)
+- epsilon /output token from ending state back to start state
+- The input abab could be interpreted as 1,2,3 or 4-tokens. 
 
-The input abab could be interpreted as 1,2,3 or 4-tokens. How can we fix this? That is, we always return the longes possible next token. However, this can still fail.
-Consider L={aa,aaa}, w=aaaa  If we take the longest possible token, we take aaa first and then we are stuck. However, we could have tokenized the string successfully as aa and aa. Oh well. It would be bad to design a programming language like this. But wait... many of the languages we use are designed like this. 
+How can we fix this? We could always return the longest possible next token. However, this can still fail.
+- Consider L={aa,aaa}, w=aaaa  
+- If we take the longest possible token, we take aaa first and then we are stuck. 
+- However, we could have tokenized the string successfully as aa and aa. 
+- Oh well. It would be bad to design a programming language like this. 
+- But wait... many of the languages we use are designed like this. 
 
-Remember the example when we started. c=a+++b -> a++ + b   NOT a + ++b
-Again from out example, c=a+++++b; -> a++ ++ +b which is invalid
-But, a++ + ++b would be valid - but that's not what the compiler does.
+Remember the example when we started.
+- c=a+++b -> a++ + b   NOT a + ++b
+- Again from out example, c=a+++++b; -> a++ ++ +b which is invalid
+- But, a++ + ++b would be valid - but that's not what the compiler does.
 
 Another example from c++:
-vector<vector<int>> v;
-c++ treats the >> like the bitshift operator instead of two closing angle brackets. We have to trick the scanner: 
-vector < vector <int> > v;
-Fixed in  c++11
+- vector<vector<int>> v;
+- c++ treats the >> like the bitshift operator instead of two closing angle brackets. We have to trick the scanner:
+ - vector < vector <int> > v;
+- Fixed in  c++11
 
-***Maximal Munch Algorithim***
-Run DFA (no epsilon-move) until nonerror move possible.
-if in accepting state:
-	token found
-else 
-	back up to most recent accepting state
-	(track this with a variable)
-	input up to that point is next token
-endif
-output token
-epsilon-move back to q0
+###Maximal Munch Algorithim
+
+    Run DFA (no epsilon-move) until nonerror move possible.
+    if in accepting state:
+    	token found
+    else 
+    	back up to most recent accepting state
+    	(track this with a variable)
+    	input up to that point is next token
+    endif
+    output token
+    epsilon-move back to q0
 
 Simplified Maximal Munch: as above, but if we are not in an accepting state, when no transition possible, then we output an error (don't backtrack)
+
 Example:
-Our identifier must start and end with a letter and may contain a single -
-We also accept operator -
-For input ab-   we find a valid start state, then b, and then -, but we cannot scan past this point since no further action is possible
-Thus we would go back ab since it was the last valid point, and then continue from there. THe SMM algorithm would simply find an error but in practice this is usually sufficient
+- Our identifier must start and end with a letter and may contain a single -
+- We also accept operator -
+- For input ab-   
+ - we find a valid start state, then b, and then -, but we cannot scan past this point since no further action is possible
+ - Thus we would go back ab since it was the last valid point, and then continue from there. 
+ - THe SMM algorithm would simply find an error but in practice this is usually sufficient
 
 ----
 ##Feb 24
