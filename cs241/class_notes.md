@@ -815,52 +815,58 @@ We can choose a different starting address for programs at assembly
 What about branches with an id - no, because the assembler calcualtes a relative offset based on PC, so relocation is unnecessary.
 
 ----
-Jan 27
+##Jan 27
 
-***Tips for Marmoset***
-Refer to the MIPS assembly reference shet.
-User specification to create your own tests.
-Can use cs241.binasm to compare against - your assembler shoud give the same output as cs241.binasm
+###Tips for Marmoset
+- Refer to the MIPS assembly reference shet.
+- User specification to create your own tests.
+- Can use cs241.binasm to compare against - your assembler shoud give the same output as cs241.binasm
 
-***Last Time***
-Loader - we can't assume our code will always be loaded at a fixed address (e.g. 0x00). Why?
-There might be other programs or code in memory
-We have been assuming our code is always loaded at 0x00. If this assumption no longer holds, what breaks? Labels.
+###Last Time
+- Loader - we cannot assume our code will always be loaded at a fixed address (e.g. 0x00). Why?
+ - There might be other programs or code in memory
+- We have been assuming our code is always loaded at 0x00. If this assumption no longer holds, what breaks? Labels.
+
 e.g.
-    ;address 	;address we had expected    ;assembly  			;machine code
-	0x100 		0x00 						lis $1 				;0x00000814
-	0x104 		0x04 						.word f 			;0x0000010C 
+
+	;address 	;address we had expected    	;assembly  			;machine code
+	0x100 		0x00 				lis $1 				;0x00000814
+	0x104 		0x04 				.word f 			;0x0000010C 
 				***machine code needs to be offset by loader - actual address, not expected
-	0x108 		0x08 						jalr $1 			;0x00200009
- 	0x10C 		0x0C 						f: add $3, $1, $2 	;0x00221820
- 	0x110 		0x10 						jr $31 				;0x03e00008
+	0x108 		0x08 				jalr $1 			;0x00200009
+ 	0x10C 		0x0C 				f: add $3, $1, $2 	;0x00221820
+ 	0x110 		0x10 				jr $31 				;0x03e00008
 
 which instructions need to be fixed? The loader will somehow need to fix
-	.word id ;need to add α (a constant)
-		id references an absolute address
-	.word consatnt ; do NOT relocate
+- .word id ;need to add α (a constant) - id references an absolute address
+- .word consatnt ; do NOT relocate
 
 what about branches?
-	no, because the assembler calculatees a relative offset based on PC, so relocation is unnecessary.
-	everything else (including bne, beq) do ont relocate
+- no, because the assembler calculatees a relative offset based on PC, so relocation is unnecessary.
+- everything else (including bne, beq) do not relocate
 
 now we have OS 3.0
-repeat:
-	p <- next program to run
-	$3 <- load_and_relocate (P)
-	jalr $3
-	beq $0, $0, repeat
 
-Problem (again) - this won't work
-Assembled file is a stream of bits - how do we know which came from a .word with an id and which are instructons? We can't. We need help. We need more info from the assembler.
-We note that the output of most assemblers is not pure machine code; it is known as 'object code'. An object file contains binary code, but in addition contains any auxiliary information about the file that will be needed. We use object file formal MERL (MIPS Executable Relocatable Linkable)
-Note that this is made up for CS241, so don't try to research it. Inside an object file:
-	- the code (in binary)
-	- which lines (addreses) need to be relocated because they are .word id instructions
-	- other stuff to be added later
+	repeat:
+		p <- next program to run
+		$3 <- load_and_relocate (P)
+		jalr $3
+		beq $0, $0, repeat
 
-***MERL***
+Problem (again) - this will not work
+- Assembled file is a stream of bits - how do we know which came from a .word with an id and which are instructons? - We cannot. We need help. We need more info from the assembler.
+- We note that the output of most assemblers is not pure machine code; it is known as 'object code'. An object file contains binary code, but in addition contains any auxiliary information about the file that will be needed. 
+- We use object file formal MERL (MIPS Executable Relocatable Linkable)
+ - Note that this is made up for CS241, so do not try to research it. 
+- Inside an object file:
+ - the code (in binary)
+ - which lines (addreses) need to be relocated because they are .word id instructions
+ - other stuff to be added later
+
+###MERL
+
 Example:
+
 	*header - 3 words*
 		0x10000002 - cookie for MERL - it's actually assembly for beq $0, $0, 2
 		length of the merl file ;where the merl file stops
@@ -873,43 +879,45 @@ Example:
 		format code 
 		address
 
-The headers has a cookie to let us know it is a MIPS file, and then the lengths of the whole fille and the code. The format code is always 1 for the relocation entry, and the associated address is the address in the MIPS code of the relocatable word.
-
-Header is always of size 12. In our example on the slide, code is size 32 and symbol table is size 16.
-	
-We note that 0x10000002 is MIPS for beq $0, $0, $2, ie a command to skip header, so that MERL files can be executed as ordinary MIPS programs (if loaded at 0x00)
+- The headers has a cookie to let us know it is a MIPS file, and then the lengths of the whole fille and the code. 
+- The format code is always 1 for the relocation entry, and the associated address is the address in the MIPS code of the relocatable word.
+- Header is always of size 12. In our example on the slide, code is size 32 and symbol table is size 16.
+- We note that 0x10000002 is MIPS for beq $0, $0, $2, ie a command to skip header, so that MERL files can be executed as ordinary MIPS programs (if loaded at 0x00)
 
 We also want the assembler to generate relocatable object code (like we did by adding relocs in the example) which is cs241.relasm, which we will get eventually
 
 Relocation Tool: cs241.merl
-	- input: merl file and a relocation address α
-	- output: non-relocatable mips file with merl header and footer removed, ready to load at address α
+- input: merl file and a relocation address α
+- output: non-relocatable mips file with merl header and footer removed, ready to load at address α
 
 Loader Tools: mips.two-ints, mips.array
-	- both of these take an optional 2nd argument, which is the address to load the mips file
+- both of these take an optional 2nd argument, which is the address to load the mips file
 
 Example: Load myobj.merl at 0x10000
-java cs241.merl 0x10000 < myobj.merl > myobj.mips
-java mips.twoint myobj.mips 0x10000
+
+	java cs241.merl 0x10000 < myobj.merl > myobj.mips
+	java mips.twoint myobj.mips 0x10000
+
 we note relocation is typically done by the loader - we do it this way as a visualization of the process 
 
 Loader Relocation Algorithm:
-read() //skip cookie, MERL check
-endMod <- read() // end of MERL file
-codeLen <- read() - 12 // lengthof code
-a <- findFreeRam (codeLen+stack)
-for (i=0; i < codeLen; i += 4) MEM[a+i] <-read() //load code into memory
-i <- codeLen+12 //position of footer
-// Perform Relocation
-while (i < endMod) 
-	format <- read
-	if (format == 1) //always 1 for now
-		rel <- read()
-		MEM[a+rel-12] += a-12 //adjust by α, back by 12 (no head - still offset from 0, 
-							  // but we don't include the header anymore
-	else ERROR
-	i += 8
-end
+
+	read() //skip cookie, MERL check
+	endMod <- read() // end of MERL file
+	codeLen <- read() - 12 // lengthof code
+	a <- findFreeRam (codeLen+stack)
+	for (i=0; i < codeLen; i += 4) MEM[a+i] <-read() //load code into memory
+	i <- codeLen+12 //position of footer
+	// Perform Relocation
+	while (i < endMod) 
+		format <- read
+		if (format == 1) //always 1 for now
+			rel <- read()
+			MEM[a+rel-12] += a-12 
+			//adjust by α, back by 12 (no head - still offset from 0, but we do not include the header anymore
+		else ERROR
+		i += 8
+	end
 
 
 ---
