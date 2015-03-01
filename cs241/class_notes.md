@@ -1176,7 +1176,7 @@ Exercise: L = {cat, cat, cow}
  - regular  
  - context-free 
  - context sensitive  
- - recrusive
+ - recursive
 
 very losely, recursive means that there is an algorithm or program to determine whether any given input is a member of the language
 
@@ -1239,10 +1239,10 @@ Can we harness what we learned about recognizing finite languages? LOOPS!
 
 Consider our example {a^(2n)b | n >=0}
 
-![cat](/Feb5-ab.jpg)
+![ ](/Feb5-ab.jpg)
 
 e.g. MIPS labels
-![cat](/Feb5-mipslabels.jpg)
+![ ](/Feb5-mipslabels.jpg)
 
 These 'machines' are called Deterministic Finite Automata (DFAs)
 - Always a start state
@@ -1253,7 +1253,7 @@ What is missing?
 - What if there is no transition? Consider the ab example - what if our input is ab? If we fall off the machine, reject. More formally, an implicit error state exists; all unlabelled transitions go there. An error state has an all input loop back to itself and is non-accepting
 
 Example: String over {a,b} with an even number of a's and an odd number of b's
-![cat](/Feb5-example1.jpg)
+![ ](/Feb5-example1.jpg)
 
 Formal definition of  DFA: a DFA is a 5-tuple (Σ, Q, q0, A, delta), where
 - Σ is a finite non empty set (alphabet)
@@ -1292,105 +1292,114 @@ Handy to know precedence (highest to lowest)
 - x*
 - xy
 - x|y
-Example: a|bc*   (a)|(b(c*))
 
-DFA is a 5-tuple (see above for definition)
-delta* (q, empty string) = q
-delta* (q, cw) = delta* (delta(q,c), w)
-Thus, a DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta* (q0, w) is in A
+Example: a|bc*  is (a)|(b(c*))
 
-If M is a DFA, we denote L(M) ("the language of M"), the set of all words accepted by M: 
-L(M) = {w | M accepts w}
+A DFA, M=(Σ, Q, q0, A, delta) accepts a word w if delta* (q0, w) is in A
+
+If M is a DFA, we denote L(M) ("the language of M"), the set of all words accepted by M: L(M) = {w | M accepts w}
 
 Theorem (Kleene)
-L is regular iff L=L(M) for some DFAM.In other words, the regular languages are accepted by DFAs.
-Proof: we will prove this later.
+- L is regular iff L=L(M) for some DFAM.In other words, the regular languages are accepted by DFAs.
+- Proof: we will prove this later.
 
-***Implementing a DFA***
-int state=qo
-char ch
-while not EOF do
-	read ch
-	switch state
-		qo: case ch of
-			a: state<-
-			b: sate<-
-		q1: switch ch
-			a: state<-
-			....
-		q2 ...
-		end case
-end while
-return state is in A
+####Implementing a DFA
 
-Unfortunatley this is very tedious
-Instead, we could use a lookup table (see provided assembler starter code)
-table of states in columns and characters in rows - where they intersect is next state
+	int state=qo
+	char ch
+	while not EOF do
+		read ch
+		switch state
+			qo: case ch of
+				a: state<-
+				b: sate<-
+			q1: switch ch
+				a: state<-
+				....
+			q2 ...
+			end case
+	end while
+	return (state is in A)
 
-Currently, our DFA takes an input string and returns yes/no whether the given string is in the language. However, it is possibleto  add an output facility to a DFA, resulting in a transducer.
+Unfortunatley this is very tedious. Instead, we could use a lookup table (see provided assembler starter code) of states in columns and characters in rows - where they intersect is next state
+
+Currently, our DFA takes an input string and returns yes/no whether the given string is in the language. However, it is possible to  add an output facility to a DFA, resulting in a transducer.
 
 DFAs with actions can attach computation to the arcs of a DFA. For example, consider L = {binary numbers with no leading zeros}, where we compute the value of the number.
-(I took a picture of the exampmle on the board)
-another possible actin would be "emit a token"
 
-***Non-Deterministic Finite Automata***
+![ ](/Feb10-binary.jpg)
+
+(sorry for horrible quality)
+
+another possible action would be "emit a token" - here we emit the current value of our number
+
+####Non-Deterministic Finite Automata
 What do we gain by making our DFAs more complex?
 e.g. L={w in {a,b}*|w ends in abb}
-(took pic of board)
+
+![ ](/Feb10-complexDFA.jpg)
 
 What if we allowed more than one arc (edge) with the same label from the same state?
 - The machine choses one (this is non-deterministic)
-- We can think of it as magic, that it knows where it goes - or we can think of it as trying every path and see if there's any path that ends in an accepting path, then it accepts
+- We can think of it as magic, that it knows where it goes - or we can think of it as trying every path and see if there is any path that ends in an accepting path, then it accepts
 - We will accept if some set of choices leads to an accepting state. Returning to our example:
+
 ->[start]-a->[]-b->[]-b->([])   start loops back to itself with a and b
 
-The machine guesses to stay in the first state until it reaches the final  abb, then transitions to accepting NFAs are often simpler than DFAs.
-Formally NFA is a 5-tuple (Σ, Q, q0, A, delta)
+The machine guesses to stay in the first state until it reaches the final abb, then transitions to accepting 
 
-Σ, Q are finite non-empty sets (αbet, states)
-q0 (start) and A subset of Q (accepting)
-delta: relation - (QxΣ) --> subsets of the powerset of Q (2^Q)
-This is the powerset of Q, which makes it non-deterministic. The powerset is the set of all subsets of Q (includes the empty set and Q)
+NFAs are often simpler than DFAs.
+
+Formally NFA is a 5-tuple (Σ, Q, q0, A, delta)
+- Σ, Q are finite non-empty sets (alphabet, states)
+- q0 (start) and A subset of Q (accepting)
+- delta: relation - (QxΣ) --> subsets of the powerset of Q (2^Q)
+ - This is the powerset of Q, which makes it non-deterministic. The powerset is the set of all subsets of Q (includes the empty set and Q)
 
 e.g. from before
 Q = {a,b,c}
-2^Q = {empty, a, b, c, ab, bc, ac, abc}
-
+2^Q = Powerset of {a,b,c} = {{}, {a}, {b}, {c}, {a,b}, {a,c}, {b,c}, {a,b,c}
 
 We want to accept if some path through the NFA lead to an accepting state, and reject if no such path exists.
 
-delta* for NFAs setes of states x Σ -> sets of states
-Define:
-delta*(P, empty) = P, where P is a set of states
-delta*(P, cw)= delta*(union of delta(q,c) for all q in p , w)
+delta* for NFAs sets of states x Σ -> sets of states
+- delta*(P, empty) = P, where P is a set of states
+- delta*(P, cw) = delta*(union of delta(q,c) for all q in P , w)
+
 And we accept if delta*({q0},w) union A != 0
 
-***NFA Simulation Procedure***
-states <- {q0}
-while no EOF do
-	ch<-read()
-	states<-union delta(q,c) for all q in states
-end while
-if (states union A) is not empty, accept
-else reject
+##NFA Simulation Procedure
 
-work with the following NFA, we willsimulate baabb
-(example from before - I'll take a picture now)
+	states <- {q0}
+	while no EOF do
+		ch<-read()
+		states<-union delta(q,c) for all q in states
+	end while
+	if (states union A) is not empty, accept
+	else reject
 
-Read Input      Unread input     	States 		Name
-empty 			baabb				{1} 		A
-b 				aabb 				{1} 		A
-ba 				abb 				{1,2} 		B
-baa 			bb 					{1,2} 		B
-baab 			b 					{1,3} 		C
-baabb 			empty 				{1,4}  		D
+work with the following NFA, we will simulate baabb
 
-Thus we accept. BUT WAIT. I'm adding the right column to the table above as we speak. If we give each set of states a name, and call those states, every NFA becomes a DFA. Adding to the trace above:
-delta(c, a) -> {1,2} = B
-delta(D,a) -> {1,2} = B
-delta(D, b) -> {1} 
+![ ](/Feb10-example1.jpg)
+
+    Read Input	    Unread input     	States 		Name
+    empty           baabb				{1} 		A
+    b               aabb 				{1} 		A
+    ba 		        abb 				{1,2} 		B
+    baa 			bb 					{1,2} 		B
+    baab 			b 					{1,3} 		C
+    baabb 			empty 				{1,4}  		D
+
+Thus we accept. 
+
+BUT WAIT. I am adding the right column to the table above as we speak. If we give each set of states a name, and call those states, every NFA becomes a DFA. For example:
+
+    delta(C, a) -> {1,2} = B
+    delta(D,a) -> {1,2} = B
+    delta(D, b) -> {1} 
 
 note if we draw this it looks just like our DFA from before!
+
 Holy cow, we have a DFA because D contains an accepting state
 
 ---
