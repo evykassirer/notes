@@ -4,6 +4,8 @@ Foundations of Sequential Programs
 
 Ashif Harji (i prounced as EE)
 
+Tutorials with solutions: https://www.student.cs.uwaterloo.ca/~cs241/#tutorial
+
 -----
 ##Jan 6
 
@@ -514,82 +516,15 @@ Why do we save the registers and ***then*** adjust the stack pointer?
 
 Because once the registers are saved, we can use one to hold the stack adjustment vlaue.
 
-
----
-TUTORIAL #1 - Jan 16
-
-MIPS - fibinnaci
-f_n = f_{n-1} + f_{n-2}
-f_0 = 0
-f_1 = 1
-f_n = ?
-
-	; $1 = n
-	; $3 should end up being f_n
-	lis $2 		; OR   	
-	.word 0 	;		add $2 $0 $0
-	lis $3
-	.word 1
-	lis $5
-	.word 5
-
-	beq $1, $0, zero
-
-	;update 3 (current) and 2 (previous) fib number
-	loop: 
-	beq $1, $5, one
-	add $4, $2, $3 
-	add $2, $3, $0
-	add $3, $4, $0
-	sub $1, $1, $5
-	beq $0, $0, loop ; always loops until the initial condition fails
-
-	zero: add $3, $0, $0
-	one:
-
-now we want to call fib 
-fib:
-	;load registers used in fib onto the stack
-	sw $1, -4,($30)
-	sw $2, -8($30)
-	sw $4 -12($30)
-	sw $5 -16($30)
-	list $2
-	.word 16
-	sub $30 $30 $2
-	<insert fib code from above>
-	lis $2
-	.word 16
-	add $30, $30, $2 
-	lw $1, -4,($30)
-	lw $2, -8($30)
-	lw $4 -12($30)
-	lw $5 -16($30) 
-	jr $31
-
-
-let's call fib a few times
-
-; $1 = n
-lis $4
-.word 4
-lis $5 ; holds the address for fib
-.word fib
-sw $31 -4($30) ; store for later
-sub $30, $30, $4
-jalr $5 ; go to the fib function, which returns back here
-add $30, $30, $4
-lw $31, -4($30)
-jr
-
 -----
-Jan 20
+##Jan 20
 
-***Last time:***
-Assembly programming: procedures
-the machine only has 32 registers. How do we make sure important data isn't overwritten?
+Last time
+- Assembly programming: procedures
+- the machine only has 32 registers. How do we make sure important data is not overwritten?
 
-***Call and return***
+###Code to call and return
+
 	main:
 		...
 		lis $5 		;#5 contains the address where
@@ -601,11 +536,12 @@ the machine only has 32 registers. How do we make sure important data isn't over
 		...
 		jr $31
 
-when we return from a procedure, we need to set PC to the line after the jr (HERE). How do we know whic address that is?
-jalr command is jump and link register 
-	the instruction is exactly like jr,but it also sets $31 to the address of the next instruction (i.e. $PC)
+when we return from a procedure, we need to set PC to the line after the jr (HERE). How do we know which address that is?
+- jalr command is jump and link register 
+- the instruction is exactly like jr,but it also sets $31 to the address of the next instruction (i.e. $PC)
 
 assembly code now looks like
+
 	main:
 		...
 		jalr $5 ; $31 = (HERE)
@@ -614,7 +550,8 @@ assembly code now looks like
 
 Thus in order to return to the loader we must save $31 on the stack first and then pop it before returning
 
-mainline template:
+###mainline template:
+
 	main:
 		lis $5
 		.word f
@@ -637,20 +574,21 @@ mainline template:
 	 	pop registers
 	 	return
 
-***Parameter/Result Passing***
-The easiest option is to pass/erturn parameters via registers. 
-However, this makes it complicated with respect to figuring out where registers/paramters are.
-If this is done, the procedure writer MUST document their code so that the client knows which registers will be passed backwards and forwards.
-The largest problem is that there are only 32 registers. A better option push parameters onto the stack. This also requires documentation.
+###Parameter/Result Passing
 
-***Full Code Example***
-We will write a function which will sum the first n numbers.
-; sum 1 to N - adds the numbers 1..N
-; Registers
-; 	$1 - working (i)
-;   $2 - input, the value of N
-;   $3 - output
-sum1toN:
+- The easiest option is to pass/return parameters via registers. 
+- However, this makes it complicated with respect to figuring out where registers/paramters are.
+- If this is done, the procedure writer MUST document their code so that the client knows which registers will be passed backwards and forwards.
+- The largest problem is that there are only 32 registers. A better option push parameters onto the stack. This also requires documentation.
+
+Full Code Example - We will write a function which will sum the first n numbers.
+
+	; sum 1 to N - adds the numbers 1..N
+	; Registers
+	; 	$1 - working (i)
+	;   $2 - input, the value of N
+	;   $3 - output
+	sum1toN:
 	sw $1, -4($30)
 	sw $2, -8($30)
 	lis $1
@@ -659,26 +597,28 @@ sum1toN:
 	add $3, $0, $0 ;initialize $3
 	lis $1
 	.word 1 ;initialize $1
-top:
+	top:
 	add $3, $3, $2
 	sub $2, $2, $1
 	bne $2, $0, top
+	
+	lis $1
+	.word 8 			;update 1
+	add $30, $30, $1 	;increment $30
+	lw $2, -8($30)
+	lw $4, -4($30) 		;pop registers
+	jr $31
 
-lis $1
-.word 8 			;update 1
-add $30, $30, $1 	;increment $30
-lw $2, -8($30)
-lw $4, -4($30) 		;pop registers
-jr $31
+Recursion
+- No extra machinery is needed
+- If registers, parameters, and the stack are managed correctly, recursion will work.
 
-***Recursion***
-No extra machinery is needed
-If registers, parameters, and the stack are managed correctly, recursion will work.
+Input and Output
+- Input: not supported. Deal with it
+- Output: MIPS provides a location (0xffff000c) called video memory, to store words where the least significant byte will be printed to the screen.
 
-***Input and Output***
-Input: not supported. Deal with it
-Output: MIPS provides a location (0xffff000c) called video memory, to store words where the least significatn byte will be printed to the screen.
 example: print CS, followed by newline
+
 	lis $1
 	.word 0xffff000c
 	lis $2
@@ -693,49 +633,55 @@ example: print CS, followed by newline
 	jr $31
 	; output: CS\n
 
-***The Assembler***
+###The Assembler
 An assembler is a program that translates assembly code into  equivalent machine code
-Assembly code (add $1, $0, $0 ...) -> assembler -> machine code (0100010...)
+- Assembly code (add $1, $0, $0 ...) -> assembler -> machine code (0100010...)
+
 Any translation proccess involves two steps 
 - analysis: understand what is meant by the source string
 - synthesis: output equivalent target string
 
 An assembly file (.asm) is just a stream of characters; a text file.
-Step 1: Group characters into meaningful *tokens*.For example, labels, hex numbers, regular numbers, .word, registers, etc.
-	This part has been done for us; we will talk about it in far more detail.
-	(e.g. for the C++ starter code, each token is an instance of the token class)
+
+Step 1: Group characters into meaningful **tokens**. For example, labels, hex numbers, regular numbers, .word, registers, etc.
+- This part has been done for us; we will talk about it in far more detail.
+- (e.g. for the C++ starter code, each token is an instance of the token class)
+
 Step 2: Group tokens into instructions, if possible (analysis)
+
 Step 3: Output equivalent machine code (synthesis)
-If tokens are not arranged into sensible instructions, output ERROR to standard error
-Advice: there are many more wrong configurations than right ones for an assembly file. 
+- If tokens are not arranged into sensible instructions, output ERROR to standard error
+- Advice: there are many more wrong configurations than right ones for an assembly file. 
+
 For example, the instructor beq $1, $0, abc  would generate a sequence of token "kinds": ID REGISTER COMMA REGISTER COMMA ID
 
-***Biggest problem with writing assembler***
+####Biggest problem with writing assembler
 How do we assemble:
+
 	beq $1, $0, abc
 	...
 	abc: add $3, $3, $3
+
 we can't assemble this because we don't (yet) know what abc is. The solution: we will scan through the program twice.
 
-Pass 1: group the tokens into instructions and record the addresses of all labelled insturctions - a "symbol table" which is conceptually alist of (name, address) pairs.
-Notes: 
-	- A line of assembly can have more than one label
-	- You can label the line after the end
-Pass 2:  
-	Translate each insctruction into machine code. If an instruction refers to a lable, look up the associated address in the symbol table.
-	Our assembler should ouptut the assembled MIPS to stdout, and we should ouput the symbol table to stderr
+Pass 1: group the tokens into instructions and record the addresses of all labelled insturctions - a "symbol table" which is conceptually a list of (name, address) pairs.
+- A line of assembly can have more than one label
+
+Pass 2: Translate each insctruction into machine code. If an instruction refers to a lable, look up the associated address in the symbol table.
+- Our assembler should ouptut the assembled MIPS to stdout, and we should ouput the symbol table to stderr
 
 Assembly Trace:
-	main: lis $2
-		  .word 13
-		  add $3, $0, $6
-    top:  add $3, $3, $2
-     	  lis $1
-     	  .word 1
-     	  sub $2, $2, $1
-     	  bne $2, $0, top
-     	  jr $31
-    beyond:
+
+	main: 	lis $2
+		.word 13
+		add $3, $0, $6
+    	top:  	add $3, $3, $2
+     	 	lis $1
+	     	.word 1
+	     	sub $2, $2, $1
+	     	bne $2, $0, top
+	     	jr $31
+    	beyond:
 
 -----
 Jan 22
