@@ -1003,8 +1003,8 @@ More notes on QuickSort
 Decision tree:
 - a binary tree that can model the processing of any algorithm in the comparison model
 
-![binary decision tree](/Jan_29_binary.jpg)
-![binary decision tree](/Jan_29_decision_tree.jpg)
+![binary decision tree](/cs240/Jan_29_binary.jpg)
+![binary decision tree](/cs240/Jan_29_decision_tree.jpg)
 
 Lower bounds for sorting 
 - thm: the lower bounds for sorting in the comparison model is omega(nlogn)
@@ -1037,7 +1037,7 @@ Pseudo-code:
 
 This takes O(n+R) time
 
-![image of quicksort](/Jan_29_quick_sort.jpg)
+![image of quicksort](/cs240/Jan_29_quick_sort.jpg)
 
 ###Radix sort
 - sort n integers in base R (R-radix)
@@ -1059,7 +1059,7 @@ try LSD-radix:
 	for d ← m down to 1 do 
 		Sort A by dth digit
 
-![LSD radix](/Jan_29_LSD.jpg)
+![LSD radix](/cs240/Jan_29_LSD.jpg)
 
 **stable**:
 - Sort-routine must be stable: equal items stay in original order.
@@ -1139,7 +1139,7 @@ Each node stores:
 
 Examples of AVL trees (and not AVL trees):
 
-![AVL and not](/Feb3_AVL_not.jpg)
+![AVL and not](/cs240/Feb3_AVL_not.jpg)
 
 Insert x into AVL
 - Search for its place
@@ -1168,7 +1168,7 @@ rotate-right(T)
 		3. newroot.right ← T
 		4. return newroot
 
-![Right rotation](/Feb3_right_rotation.png)
+![Right rotation](/cs240/Feb3_right_rotation.png)
 
 
 rotate-left(T)
@@ -1180,7 +1180,7 @@ rotate-left(T)
 		3. newroot.left ← T
 		4. return newroot
 
-![Left rotation](/Feb3_left_rotation.png)
+![Left rotation](/cs240/Feb3_left_rotation.png)
 
 
 fix(T)
@@ -1225,9 +1225,9 @@ Lemma:
 
 Example of delete:
 
-![Pre-delete](/Feb5_pre_delete.png)
+![Pre-delete](/cs240/Feb5_pre_delete.png)
 
-![Post-delete](/Feb5_post_delete.png)
+![Post-delete](/cs240/Feb5_post_delete.png)
 
 Note that we can't just rotate right because then the right half of the tree would be taller than the left half - still a problem. This is why we need to rotate the left half before rotating the whole thing.
 
@@ -1276,7 +1276,7 @@ Def 2-3 tree
 - contains one KVP and 2 children which are 2-3 trees
 - two KVP and 3 children which are 2-3 trees
 
-![example](/Feb5_23_example.png)
+![example](/cs240/Feb5_23_example.png)
 
 Restriction: all empty subtrees are at the same level (aka all of the non-empty leaves are at the same level)
 
