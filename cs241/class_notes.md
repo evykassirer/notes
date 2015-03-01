@@ -1531,51 +1531,47 @@ Example:
 
 ####Last time:
 
-Note that if we have L  {a^2n | n>=0} we show it's regular by describing it with a regular expression - using only operations in regular expressions that we talked about - here it's (aa)*
-
-####Scanning algorithm
-
-- Maximal Munch vs Simplified Maximal Munch
+- Note that if we have L  {a^2n | n>=0} we show it's regular by describing it with a regular expression - using only operations in regular expressions that we talked about - here it's (aa)*
+- Scanning algorithm - Maximal Munch vs Simplified Maximal Munch
  - difference? - no backtracking
 
-###Segway to new topic
 
-Consider Σ  = {( , )} (αbet of brackets)
 
-- We have L = {w in Σ* | w is a string of balanced parentheses}
+Now consider Σ  = {( , )} (alphabet of brackets)
+
+- We have L = {w in Σ\* | w is a string of balanced parentheses}
 - Can we build a DFA for L?
-- Ech new state lets us recognize one more level or nesting, but no finite number of states recognizes all levels of nesting, and a DFA must have a finite number of states
+- Each new state lets us recognize one more level or nesting, but no finite number of states recognizes all levels of nesting, and a DFA must have a finite number of states
 
 tokens => [Parsing/syntactic analysis] => parse tree
 
 what is required?
-
-Given a formal syntax specication, the parser verfiies whether the incoming tokens have a valid syntax confirming to the specifications and outputs a parse tree to allow semantic analysis in the following step.
-
-This cannot be done with regular languages, so we move to the next class in the Chomsky Hierarchy
+- Given a formal syntax specication, the parser verfiies whether the incoming tokens have a valid syntax confirming to the specifications and outputs a parse tree to allow semantic analysis in the following step.
+- This cannot be done with regular languages, so we move to the next class in the Chomsky Hierarchy
 
 ###Context-Free Languages
 
-These are languages which can be described by a context-free grammar; a set of "rewrite rules". Following the balanced paranthesis example:
+These are languages which can be described by a context-free grammar; a set of "rewrite rules". 
 
+Following the balanced paranthesis example:
 - empty: S->epsilon
 - a word in the language surrounded by (): S->(S)
-- the concatenation of two words in the language: S-SS
+- the concatenation of two words in the language: S->SS
 
 The shorthand for this is S->epsilon|(S)|SS
 
 Example: show how this system generates (())():
+- S => SS => (S)S => ((S))S => (())S => (())(S) => (())()
 
-	S => SS => (S)S => ((S))S => (())S => (())(S) => (())()
-
-The notaton we have used:
-- => means "derives": a->b means b can be dervied from a by one application of a grammar rule
+**The notaton we have used:**
+- => means "derives"
+- a->β means β can be dervied from a by one application of a grammar rule
 
 we formally define a context-free language to consist of:
-- an αbet of terminal symbols
+- an alphabet of terminal symbols
 - a finite non-empty set N of of non-terminal symbols, such that N union Σ = null set
  - we often use V (vocabulary) to denote N U Σ
-- a finite set of P productions, where productions have the form a->b, A in N, b in V*
+- a finite set of P productions, where productions have the form A->β, A in N, β in V*
 - an element S in N as the start symbol
 
 In our parentheses example, we have that terminal symbols are {(,)}, non-terminal symbols are {S}, and S is our start symbol
@@ -1585,13 +1581,13 @@ Conventions
 - w, x, y,... are elements of Σ* (words)
 - A, B, C, ..., S, ... are elements of N (non-terminals)
 - S is the start symbol
-- α, β, gamma, ... indicate elements of V* (I've been using a, b, c in these notes cause I didn't want to type out α, β, etc)
+- α, β, γ, ... indicate elements of V*
 
 We write αAβ => αγβ if there is a production A->γ in P
 
-alpha=>beta means that alpha=>delata1=>delta1=>...=>deltan=>beta for n>=0
+α=>β means that α=>delata1=>delta1=>...=>deltan=>β for n>=0
 
-Definition: L(G) = {w in sigma* | S =>*  w}, where L(G) is the langauge specified by G
+Definition: L(G) = {w in Σ\* | S =>\*  w}, where L(G) is the langauge specified by G
 
 Note that this is a set of strings of terminals only. A language L is context-free if L=L(G), for some context-free grammar G
 
@@ -1604,30 +1600,30 @@ Example: Palindromes over {a,b,c}
  - S => aSa => abSba => abMba => abcba
  - ^ This proccess is called a derivation
 
- Example 1: sigma = {a,b,c,+,-,x,/} and L1 = {arithmetic expression from sigma}
- S -> S op S|a|b|c
- Op->+|-|/
- But we could have speciiced this with a regular expression
+Example 1: sigma = {a,b,c,+,-,x,/} and L1 = {arithmetic expression from sigma}
+- S -> S op S|a|b|c
+- Op->+|-|/
+- But we could have speciiced this with a regular expression
 
 Example 2: sigma2={a,b,c,+,-,/,(,)} where L2 = {arithmetic expressions over sigma2 with balanced parthentheses}
-S->a|b|c|S op S|(S)
-Op->+|-|x|/
-Show that S =>* a+b
-	S => S op S => a Op S => a + S => a + b     
-	alternatively:
-	S => S op S => S op b => S + b => a + b
-Note that we have a choice over which symbmol to expand first
+- S->a|b|c|S op S|(S)
+- Op->+|-|x|/
+- Show that S =>* a+b
+ - S => S op S => a Op S => a + S => a + b     
+ - alternatively: S => S op S => S op b => S + b => a + b
+- Note that we have a choice over which symbmol to expand first
 
 Leftmost Derivation: always expand leftmost symbol first
+
 Rightmost Derivation: always expand rightmost symbol first
 
-We are showing too much information sinc this information doesn't matter and this can get very long. We can express them naturally and succinctly as a tree stucture.
+We are showing too much information, since this information doesn't matter and this can get very long. We can express them naturally and succinctly as a tree stucture.
 
-Example: consider abcba (see pic)
+Example: consider abcba
+
+![ ](/Feb24-abcba.jpg)
+
 For the leftmost derivation, there is a unique corresponding parse tree and vice versa.
-For example, the leftmost derivation for a+bxc
-	S=>S Op S=>a+b Op S => a+bxS => a+bxc
-	see tree picture
 
 ----
 ##Feb 26
@@ -1639,27 +1635,28 @@ Midterm - we will provide
 
 ####Last Time
 
-CFL/CFOs
-In a derivation, one non-terminal in the current string is selected and replaced or rewritten using RHS of a production rule for that non-terminal
+- CFL (context free languages)/CFGs
+- In a derivation, one non-terminal in the current string is selected and replaced or rewritten using RHS of a production rule for that non-terminal
+
+e.g. production rules
 
 	S->a|b|c|S op S|(S)
 	Op->+|-|x|/
 
 What is the RE for this langugae?
-- (a|b|c)((+|-|*|/)(a|b|c))*
+- (a|b|c)((+|-|\*|/)(a|b|c))\*
 
-Leftmost derivation for a+bxc
-S => S Op S => a Op S => a + S => a + S Op S => a + b Op S => a + b x S => a + b x c
-(picture of tree)
+Leftmost derivation for a+bxc: S => S Op S => a Op S => a + S => a + S Op S => a + b Op S => a + b x S => a + b x c
 
-Or, expand the first S first
-S => S Op S => S Op S Op S => a Op S Op S => a + S Op S => a + b Op S => a + b x S => a + b x c
-(picture of tree)
+![ ](/Feb26-leftmost.jpg)
+
+Or, expand the first S first: S => S Op S => S Op S Op S => a Op S Op S => a + S Op S => a + b Op S => a + b x S => a + b x c
+
+![ ](/Feb26-rightmost.jpg)
 
 These correspond to DIFFERENT parse trees. A grammar for which the same word has more than one distinct parse tree is called **ambiguous**. The grammar we defined above is ambiguous. If we only care about whether a string is in the language, the ambiguity doesn't matter.
 
-As compiler writers we want to know why a word is in a language, so the derivation matters.
-Why does it matter? The shape of the prase tree describes the meaning of the word, so a word with an ambiguous parse may have multiple possible meanings.
+As compiler writers we want to know why a word is in a language, so the derivation matters. Why does it matter? The shape of the parse tree describes the meaning of the word, so a word with an ambiguous parse may have multiple possible meanings.
 
 In the first tree, bxc is grouped more tightly, and in the second a+b is grouped. So it could mean a+(bxc) or (a+b)xc
 
