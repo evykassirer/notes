@@ -1757,17 +1757,1396 @@ For simplicity, we will use **augmented grammars** for parsing. We invent two ne
 
 say w = BOF a b y w x EOF
 
-Stack  			Read Input 		Unread Input 			Action
------------------------------------------------------------------------
-S'  			ɛ 		BOF a b y w x EOF   	Pop S', push EOF S BOF
-EOF S BOF 		ɛ 		BOF a b y w x EOF 		match BOF (first in unread input)
-EOF S 			BOF 			a b y w x EOF 			Pop S, push ByA
-EOF B y A 		BOF 			a b y w x EOF 			Pop A, Push ba
-EOF B y b a 	BOF 			a b y w x EOF 			match a
-EOF B y b       BOF a 			b y w x EOF 			match b
-EOF B y 		BOF a b 		y w x EOF 				match y
-EOF B 			BOF a b y 		w x EOF 				pop B, push xw
-EOF x w   		BOF a b y 		w x EOF 				match w
-EOF x 			BOF a b y w 	x EOF 					match x
-EOF 			BOF a b y w x   EOF 					match EOF
-ɛ 		BOF a b y w x EOF
+		Stack  			Read Input 			Unread Input 			Action
+		-----------------------------------------------------------------------
+		S'  			ɛ 					BOF a b y w x EOF   	Pop S', push EOF S BOF
+		EOF S BOF 		ɛ 					BOF a b y w x EOF 		match BOF (first in unread input)
+		EOF S 			BOF 				a b y w x EOF 			Pop S, push ByA
+		EOF B y A 		BOF 				a b y w x EOF 			Pop A, Push ba
+		EOF B y b a 	BOF 				a b y w x EOF 			match a
+		EOF B y b       BOF a 				b y w x EOF 			match b
+		EOF B y 		BOF a b 			y w x EOF 				match y
+		EOF B 			BOF a b y 			w x EOF 				pop B, push xw
+		EOF x w   		BOF a b y 			w x EOF 				match w
+		EOF x 			BOF a b y w 		x EOF 					match x
+		EOF 			BOF a b y w x   	EOF 					match EOF
+		ɛ 				BOF a b y w x EOF  epsilon					accept
+
+----
+##March 3 
+
+
+Let's codify this
+- When the top of othe stack is a terminal pop and matched against the input
+- when TOS (top of stack) is a non-terminal A, pop A and push reverse (alpha), where A->alpha is a grammar rule
+- accept when stack and input are empty
+- brute force: try all combinations until one works - this is inefficient
+- we want a Deterministc Procedure with no backtracking
+- our solution is to use the next symbol of input (lookahead) to help decide
+
+Construct a **predictor table** - given a non-terminal on the stack and an input symbol, tell us which production to use. Empty cells are errors.
+
+	     BOF  a  b  c  d  w  x  y  z  EOF
+	-----------------------------------------
+	S'    1
+	S         2     2
+	A         3     4
+	B                     6         5
+
+The rest of the table can be used for descriptive error mesesages: "Parse error at row, col: expecting one of (symbols where the predictor table does have entries)"
+
+What if a cell contains more than one rule? THe method breaks down
+
+A grammar is called LL(1)
+- L: left to right scan of input
+- leftmost derivations produced
+- 1: 1 symbol of lookahead
+
+(top down parsing - starting with s ending at w - recall that triangle diagram)
+
+We can automatically compute the predictor table
+- Predict(A,a) -> rules that apply when A is on the setack and a is the next input character
+ - Predict(A,a) = {A->B | a is elem of First(beta)}
+- First(beta), beta in V* is the set of characters thata can be the first letter of a derivation starting from beta
+ - First(beta) = {a|beta =>* a gamma}
+ - For example: First(AyB) = {a,c}
+- So Predict(A,a) = {A->beta | beta =>* a gamma}
+
+However, this is not quite right. What if A=>*epsilon?
+- Then a might not come from A, but from something AFTER A.
+- we missed something - what if there is more than one production with the same LHS? How do we know which one to pick?
+- So, Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
+- Nullable(beta) = true if B=>*epsilon, false otherwise
+- Follow(A) = {b | S' =>* alpha A b beta}: the set of terminal symbmols that can come immediatly after A in a derivation of S'. 
+ - In our example: Follow(A) = {y}
+
+Computing Nullable -  Nullable(Beta) = true if beta =>* epsilon
+
+	initialize Nullable[A] <- false for all A // an array
+	repeat
+		for all rule A->B1...Bk do
+			if k = 0 or Nullable[B1] = Nullable[B2] = ... = Nullable[Bk] = true then
+				Nullable[A]<-true
+	until nothing changes
+
+First(beta) = {a|beta =>* a gamma}
+
+	initialize First[A] <- {} for all A //an array
+	for all rule A -> B1...Bk do
+		for i in 1...k do 
+			if Bi in sum terminal then
+				First[A] <- FIrst[A] U Bi
+				break
+			else (Bi in N (non terminal))
+				First[A] <- First[A] U First[Bi]
+				if not Nullable[Bi] then
+					break
+
+First*(B)
+
+	First*(Y1..Yn)
+		result<-{}
+		for i in 1...n do 
+			if Yi in sigma then
+				result <- result U Yi
+				break
+			else (Yi in N)
+				result <- result U first[Yi]
+				if not Nullable[Yi] then
+					break
+		return result
+
+Follow(A)
+
+	initialize Follow[A] <- {} for all A != S'
+	repeat
+		for all rule A->B1...Bn do
+			for i in 1..n do
+				if Bi in N then
+					Follow[Bi]<-Follow[Bi] U First*(Bi+1 ... Bn)
+				if all of Bi+1...Bn are Nullable then
+					Follow[Bi]<-
+
+
+
+					THESE ARE BEING POSTED :C
+
+
+Sample Trace:
+
+	1) S' -> BOF S EOF
+	2) S -> bSd
+	3) S -> pSq
+	4) S -> C
+	5) C -> lC
+	6) C -> epsilon
+
+Nullable
+
+	0 - initialize array
+	1 - there's a rule for C to null
+	2 - there's a rule for S to C (which is null)
+	3 - no change, so done
+
+	iterator   0   1   2   3
+	--------------------------
+	S'         F   F   F   F 
+	S 		   F   F   T   T
+	C          F   T   T   T
+
+First
+
+	iteration   0     1      2       3-same as 2
+	----------------------------------------------
+	S'         {}   {BOF}    {BOF}
+	S          {}   {b,p}    {b,p,l}
+	C          {}   {l}      {l}
+
+Follow
+   iter  0    1                2
+   S    {}   {BOF, d, q}    {BOF, d, q}
+   C    {}   {BOF, d, q}    {BOF, d, q}
+
+------
+##March 5
+
+###Last time
+- LL(1) Parsing
+
+
+	1) S' -> BOF S EOF
+	2) S -> bSd
+	3) S -> pSq
+	4) S -> C
+	5) C -> lC
+	6) C -> epsilon
+
+Nullable:  S' false    S true	L true
+
+First: S' {BOF}    S {b,p,l}    L {l}
+
+Follow: S {BOF, d, q}  L {BOF, d, q}
+
+Now since Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
+
+	    BOF   EOF   b   d   p   q   l
+	S'   1                             <-- rule numbers
+	S          4    2   4   3   4   4 
+	C          6        6       6   5
+
+This makes a very good exam question
+
+A grammar is LL(1) if
+- no two distinct productions with the same LHS can generate the first terminal symbol (the first set in the union for predict is at most 1)
+- there is only one way to send a nullable symbol to epsilon (the second set in the union for predict must be at most 1)
+- no nullable symbol has the same terminal in both its first set and its follow set (only one of the sets has size 1)
+
+Weakness: LL must predict which production to use based on first (k) tokens of RHS
+
+###Bottom-up parsing
+
+We want w to S. THe stack stores partially reduced input: s <= alpha_k <= ... <= S
+
+Our invariant: the stack and unread input are equal to alpha_i
+
+[some slides that will be posted]
+
+We have two choices at each step
+- shift a character from input to top of stack
+- reduce - top of stack is RHS of a grammar rule, replace with the LHS
+- accept if the stack contains S' and input epsilon (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting END of is good enough too
+
+How do we know whether to shift or reduce? We know
+- the next character of input
+- this is is a very hard problem
+
+Theorem (Donald Knuth, 1965): Let w be the stack and a be the next input character. The set {wa | there exists x . S' =>* wax} is a regular set. This can be described by a DFA, and we can use the DFA to make shift/reduce decisions.
+
+The resulting method is LR parsing left-to-right scanning.
+- rightmost derivation (remember triangle pic)
+
+LR is more powerful than LL because it chooses the production after tokens for the entire RHS have been seen (plus any lookahead)
+
+Example:
+
+	S' -> BOF E EOF
+	E -> E + T
+	E -> T
+	T -> id
+
+Definition: An **item** is a production with a dot (·) somewhere on the RHS, indicating a partially completed rule.
+
+Label an arc with the symbol that follows the dot. Advance the dot in the next state. If the dot preceeds a non-terminal A, add all the productions with A on the LHS to the state (dot in the leftmost position
+
+[more slides]
+
+####Using the Automaton
+
+Start in the start state with an empty stack
+- shifting
+ 1. shift a character from input to the stack
+ 2. follow the transition labeled with that chracter in themachine, to the next state (if there is one)
+ 3. if none - error or reduce
+
+Reducing
+1. Reduce states have only one item and the dot is rightmost
+2. Reduce by the rule in the stack - pop RHS off the stack, backtrack size(RHS) states in DFA, psush LHS onto stack and then follow the transition for LHS
+- accept when you shift EOF
+- backtracking in a DFA is accomplished by remmebering the previous DFA states. We can push the DFA states onto the setack as well. We can use 2 stack or comine into one stack.
+
+Example: BOF id + id + id EOF
+
+Stack 					Read 			Unread					Action
+1 						epsilon			BOF id + id + id EOF 	Shift BOF, goto 2
+1 BOF 2 				BOF 			id + id + id EOF 		shift 6
+1 BOF 2 id 6  			BOF id 			+ id + id EOF 			R T->id (Now in state 2) 
+1 BOF 2 T S				BOF id 			+ id + id EOF			R E->T
+1 BOF 2 E 3 			BOF id 			+ id + id EOF 			S 7
+1 BOF 2 E 3 + 7  		BOF id + 		id + id EOF 			S 6
+1 BOF 2 E3 + 7 id 6 	BOF id + id 	+ id EOF                R T->id
+1 BOF 2 E 3 + 7 T 8     BOF id + id     + id EOF    			R E->E+T
+1 BOF 2 E + 7
+
+...etc (I think it's in Brad's notes I have from somewhere)
+
+Note this is a DFA (from NFA)
+
+What can go wrong? 
+
+What if a state looks like:	
+
+	A -> alpha dot c beta
+	B -> gamma dot
+
+Do we shift c (as suggested by reule 1) or reduce by second rule?
+
+This is a shift-reduce conflict
+Also what about
+
+	A->alpha dot
+	B-> beta dot
+
+Which rule do we reduce? This is a reduce-reduce conflict	
+
+If any item
+
+	S' -> BOF E EOF
+	E -> T + E 
+	E -> T
+	T -> id
+
+For each A->alpha dot, attach Follow(A) 
+Follow(E) = {BOF}
+Follow(T) = {+, EOF}
+
+
+-----
+##March 10
+
+
+Reduce-shift conflict
+- A -> alpha dot c beta
+- beta -> alpha dot
+- do we shift c or reduce second rule?
+
+Reduce-reduce conflict
+- A -> alpha dot
+- B -> beta dot
+
+If any item which has a dot at the end occurs in a state which it is not alone, then there is a conflict and the grammar is not LR(0).
+
+	S' -> BOF E EOF
+	E -> T + E
+	E -> T
+	T -> id 
+
+	E -> dot T + E
+	E -> dot T
+
+Right associative expressions (slides)
+
+We see a shift reduct conflict in state 5. For example, if the input starts with BOF id, we go from state 1 to 2 to 6 to 5. Then should we reduce E->T? IT DEPENDS. If the input is BOF id EOF then YES. If the input is BOF id + ... EOF then NO. Add lookahead to the automaton to resolve the conflict.
+
+For each A -> alpha, attach Follow(A): 
+Follow(E) = {EOF}, Follow(T) = {+, EOF}
+
+THe interpretation: A reduce action applies only if the next character is in the follow set of the non-terminal. Thus, the first rule only applies if the next char is EOF, and the second only applies if the next char is + (for state 5). Conflict resolved.
+
+The result is called an SLR(1) parser (simple left-to-right, rightmost derivation, 1 character lookahead).
+- SLR resolves many (but not all) conflicts. LR(1) is more sophisticated than SLR(1), parsing more grammars.
+
+recall that theorem from Knuth from before
+- on the translation of languages from left to right: Information and Control, 8 607-639 (1965)
+
+More resources:
+- Introduction to the Theory of Computation, Sipser
+- Introduction to Automata Theory, Languages, and Computation - Hopcroft and Ullman
+
+###back to LR1
+
+Example: This language is not LL(1)
+
+	E -> E + T | T
+	T -> T * F | F
+	F -> a | b | c
+
+How do we know this right away? 
+
+This is because we have left recursion (ie recursion on the left). This is because we with E on the stack and a on the input, we can do two different Things. Note that First(E) and First(T) both contain a.
+
+Let's try right recursion:
+
+	E -> T + E | T
+	T -> F * T | F
+	F -> a | b | c
+
+But this is still not LL(1), since T, T+E generate the same first symbols. So we do this:
+
+	E -> T E'
+	E' -> epsilon | + epsilon
+	T -> F T'
+	T' -> epsilon | * F
+	F -> a | b | c
+
+Left factoring - This is LL(1) but it's ugly and we've changed the associativity of expressions. So LL(1) is a odds with left associativity.
+
+Building a parse tree:
+- Top Down: 
+ - Expand S->Ayb - pop S, push b, y, A
+ - keep S, make new nodes its children
+- Bottom Up:
+ - Reduce A -> ab
+ - attach the old nodes as children of the new node
+
+ ### Context sensitive Analysis
+
+ Now that we have a grammar and can parse, if our program is not rejected by this point, do we have a valid C program?
+
+ No, but hopefully we haven't excluded any valid programs.
+
+ What do we know? - The program is syntactically well-formed. What properties of valid C programs cannot be enforced by CFGs?
+- Variables and Functions - declaration before use, multiple declarations
+- Scope
+- Types - operators, parameter lists
+
+Third step of our compiler: parse tree -> [semantic analysis] -> symbol table and parse tree
+
+Note: our compiler is broken into separate programs to isolate the pieces of each assignment . Remember the tree question from A3 for A8.
+
+To solve these, we need more complex programs. We will perform context sensitive analysis by traversing the parse tree. To use the given parse tree we need the following 
+
+Example: expr - three children expr + expr
+
+Class Tree {
+	public
+		string rule; //expr expr PLUS term
+		vector<string> tokens; // "expr, "expr", "PLUS", "term"
+		vector<Tree*> children; // 3 children
+}
+
+-----
+## March 12
+
+Traversal through a tree:
+
+void doSomething(const Tree &t) {
+	// do something with t
+	for(vector<TREE*>::const_iterator it = t.children.begin(); it != t.children.end(); ++it) {
+		dosomething(**it);
+	}
+}
+
+###Declaration Errors - Multiple/Missing
+
+For simplicity, for now we assume that there is only one procedure. We've seen this before - we created a symbol table to keep track of used labels when we assembled a MIPS file. We'll do it again:
+
+For each node with rule [dcl->type ID]
+- extract name (e.g. x) and type ("int" or "int*") and add it to the symbol table
+- if name already in symbol table, error
+- multiple declarations are now checked
+
+Traverse again - for rules factor -> ID, statement -> lvalue becomes expr SEMI
+- if ID's name is not in symbol table, error (lvalue has an id)
+- undeclared variables now checked
+
+To actually implement the symbol table, we could use a global variable: 
+- map<string, string> symbolTable  (where the first string is the name, second is the type)
+- but, this does not take scope into consideration:
+
+	int f() {
+		int x = 0;
+		return 1;
+	}
+	int wain(int a, int b) {
+		int x = 0; //this is a duplicate declaration of x
+		return x;
+	}
+
+Likewise, if we declared x in f and used it in wain, it would appear valid. We also haven't checked procedure declarations. How can we forbid duplicate declarations in the same procedure, but permit them in different procedures? The solution is to have a separate symbol table for each procedure. Have one top-level symbol table that collects all procedure names: map<string, map<string, string>> topSymbolTable (where the first string is procedure name, the map is the procedure's symbol table)
+
+When traversing, if the rule is "procedure -> INT ID LPAREN ..." or "main -> INT WAIN LPAREN ..." then we have a new procedure. If the name is not in the symbmol table, create a new entry (and a new symbol table)
+. Note - you probably want a variable that determines what procedure is currently being parsed. Update each time we encounter one of the two procedure rules above.
+
+For variables, the declared type is stored in the symbol table. For procedures, we still need the signature (the types of the parameters). Note that all procedures return int for this language So we don't need to worry about the return type. We re-update the table again:
+
+#include<utility>
+map<string, pair<vector<string>, map<string,string>>> topSybolTable;    (where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
+
+To compute the signature:
+- traverse nodes of the form: 
+ - paramlist -> dcl   
+ - paramlist -> dcl COMMA paramlist
+- if params -> epsilon, the signature is empty
+
+All this analysis can be done in a single pass
+
+### Type Checking
+
+Why do programming languages have types? Recall - we can't know just by looking at raw bits what they represent. We need to remember what our intent was when we stored the bits. Types help us do that. Types allow us to assign and remmeber an interpreation for the contents of some memory address. A good type system prevents us from reinterpreting the bits as something else.
+
+	int *a = NULL; // denotes pointer
+	a = 7; // attempting to store an int where a pointer is needed, should be prevented
+
+In WLP4, there are only two types: int and int*. To check type correctness, we need to get the type for every variable/expression and ensure that operators/functions are applied to operands of the correct type. Catching type errors can be performed as follows:
+	string typeOF(const Tree &t) {
+		for each c in t.children
+			compute_type_of(c);
+		use t.rule to decide what type rule is relevant
+		combine typoes of children with the rule, use these to determine t's type
+		if not possible, error
+	}
+
+For example, how do we type check on ID? We get its type from the symbol table: look if <id.name, T> is in dcls
+- <id.name, T> in dcls => id.name : T (notation on the board shows as a/b instead of a=>b - recall notation from CS 245)
+- x:y means x has type y
+- if id.name was declared to have type T, then id.name has type T
+
+	string typeOf(const Tree &t) {
+		....
+		if (t.rule == "ID NAME") {
+			return symbolTable.lookup(name);
+		}
+	}
+
+Singleton Productions:
+- e.g. 
+ - expr -> term
+ - term -> factor
+ - factor -> ID
+ - we return typeOf(only child);
+- other forms are also easy (especially leaves)
+ - [nothing] => Num:int
+ - [nothing] => NULL:int*
+ - E:T -> (E):T
+- other forms get more complicated
+ - E:int => &E:int
+ - E:int* => *E:int
+ - E:int => new int[E]:int*
+- multiplicaiton and division
+ - E1:int E:int => E1*E2:int
+ - E1:int E2:int => E1/E2:int
+ - E1:int E2:int => E1%E2:int
+- Addition is more complicated
+ - int + int -> int
+ - int* + int or int + int* -> int*
+ - int* + int* -> NO
+- subtraction is similar
+ - int - int -> int
+ - int* - int -> int*
+ - int - int* -> NO
+ - int* - int* -> int
+- function calls:
+ - <f,()> in dcls => f():int
+ - <f,(T1..Tn)> in dcls E1:T1 ... En:Tn => f(E1,...,En):int
+
+For while loops and if statements, the condition should be booelean, not int or int*, but there is no boolean type in WLp4. The grammar forces T to be a comparison (expr comparison expr). However, the comparison stil needs to be checked. Any expression witha  type is well-typed.
+- E:T => wellTyped(E)
+
+For comparisons
+- E1:T E1:T => welltyped(E1 == E2)
+- E1:T E2:T => welltyped(E1 != E2)
+- E1:T E2:T => welltyped(E1 < E2)
+
+A comparison is welltyped if its arguments have the same type. We allow less than comparisons of pointers if they are the same array; otherwise behavour is undefined. (which is fine - we just don't worry about it)
+
+-------
+## March 17
+
+Assignment:
+- E1:T E2:T => welltyped(E1=E2)
+
+Print:
+- E:int => welltyped(println(E))
+
+Deallocation:
+- E:int* => welltyped(delete[]E)
+
+If
+- welltyped(T) welltyped(S1) welltyped(S2) => welltyped(if (T) {S1} else {S2})
+
+Loops:
+- welltyped(T) welltyped(S) => welltyped(while(T) {S})
+
+Statement sequences (including empty):
+-    => welltyped(epsilon)
+- welltyped(S1) welltyped(S2) => welltyped(S1 S2)
+
+Procedures:
+- welltyped(dcls) welltyped(S) E:int => welltyped(int id (params) {dcls S return E;})
+
+Wain (using mips.twoints or mips.array):
+- dcls:int welltyped(dcls) welltyped(S) E:int => welltyped(int wain(dcl, dcl2) {dcls S return E;})
+
+The results so far:
+
+	source -> [lexical analysis] -> tokens -> [parsing] -> parse tree -> [semantic analysis] -> symbol table and parse tree -> [code gen] -> assembly
+
+We're at the code gen stage! 
+
+###Code generation
+
+By now the source program is guarenteed to be without compiler errors. We must now output an equivalent MIPS assembly program. THere are infinitely many equivalent MIPS programs - which do we choose?
+- correct: must work in most cases
+- easy: for CS241
+- efficient: compile time and runtime - for the purpose of A11, fastest will be interpreted as fewest instructions
+
+Example: 
+	
+	int wain (int a, int b) {
+		return a;
+	}
+
+Conventions:
+- the parameters are held in $1 and $2
+- since our loaders are mips.twoints and mips.array, the output of wain goes into $3
+
+some assembly code for this:
+
+	add $3, $1, $0
+	jr $31
+
+We will never see assembly code this clean and efficient, unless the compiler is really really really smart.
+
+Example 2:
+
+	int wain (int a, int b) }
+		return b;
+	}
+
+assembly:
+
+	add $3, $2, $0
+	jr $31
+
+These two programs have the exact same parse tree, so how do we tell one from the other? We are going to use the symbol table. Let's add a field to the symbol table which indicates where each symbmol is stored.
+
+	Name 	Type 		Location
+	-----------------------------------
+	a 		int 		$1
+	b 		int 		$2
+
+(suggestion to combine type and location into a class/struct)
+
+Then when traversing the parse tree for code generation, when ID is encountered	within the return statement, look itup in the symbol table. If ID is a, get back $1, and $2 for b.
+
+####Adding Local Declarations
+
+These can't all be in registers, since there are not enough. For simplicity, allocate space on the stack for all local variables, including parameters of wain.
+
+	int wain(int a, int b) {
+		int c = 0;
+		return a;
+	}
+
+Symbol table without c:
+
+	Name  	type 	offset
+	-----------------------
+	b 		int 	4
+	a  		int 	0
+
+stack:  $30-> b a  (b is on the top of the stack)
+
+	sw $1, -4($30)
+	sw $2, -8($30)
+	lis $4
+	.word 4
+	sub $30, $30, $4
+	sub $30, $30, $4
+	lw $3, 4($30) ; 3 is equal to the value at offset 4
+	add $30, $30, $4
+	add $30, $30, $4
+	jr $31
+
+what happens when we add c?
+
+new symbol table:
+
+	Name  	type 	offset
+	-----------------------
+	c 		int 	8
+	b 		int 	4
+	a  		int 	0
+
+stack:  $30-> c b a 
+
+	sw $1, -4($30)
+	sw $2, -8($30)
+	lis $4
+	.word 4
+	sub $30, $30, $4
+	sub $30, $30, $4
+	sw $0, -4($30)
+	sub $30, $30, $4
+	lw $3, 8($30) ; now 3 is equal to the value at offset 8
+	add $30, $30, $4
+	add $30, $30, $4
+	add $30, $30, $4
+	jr $31
+
+Problem: we dont konw the offsetes until all declarations have been processed. Since $30 changes with each new declaration and if we ever use the stack for temporary data, $30 changes and all the offsets in the symbol table are wrong.
+
+Solution: $29 points ot the bottom of the stack frame, aka the "frame pointer". We compute the offsets relative to $29, and they won't move. A stack frame consists of all the state information stored on the stack for an active procedure call. 
+
+A convention taht we will follow is that $4 will always contain the value 4.
+
+New symbol table:
+
+	Name  	type 	offset
+	-----------------------
+	a 		int 	0
+	b 		int 	-4
+	c  		int 	-8
+
+stack: c b a
+ - $30 points to c
+ - $29 points to a
+
+new code:
+	
+	; prologue
+	lis $4
+	.word 4
+	sub $29, $30, 4
+	sw $1, -4($30)
+	sub $30, $30, $4
+	sw $2, -4($30)
+	sub $30, $30, $4
+	sw $0, -4($30)
+	sub $30, $30, $4   ; int c = 0
+	lw $3, 0($29)      ; return a
+	; epilogue
+	add $30, $29, $4
+	jr $31
+
+--------
+##March 19
+
+####Last time
+- codegen
+- recall $3 is used for return value of wain
+
+More complicated example
+
+	int wain (int a, int b) {
+		return a+b;
+	}
+
+###More code gen - addition example
+
+In general, for each grammar rule A -> gamma; we will build code (A) from code (gamma). We will extend the $3 convention to use $3 for the "output" of all expressions 
+
+	a+b;   code(a) ($3 <- value(a))
+		   code(b) ($3 <- value(b))
+		   $3 <- $3 + $3
+
+We need to store pending computations in other registers
+
+	a+b; 	code(a) ($3 <- value(a))
+			add $5, $3, $0 ($5<-$3)
+			code(b) ($3 <- value(b))
+			add $3, $5, $3 ($3 < a+b) // 1 extra register
+
+This works for now, but we are about to see some problems. What about a+b+c?
+
+a+(b+c) : 	
+
+	code(a) 		($3 <- value(a))
+	add $5, $3, $0 	($5<-$3)
+	code(b) 		($3 <- value(b))
+	add $6, $3, $0 	($6<-$3) // can't add now due to ()
+	code(c) 		($3<-value(c))
+	add $3, $6, $3 	($3<-b+c)
+	add $3, $5, $3 	($3<- a+(b+c)) // 2 extra registers
+
+Similarily, a+(b+(c+d)) needs 3 extra registers. Eventually, we will run out of registers. Therefore, this doesn't work. The more general solution is touse the stack. Let's compile a+(b+(c+d)) using the stack.
+
+a+(b+(c+d)): 	
+
+	code(a) 	($3<-a)
+	push($3) 	(sw $3, -4($30); sub $30, $30, $4)
+	code(b) 	($3<-b)
+	push($3)	 etc.
+	code(c)
+	push($3)
+	code(d)
+	pop($5) 	(add $30, $30, $4; lw $5, -4($30))
+	add $3, $5, $3 	($3 <- c+d)
+	pop($5)
+	add $3, $5, $3 ($3 <- b+(c+d))
+	pop($5)
+	add $3, $5, $3 ($3<-a+(b+(c+d))) // 1 extra register
+
+In general, expr1 -> expr2 + term
+
+code(expr1):
+
+	code(expr2)
+	push($3)
+	code(term)
+	pop($5)
+	add $3, $5, $3
+
+###More rules:
+
+####Singleton Rule: 
+
+For general singleton rule (e.g. expr->term)
+- code(expr) : code(term)
+
+####Print
+
+For print expression - println(expr) : print expr followed by newline to the screen. We've done this already (A2Q6, A2Q7a). We use a *runtime environment*: a set of procedures provided by the compiler or OS to assist programs in their execution. (for example libc.so, msvert.dll, etc)
+
+We make the procedure print part of the runtime environment, which will be provided as print.merl.
+
+	./wlp4gen < source.wlp4i > source.asm
+	java cs241.linkasm < source.asm > source.merl
+	linker source.merl print.merl > exec.mips
+	java mips.xxx exec.mips
+
+Thus, we assume that 'print' is available to be used. It takes input from $1
+
+code(println(expr))
+
+	code(expr) 		($3 <- expr)
+	add $1, $3, $0 	($1 <- expr)
+	call(print)
+
+Note that
+- $1 is going to be clobbered - if its value is needed, save and restore
+- save and restore $31
+- import print function : we will add .import print to prologue
+
+code(println(expr))
+	
+	code(expr)
+	add $1, $3, $0
+	push($31)
+	lis $5
+	.word print
+	jalr $5
+	pop($31)
+
+###Assignment Statements
+
+	int x;
+	x = 7;
+	x = x+1;
+
+What does int x mean for the compiler? It sets aside a memory address big enough to hold an integer and calls it x. The meaning of x changes depending on whether it is on the left or right hand sideo f an assignment. 
+- On the right side it is the value.
+- On the left side it is an address or location
+- Originally, an lvalue is something that could appear on the leftside of an assignment
+- A simple definition is an lvaulue is an object (or location) that presents beyond an expression
+
+statement -> lvalue BECOMES expr SEMI
+- For now we will assume lvalue=ID (no pointers yet)
+
+code(stmt):
+
+	code(expr)
+	sw $3, __($29) // lookup offset in symbol table
+
+###Boolean testing
+
+We will suggest two more conventions
+- store print in $10 and add to prologue
+- store 1 in $11 in prologue
+
+test -> expr1 < expr 2
+
+	code(expr1)
+	push($3)
+	code(expr2)
+	pop($5)
+	slt $3, $5, $3
+
+To the contrary, test -> expr1 > expr2
+- code(test) treat as expr2 < expr 1, proceed as above
+
+If we have non-equal rule: test -> expr1 != expr2
+
+	code(expr1)
+	push($3)
+	code(expr2)
+	pop($5)
+	slt $6, $3, $5
+	slt $7, $5, $3
+	add $3, $6, $7 // $6 and $7 cannot both be 1, if neither are then we're equal
+
+If we have equal rule: test -> expr1 == expr2
+- code(test) same as above !=
+- sub $3, $11, $3
+
+<= and >= are left as exercises
+
+###If statements
+
+if(test) {stmts1} else {stmts2}
+
+code(stmt):
+
+	code(test)
+	beq $3, $0, else
+	code (stmts1)
+	beq $0, $0, endif
+	else:
+	code(stmts2)
+	endif:
+
+##March 24
+
+###Last time: codegen
+
+if statements -- if(test) {stmts1} else {stmts2}
+
+code(stmt):
+
+	code(test)
+	beq $3, $0, else
+	code (stmts1)
+	beq $0, $0, endif
+	else:
+	code(stmts2)
+	endif:
+
+But what if the program has more than one if statement? This is bad. We need to generate unique label names. Keep a counter x for if statements. Use elseX, endifX for labels and increment X for each new if statement.
+
+new code:
+
+	code(test)
+	bne $3, $0, trueX
+	code(stmts2)
+	beq $0, $0, endifX
+	trueX:
+		code(stmts2)
+	endifX:
+
+while loops: stmt->WHILE(test) {stmts}
+
+	toploopY:
+	code(test)
+	beq $3, $0, endloopY
+	code(stmts)
+	beq $0, $0, toploopY
+	endloopY:
+
+####Advice for Writing Compilers
+- generate comments along with MIPs instructions to make output easier to decipher
+
+###Pointer Code Generation
+- allocation/deallocation
+- deferencing and address-of
+- pointer arithmetic / comparison
+- NULL
+- assignment through pointers
+
+What is the value of NULL? 
+- at the source level 0 and NULL are indistinguishable
+- at the machine level, we will use 0x01 to guarentee deferencing NULL will crash
+
+factor->NULL
+
+	add $3, $11, $0
+
+with respect to deferencing: factor->*expr
+
+	code(expr)
+	lw $3, 0($3)
+
+Pointer comparisons are the same as integer comparisons, except that there are no negative pointers, so pointer comparisons sould be unsigned - ie uses sltu instead of slt
+
+For pointer arithmetic, the exact memory depends on the types involved
+
+expr1 -> expr2 + term
+- if expr2:int, term:int - as before
+- if expr2:int*, term:int - expr2 + 4*term
+
+code: 
+	code(expr2)
+	push($3)
+	code(term)
+	mult $3, $4
+	mflo $3
+	pop($5)
+	add $3, $5, $3
+
+if expr:int, term:int* - left as exercise
+
+We can't know which + - < > to do unless we know the tpe of expr2 and term. We should add a "type" field to each tree node. We can record each node's type during type checking. Then, when we need the type during code generation, it will be right there.
+
+expr1 -> expr2 - term
+
+	if expr2: int, term:int - as before
+	if expr2:int*, term:int --- we do expr2 - 4*term (same as before, but subtract)
+	if expr2:int*, term:int* - same as regular subtraction, divided by 4
+
+For new and delete, we are given code in the runtime environment. There is an allocation module called alloc.merl. This must be linked in *last*. We will add to the prologue:
+
+	.import init
+	.import new
+	.import delete
+
+init sets up the allocator's data structure. We call init once in the prologue, and it takes a parameter in $2. If we are calling with mips.array (ie the first parameter of wain is int*), $2 needs to be the length of the array. Otherwise, $2 needs to be 0.
+
+
+------
+##March 26
+
+####Last time
+- codegen - pointers
+- CORRECTION: Null pointer arithemetic is undefined
+
+#####Init
+- call once in prologue, parameter in $2
+- otherwise $2 should be 0
+- paramter used to account for already allocated space
+
+#####New
+- this takes the size of the array in $1
+- new returns a pointer to the allocated memory, or returns 0 if the allocation is not possible
+- if new returns 0, replace it with 0x01, so it matches our representation of NULL
+
+#####Delete
+- $1 contains a pointer to memory to be deallocated
+- this delete does not check for NULL. Your assembly code should not call delete if pointer is NULL
+
+#####Assignment through pointers
+- the lefthand side is the address at which to store the value and the righthand side is the value
+- recall that since assignments and comparisons don't nest, we don't need to push and pop
+- start- > lvalue = expr
+ - calculate address for lvalues
+ - store expr there
+
+assignment code (statement -> lvalue BECOMES expr SEMI)
+
+	code(lvalue)
+	add $6, $3, $0
+	code(expr)
+	sw $3, 0($6)
+
+#####Address of 
+
+factor -> AMP lvalue
+- code(lvalue)
+- it already returns an address, so just pass it along for factor
+
+lvalue -> ID
+
+	get offset
+	lis $3
+	.word offset
+	add $3, $3, $29
+	
+lvalue -> STAR factor
+
+	code(factor)
+
+(end of A10/pointer stuff)
+
+###Compiling Procedures
+
+How do you run starting at wain, when it is not the first procedure?
+
+(see pic)
+
+The main line will always have a prologue and epilogue. THe procedures must also have a procedure specific prologue and epilogue. In procedures we don't need to setup the constants or imports. We do need to set $29, save registers, and restore registers at the end, as well as jr $31
+
+####Saving and restoring registers: 
+
+how do we know which registers to save and restore? We can save and restore all of them. Our code generation scheme doesn't use any registers past 7. Don't forget to save and restore $29.
+
+There are two general approaches to saving registers. Suppose f calls g:
+- caller-save: f saves all registers that contain critical data before calling g
+- callee-save: g saves all registers it modifies
+
+Which approach is better?
+- one advantage of callee saving is fewer lines of code as the saving and restoring only occurs once in the procedure definition.
+- if caller strategy, saving and restoring code must be put in for each call
+
+We have been using a hybrid appraoch - caller-save for $31 and callee for everything else. Other approaches work as well. Who should save $29?
+- suppose g saves $29. g has to save registers and point $29 to g's stack frame
+- $30 has already been changed if we save registers first, so we need to figure out where $29 should be pointing to based on the number of pushed registers
+- if we set $29 first, we know right away where to put $29, this is easier but we changed $29 before saving it. Thus, caller should save $29
+
+f:
+	
+	push($29)
+	push($31)
+	lis $5
+	.word g ; clean
+	jalr $5
+	pop($31)
+	pop($29)
+
+####Duplicate Names
+- what if my WLP4 proram has procedures called init or point etc. 
+- procedure names that match procedures in the runtime environment, and we'll have duplicated names in assembly.
+- More generally, what if a function has the same name as one of the labels the computer generates?
+- for functions, we will use the labels Ff, Fg, Fh, etc.
+ - reserve labels starting with F for functions
+
+Parameters:
+- we can use registers for parameters
+- alternatively, we can (should) push parameters on th stack
+- a call to a function looks like 
+
+factor-> ID (Expr1, ..., exprn)
+
+	code(expr1)
+	push($3)
+	...
+	code(exprn)
+	push($3)
+	push($29)
+	push($31)
+	lis $31
+	.word FID
+	jalr $31
+	pop($31)
+	pop($29)
+	pop all arguments
+
+then we have code(procedure) = 
+
+	sub $29, $30, $4
+	push registers
+	code(dcls)
+	code(stmts)
+	code(expr)
+	pop regs
+	jr $31
+
+currently, on the stack we have the caller, then the arguments, then $29, and $31 (f's frame), then anything g pushes, then local variables
+
+(see pic)
+
+the issue here is that there are registers in between the offsets originally recorded in the symbol table are wrong, because there are things stored between them
+
+
+-------
+
+##March 31
+
+Last time: Codegen Procedures
+- stack from top to bottom
+ - g locals
+ - g saves <- $29
+ - ----f----
+ - $31
+ - $29
+ - arguments
+ - caller
+
+The issue here is that there are registers in between the offsets originally recorded in the symbol table, so the offsets are wrong.
+
+The parameters should have positive offsets since they are below the frame pointer, and local variables should have negative offsets or 0. (this is in contrast to how we handled wain, where both had positive offsets)
+
+This problem has an easy solution. We add 4 times the number of parameters to all offsets in the symbol table. This means we are looking down for parameters, and up for local variables.
+
+However, we still have registers between the arguments and the local variables. Instead, we should save $29 and $31 before pushing the arguments and save the registers after pushing the local variables
+
+new stack from top to bottom:
+- g saves
+- g locals <- $29
+- ----f----
+- arguments
+- $31
+- $29
+- caller
+
+e.g. stack frame:
+- -8: local 3
+- -4: local 2
+- 0: local 1
+- 4: arg n
+- 8: arg n-1
+
+code(factor):
+
+	push($29)
+	push($31)
+	code(expr1)
+	...
+	code(exprn)
+	push($3)
+	lis $3
+	.word FID
+	jalr $3
+	pop args
+	pop($31)
+	pop($29)
+
+code(procedure):
+
+	sub $29, $30, $4
+	code(dcls)
+	push regs
+	code(stmts)
+	code(expr)
+	pop regs
+	add $30, $29, $4 ;pops off locals - don't need to save them, can just move pointer
+
+---- should be able to complete A11 (without bonus) ----
+
+###Code Optimization
+
+This is a large and difficult topic. In general, we wish to minimize runtime. For cs241, we aim to produce short MIPs code, which is an approximation of runtime. This problem is computationally unsolvable. The best we can do is to employ heuristics. 
+
+Some of the code written is really long. For example, consider 5+2. We could compute 5+2 at compile time instead, dropping from 9 to 2 words. This is called *constant-folding*.
+
+	lis $3
+	.word 7
+
+*Constant-Propogation:*
+
+	int x = 1;
+	//x doesn't change
+	return x+x;
+
+If we never changes, we could recognize that this will return 2. If that is the only place x is used, it doesn't een need a stack entry.
+
+	lis $3
+	.word 2
+	jr $31
+
+When trying to determine that x nevre changs, what problem can you run into?
+Alias - when two or more variables denote the same memory address they are aliases of each other.
+
+	int *y =  &x;
+	*y = 5; // x = 5 now
+
+Be careful, you may overlook that the value of x is changed. 
+
+If x's value is not known, we can still recogize that $3 aleady contains x. This is called *Common Subexpression Elimination*
+
+	lw $3, -12($29)
+	add $3, $3, $3
+	jr $31
+
+(a+b)*(a+b)
+- use a register to hold a+b, then multiply by itself rather than computing twice
+- this might not work with function calls (f()+f()) since f ma print something
+
+*Dead Code Elimination*
+
+If we are certain that some part of the program willnever run, then we don't output code for it.
+
+	while(false) {
+		// don't compile this!
+	}
+
+*Register Allocation*:
+- It is cheaper to use registers for variables instead of the stack. This saves the number of lw and sw calls we make
+- we could, however, use some of these to hold variables or temporary values.
+- which variables should go into registers? the most used ones.
+- the issue:
+ - & address-of
+ - registers don't have addresses. If you take the address of a var, it can't be in registers - it must have a RAM address
+
+*Strength Reduction*
+
+Add is usually faster than mult, so we prefer add for speed. For CS241, multiplying by 2 would require 4 lines, while adding would require 1.
+
+	lis $2
+	.word 2
+	multi $3, $2
+	mflo $3
+
+vs
+
+	add $3, $3, $3
+
+Looping unrolling: outputting a loop multiple times to reduce branching
+
+####Procedure specific optimizations
+
+Using registers for parameters is an immediate optimization for procedures. There are other options:
+
+*Inlining*
+
+	int f(int x) {
+		return x+x;
+	}
+	int wain(int a, int b) {
+		return f(a);
+	}
+
+This could be accomplished with a smaller program
+
+	int wain(int a, int b) {
+		return a+a;
+	}
+
+We can replace the function call with its body in the caller. The downside is that if f is called many times, we get many copies of the body.
+
+This could be good or bad - it depends on relative sizes of the body of f, or the code to call f. Some functions are harder to inline than others (e.g. recursive). If al calls to f are successfully inline, then we don't need f anymore
+
+*Tail recursion*
+
+	int fact(int n, int a) {
+		if (n==0) return a;
+		else return fact(n-1, n*a);	
+	}
+
+The last thing that a function does is make a recursive call. There is no pending work to do when the recursive call to fact returns. The contents of the current stack frame (local variables, etc) will not be used again, so we can reuse the current frame.
+
+This is tricky in wlp4, because we can only return at the end of a procedure, meaning that there is no base case. Here is the basic transformation after parsing, expand language language and then mutate the parse tree. Whenever a return immediately follows if-then-else, push inside both branches.
+
+	(see picture of transformed code)
+
+Whenever return x follows assignment to x, we merge.
+- merge ret = f(); return ret; -> return f();
+- this can be generalized to tail call optimization
+
+-----
+
+##April 2
+
+###New and Delete
+
+####We will talk about scope vs extend
+- scope: the part of the pgoram in which a variable's name is visible. It is a static property which can be determined at compile time
+- extent: the part of the program's execution in which the content of a variable's memory is live; a dynamic (runtime) property
+
+some code:
+
+	int f() {
+		int x;
+		...
+		return x;
+	}
+
+what is the scope of x? what is the extent of x? (here they're the same)
+
+In many situations, these two are equivalent. For example, stack allocated, the data lives uintil the declared variable has gone out of scope or the block in whihc the variable is defined is finished executing. Sometimes, we want the data to outlive the variable that contained it - here we use the heap.
+
+memory model:
+
+	code
+	heap (filled downwards)
+	...
+	stack (filled upwards)
+
+code snippet:
+	
+	class c {
+		...
+	}
+	c *f() {
+		c *d = new c(...);
+		return d; // c is in the heap, but the variable d is on the stack
+	}
+
+memory model:
+
+	code
+	c()
+	...
+	d (points to instance of c)
+
+- d lives on the stack until it is popped (memory is managed implicitly)
+- the instance of c's extent is ended by calling delete (explicit - you have to explicitly allocate and dealloate)
+	
+- In WLP4, C, C++, the user must do explicit memory management, i.e. new/delete or malloc/free.
+- Java and Racket (Scheme) have implicit memory management	
+
+####Using new and delete
+
+- How do new/delete (malloc/free) work?
+- There are a variety of implimentations
+- Basic Approach: list of free blocks and a list of pointers to areas of free RAM
+- initially, the entire heap is free and the list contains one entry
+
+suppose the heap is 100 bytes, suppose 16 bytes bytes are allowed
+
+	free->[100| / ]
+
+Then the user has access to 16 bytes of memory. The free list and the amount of free RAM are updated. Do we need a list of used memory? No! Used memory is pointed at by program variables (directly or indirectly). Otherwise, memory leak!
+
+But then, how do we know what to delete? We actually allocate 20 byetes; 16 bytes plus 1 int. We erturn the pointer to the second word, while the first word stores the size of the memory it came with.
+
+	 4   16
+	[16|     ]   pointer points to | line
+
+Now if we allocate 28 bytes, we actually allocate 32. Suppose, we free the 16 allocation, then 28 bytes allocated.
+
+	allocated: [32 bytes]
+	free->[20 bytes]->[48 bytes left]   
+
+Now suppose the first block is freed
+- we check p[-1]  (memory before pointer) to determine how much memory came back, and then we add it to the free list.
+- then if the other block is freed, we will recognize that the blocks were adjacent in RAM and merge them (100 bytes of free memory)
+- then repeated allocation and deallocation creates holes in the heap
+- Allocate 20, then 40. Free 20, then allocate 5. Then allocating 20 more cannot fill that space and has to go after the 40 
+- a subsequent allocation of 24 words would fail even thugh there is enough space on the heap, but not enough continuous space
+
+heap:
+
+	[100 free]
+	[20 taken | 80 free]
+	[20 taken | 40 taken | 40 free]
+	[20 free  | 40 taken | 40 free]
+	[5 taken | 15 free | 40 taken | 40 free]
+	[5 taken | 15 free | 40 taken | 20 taken | 20 free]
+
+This is called fragmentation - what this means is that even if n bytes are free, we may not be able to allocate a coninuous block of n bytes.
+- We cannot eliminate fragmenation, but if we choose the smallest block that can hold the requested data then we can limit it.
+- However, searching the RAM takes time, it is not free. 
+- First fit (best fit) model: the smallest block that is big enough
+
+###Garbage collectoin in Implicit Memory Management:
+
+This is more in languages with a known type runtime environment like Java or Scheme
+
+	int f() {
+		MyClass x = new MyClass();
+		...
+	} - object on longer accessible, so GC reclaims
+
+####Mark and Sweep
+
+Scan the entire stack looking for pointers. For each pointer found, mark the heap block it points to. Then if the heap object contains pointers, follow those as well and mark the heap block it points to. This is a recursive proccess.
+
+Then scan the heap; reclaim any blocks which are not marked and clear the marks. This does not work well in c++ where the runtime types of stack elements are not known. 
+
+A disadvantage here is that the proram must be stopped temporarily to do this.
+
+####Reference counting
+
+- Reference counting does not require a program stop. 
+- For each heap block, keep track of the number of pointers which point to it. 
+- This means that we watch every pointer and update the reference count (decrement old, increment new) each time a pointer is reassigned.
+- if a block's reference count reaches - then it can be reclaimed
+- A problem with this is circular references. If two objects point to each other and nothing else points to them,then they are still gargabe, but have a reference count of 1 (each)
+
+####Coping Garbage Collector
+- the heap is in 2 halves: "from" and "to"
+- we only allocate memory from "from"
+- at some point "from" fills up, all the memory reachable is copied into "to"
+- any memory that was not reachable was not copied over
+- then we just reverse the roles of "from" and "to"
+- once again, this requires a program stop
+
+This scheme is no susceptible to fragmentation: when memory is copied over it can be copied into continuous blocks. This is also a trash compactor. However, only half of the heap can be used at any given time. 

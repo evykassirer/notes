@@ -799,7 +799,7 @@ so we have
 	= 0.5n * sum i=1..k  0.5^i * i 
 	= ... use sum sheet on slides ... 
 	= (n/2)(2 - k+2/2^k) 
-        =(approx)n - logn/2 - 1 	(using k=logn)
+    = (approx)n - logn/2 - 1 	(using k=logn)
 	which is linear time!
 
 
@@ -1519,13 +1519,779 @@ Problem - if we end up with a loop where we're skipping over empty spaces
 - insert - k is inserted into h1(k) - if it's later kicked out it'll go to h2(k) - if it's kicked out again goes back to h1(k0
 - this makes it easier to search!
 
---- 
+------ 
 ##Feb 26
 
-Don't really wanna copy from slides today
+####Cuckoo Hashing continued:
+- we use two independent hash functions h1,h2.
+- The idea is to always insert a new item into h1(k).
+- This might “kick out” another item, which we then attempt to re-insert into its alternate position.
+- Insertion might not be possible if there is a loop. In this case, we have to rehash with a larger M.
+- The big advantage is that an element with key k can only be in T[h1(k)] or T[h2(k)].
 
-Similar to B-trees, for hashing, when hash table is too big, use extendable hashing
-Extendable Hash Table order d is a directory of 2^d references (slots) to blocks (pages) that contain in total up to M items with keys. The items in each block have the first k bits equal and he diretory contains 2^(d-k) pointers to the block
+Code: cuckoo-insert(T,x) T: hash table, x: new item to insert
+	
+	y←x, i←h1(x.key) 
+	do at most n times:
+		swap(y,T[i])
+		if y is “empty” then return “success” 
+		if i = h1(y.key) then i ← h2(y.key) 
+		else i ← h1(y.key)
+	return “failure”
+
+See slides for examples
+
+Complexities of open addressing (we won't do the analysis, just state costs)
+- load factor must be  < 1
+- cuckoo requires load factor < 1/2
+- linear
+ - search and delete: 1/(1-alpha)^2  
+ - delete: 1/(1-alpha)
+- double hashing
+ - search and delete: 1/(1-alpha) 
+ - delete: 1/alpha * log(1/(1-alpha))
+- cuckoo hashing
+ - search and delete: 1
+ - insert: alpha/(1-2alpha)^2
+
+####Choosing a good hash function
+
+Uniform Hashing Assumption: Each hash function value is equally likely. Proving is usually impossible, as it requires knowledge of the input distribution and the hash function distribution. We can get good performance by following a few rules.
+
+A good hash function should:
+- be very efficient to compute
+- be unrelated to any possible patterns in the data 
+- depend on all parts of the key
+
+If all keys are integers (or can be mapped to integers), the following two approaches tend to work well:
+- Division method: h(k) = k mod M.
+ - We should choose M to be a prime not close to a power of 2 (***why)
+- Multiplication method: h(k) = floor(M(kA − floor(kA))),
+ - for some constant floating-point number A with 0 < A < 1.
+ - Knuth suggests A = φ = root5−1 / 2 ≈ 0.618.
+
+What if the keys are multi-dimensional, such as strings?
+- Standard approach is to **flatten** string w to integer f(w) ∈ N, e.g. adding ascii values
+- you can then hash the integer - h(f(k))
+- Note: computing each h(f (k)) takes Ω(length of w) time
+
+###Hashing vs. Balanced Search Trees
+
+Advantages of Balanced Search Trees
+- O(log n) worst-case operation cost
+- Does not require any assumptions, special functions, or known properties of input distribution 
+- No wasted space
+- Never need to rebuild the entire structure
+
+Advantages of Hash Tables
+- O(1) cost, but only on average
+- Flexible load factor parameters
+- Cuckoo hashing achieves O(1) worst-case for search & delete
+
+External memory:
+- Both approaches can be adopted to minimize page loads.
 
 
---- and then I fell asleep, but we were just using slides ---
+If we have a very large dictionary that must be stored externally, how can we hash and minimize disk transfers? Say external memory is stored in blocks (or “pages”) of size S.
+Most hash strategies covered access many pages (data is scattered) - except linear probing where they're usually in the same page, but linear hashing is bad for clustering and stuff anyways. Let's try something new:
+
+###Extendible Hashing
+
+- Similar to B-tree with height 1 and max size S at the leaves
+- values have to range from 0 to 2^L - 1
+- a **directory** (like root node) is in internal memory
+- directory has array of size 2^d where d <= L is the **order**
+- each directory points to a block stored in external memory, which contains at most S items (multiple entries can point to same block)
+- look up key k by using d leading bits of h(k)
+- Every block B stores a **local depth** k_B ≤ d
+- Hash values in B agree on leading k_B bits
+- All directory entries with the same k_B leading bits point to B
+- 2^(d−k_B) directory entries point to block B.
+
+Searching 
+- done in the directory, then in a block:
+- Given a key k, compute h(k)
+- Leading d digits of h(k) give index in directory
+- Load block B at this index into main memory
+- Perform a search in B for all items with hash value h(k). Search among them for the one with key k.
+- Cost:
+ - CPU time: Θ(logS) if B stores items in sorted order.
+ - Disk transfers: 1 (directory resides in internal memory)
+
+insert(k,v)
+- Search for h(k) to find the proper block B for insertion 
+- If the B has space, then put (k,v) there
+- ElseIf the block is full and kB < d, perform a block split:
+􏰀 - Split B into two blocks B0 and B1.
+􏰀 - Separate items according to the (kB + 1)-th bit. 􏰀 
+ - Set local depth in B0 and B1 to kB + 1
+􏰀 - Update references in the directory
+- ElseIf the block is full and kB = d, perform a directory grow:
+􏰀 - Double the size of the directory (d ← d + 1)
+􏰀 - Update references appropriately
+􏰀 - Then split block B (which is now possible)
+- see slides for examples
+
+delete(k) 
+- reverse of insert: search for block B and remove k from it
+- If block becomes too empty, then we perform a **block merge**
+- If every block B has local depth kB ≤ d − 1, perform a **directory shrink**
+
+Cost of insert and delete:
+- CPU time: Θ(S) without a directory grow/shrink
+- Directory grow/shrink costs Θ(2d) (but very rare).
+- Disk transfers: 1 or 2, depending on whether there is a block split/merge.
+
+Summary of extendible hashing
+- Directory is much smaller than total number of stored keys and should fit in main memory.
+- Only 1 or 2 external blocks are accessed by any operation.
+- To make more space, we only add a block.
+ - Rarely do we have to change the size of the directory. 
+ - Never do we have to move all items in the dictionary (in contrast to normal hashing).
+- Space usage is not too inefficient: can be shown that under uniform hashing, each block is expected to be 69% full.
+- Main disadvantage: extra CPU cost of O(logS) or O(S)
+
+------ 
+##March 3
+
+###Interpolation Search
+
+- used on a sorted array, and min max of keys are known 
+- it is like taking a guess of position of the key
+- instead of binary search(A[l,r], k) - where you check the halfway point between l and r
+- use the key (if it's a number) to guess its location
+- check index l + floor( ( k−A[l]  /  A[r]−A[l] ) (r −l))
+- Works well if keys are uniformly distributed: O(log log n) on average (**** calcuate this?)
+- Bad worst case performance: O(n)
+
+###Gallop Search
+
+Problem in Binary-Search: Sometimes we cannot see the end of the array (data streams, a huge file, etc.)
+
+Gallop-Search(A, k) 	A: An ordered array, k: a key
+
+	i←0
+	while i < size(A) and k > A[i] do 
+		i ← 2i + 1
+	return Binary-Search(A􏰄⌈i /2⌉, min(i , size(A) − 1)􏰅, k )
+
+- O(log m) comparisons (m: location of k in A)
+
+###Self-Organizing Search
+- Unordered linked list is search: Θ(n), insert: Θ(1), delete: Θ(1) (after a search)
+- Linear search to find an item in the list - Is there a more useful ordering?
+ - No: if items are accessed equally likely
+ - Yes: otherwise (we have a probability distribution for items)
+
+Optimal static ordering: sorting items by their probabilities of access in non-increasing order minimizes the expected cost of Search.
+
+Proof Idea: For any other ordering, exchanging two items that are out-of-order according to their access probabilities makes the total cost decrease.
+
+Dynamic Ordering
+- What if we do not know the access probabilities ahead of time?
+- Move-To-Front(MTF): Upon a successful search, move the accessed item to the front of the list
+- Transpose: Upon a successful search, swap the accessed item with the item immediately preceding it
+
+Performance of dynamic ordering:
+- Both can be implemented in arrays or linked lists
+- Transpose can perform very badly on certain input (e.g. last two keys are most accessed, and keep getting swapped with each other)
+- MTF works well in practice. Theoretically MTF is “competitive”: No more than twice as bad as the optimal “offline” ordering - where offline is optimal static ordering where we know the probabilities beforehand - transpose is worse
+
+###Skip Lists
+- Randomized data structure for dictionary ADT 
+- A hierarchy of ordered linked lists
+- good for small number of items, wanting simple implementation
+- A skip list for a set S of items is a series of lists S0,S1,···,Sh such that:
+􏰀 - Each list Si contains the special keys −∞ and +∞
+􏰀 - List S0 contains the keys of S in non-decreasing order
+􏰀 - Each list is a subsequence of the previous one, i.e., S0 ⊇ S1 ⊇ ··· ⊇ Sh
+􏰀 - List Sh contains only the two special keys
+- A skip list for a set S of items is a series of lists S0,S1,···,Sh 
+- A two-dimensional collection of positions: levels and towers 
+- Traversing the skip list: after(p), below(p)
+ - drop down: p ← below(p)
+ - scan forward: p ← after(p)
+
+skip-search(L, k) L: A skip list, k: a key
+
+	p ← topmost left position of L
+	S ← stack of positions, initially containing p 
+	while below(p) ̸= null do
+		p ← below(p)
+		while key(after(p)) < k do
+			p ← after(p) 
+		push p onto S
+	return S
+	
+S contains positions of the largest key less than k at each level. after(top(S)) will have key k, iff k is in L. (*****why stack...?)
+
+see slides for examples
+
+-----
+##March 5
+
+###Skip lists continued
+
+Skip-Insert(S , k , v)
+􏰀- Randomly compute the height of new item: repeatedly toss a coin until
+you get tails, let i the number of times the coin came up heads
+􏰀- Search for k in the skip list and find the positions p0,p1,··· ,pi of the
+items with largest key less than k in each list S0,S1,···,Si (by performing Skip-Search(S, k))
+􏰀- Insert item (k,v) into list Sj after position pj for 0 ≤ j ≤ i (a tower of
+height i)
+
+Skip-Delete(S , k )
+􏰀- Search for k in the skip list and find all the positions p0,p1,...,pi of
+the items with the largest key smaller than k, where pj is in list Sj. (this is the same as Skip-Search)
+􏰀- For each i, if key(after(pi)) == k, then remove after(pi) from list Si
+􏰀- Remove all but one of the lists Si that contain only the two special keys
+
+see slides for examples
+
+Summary of Skip Lists
+- Expected space usage: O(n)
+- Expected height: O(log n)
+- Worst case height is n *********what - shouldn't it be infinite?
+- A skip list with n items has height at most 3 log n with probability at least 1 − 1/n^2
+- Skip-Search: O(log n) expected time, O(n) worst if we have to go through all the items in some way
+- Skip-Insert and delete have same run time as search
+- Skip lists are fast and simple to implement in practice
+
+###Multi-dimensional data
+- Various applications: 
+ - Attributes of a product (laptop: price, screen size, processor speed, RAM, hard drive,· · · )
+􏰀 - Attributes of an employee (name, age, salary,· · · )
+- Dictionary for multi-dimensional data - a collection of d-dimensional items
+- Each item has d **aspects** (coordinates): (x0, x1, · · · , xd−1) 
+- Operations: insert, delete, **range-search query**
+- (Orthogonal) Range-search query: specify a range (interval) for certain aspects, and find all the items whose aspects fall within given ranges. Example: laptops with screen size between 11 and 13 inches
+- aspect values will be numbers, and each item corresponds to a point in d-dimensional space - here we will concentrate on d = 2, i.e., points in Euclidean plane
+
+####One-Dimensional Range Search
+- First solution: ordered arrays
+􏰀 - Running time: O(log n + k), k: number of reported items
+􏰀 - Problem: does not generalize to higher dimensions
+- Second solution: balanced BST (e.g., AVL tree)
+￼￼
+BST-RangeSearch(T , k1 , k2 ) - T: A balanced search tree, k1,k2: search keys Report keys in T that are in range [k1,k2]
+
+	1if T = nil then return
+	if key(T) < k1 then
+		BST-RangeSearch(T .right , k1 , k2 )
+	if key(T) > k2 then
+		BST-RangeSearch(T .left , k1 , k2 )
+	if k1 ≤ key(T) ≤ k2 then
+		BST-RangeSearch(T .left , k1 , k2 )
+		report key(T)
+		BST-RangeSearch(T .right , k1 , k2 )
+
+see slides for example
+
+Terms from searched tree:
+- P1: path from the root to a leaf that goes right if k < k1 and left otherwise
+- P2: path from the root to a leaf that goes left if k > k2 and right otherwise
+- Partition nodes of T into three groups:
+ - boundary nodes: nodes in P1 or P2
+ - inside nodes: non-boundary nodes that belong to either (a subtree rooted at a right child of a node of P1) or (a subtree rooted at a left child of a node of P2)
+ - outside nodes: non-boundary nodes that belong to either (a subtree rooted at a left child of a node of P1) or (a subtree rooted at a right child of a node of P2)
+- k: number of reported items 
+- Nodes visited during the search: O(log n) boundary nodes, O(k) inside nodes, no outside nodes => therefore running time O(log n + k)￼￼
+
+####Each item has 2 aspects (coordinates): (xi , yi)
+
+Each item corresponds to a point in Euclidean plane 
+
+Options for implementing d-dimensional dictionaries:
+- Reduce to one-dimensional dictionary: combine the d-dimensional key into one key
+ - Problem: Range search on one aspect is not straightforward
+􏰀- Use several dictionaries: one for each dimension 
+ - Problem: inefficient, wastes space
+􏰀- Partition trees
+ - A tree with n leaves, each leaf corresponds to an item
+ - Each internal node corresponds to a region
+ - quadtrees, kd-trees
+􏰀- multi-dimensional range trees
+
+###Quadtrees
+- We have n points P = {(x0, y0), (x1, y1), · · · , (xn−1, yn−1)} in the plane
+- How to build a quadtree on P:
+􏰀 - Find a square R that contains all the points of P (We can compute minimum and maximum x and y values among n points)
+􏰀 - Root of the quadtree corresponds to R
+􏰀 - **Split**: Partition R into four equal subsquares (quadrants), each correspond to a child of R
+􏰀 - Recursively repeat this process for any node that contains more than one point
+􏰀 - Points on split lines belong to left/bottom side
+􏰀 - Each leaf stores (at most) one point
+􏰀 - We can delete a leaf that does not contain any point
+
+see slides for examples
+
+- Search: Analogous to binary search trees 
+- Insert:
+􏰀 - Search for the point
+􏰀 - Split the leaf if there are two points
+- Delete:
+􏰀 - Search for the point
+􏰀 - Remove the point
+􏰀 - Walk back up in the tree to discard unnecessary splits
+
+Range Search:  QTree-RangeSearch(T , R) -- T: A quadtree node, R: Query rectangle
+
+	if (T is a leaf) then
+		if (T.point ∈ R) then
+			report T.point 
+	for each child C of T do
+		if C.region ∩ R != ∅ then 
+		QTree-RangeSearch(C , R)
+
+Terms
+- spread factor: spread factor of points P : β(P) = dmax/dmin
+- dmax and dmin: maximum and minimum distance between two points in P
+
+height of quadtree: 
+
+	dmax = d / sqrt2  if d is the width and height of R 
+	d / 2^(h-1) > dmin > d/2^h
+	sqrt2*dmax / 2^(h-1) > dmin > sqrt2*dmax / 2^h
+	2*sqrt2*dmax > 2^h*dmin > sqrt2*dmax
+	2*sqrt2*dmax/dmin > 2^h > sqrt2*dmax/dmin
+	so h ∈ Θ(log_2 dmax/dmin)
+
+Worst-case complexity to build initial tree = Θ(#nodes · height) = Θ(nh) *****why 
+
+Worst-case complexity of range search = O(#nodes · height) = O(nh) even if the answer is ∅
+
+Quadtree Conclusion
+- Very easy to compute and handle
+- No complicated arithmetic, only divisions by 2 (usually the boundary box is padded to get a power of two).
+- Easily generalizes to higher dimensions (octrees, etc. ).
+- Space wasteful
+- Major drawback: can have very large height for certain nonuniform distributions of points
+
+-----
+##March 10
+
+###kd-trees
+- We have n points P = {(x0, y0), (x1, y1), · · · , (xn−1, yn−1)} in the plane
+- Quadtrees split square into quadrants regardless of where points actually lie - idea: split the points into two (roughly) equal subsets 
+- How to build a kd-tree on P:
+􏰀 - Split P into two equal subsets using a vertical line
+􏰀 - Split each of the two subsets into two equal pieces using horizontal lines
+􏰀 - Continue splitting, alternating vertical and horizontal lines, until every point is in a separate region
+- Initially, we sort the n points according to their x-coordinates, so the root of the tree is the point with median x coordinate (index floor(n/2) in the sorted list)
+􏰀- All other points with x coordinate less than or equal to this go into the left subtree; points with larger x-coordinate go in the right subtree.
+􏰀- At alternating levels, we sort and split according to y-coordinates instead.
+- *******how do we deal with multiple points on boundary?
+
+see slides for examples
+
+kd-rangeSearch(T,R,split[← ‘x’]) -- T: A kd-tree node, R: Query rectangle
+
+	if T is empty then return 
+	if T.point ∈ R then
+		report T.point 
+	if split = ‘x’ then
+		if T.point.x ≥ R.leftSide then 
+			kd-rangeSearch(T.left , R , ‘y’)
+		if T.point.x < R.rightSide then 
+			kd-rangeSearch(T.right , R , ‘y’)
+	if split = ‘y’ then
+		if T.point.y ≥ R.bottomSide then
+			kd-rangeSearch(T .left , R , ‘x’) 
+		if T.point.y < R.topSide then
+			kd-rangeSearch(T .right , R , ‘x’)
+
+The complexity 
+- O(k + U) where k is the number of keys reported and U is the number of regions we go to but unsuccessfully (regions which intersect one of the sides of R, but are not fully in R)
+- Q(n): Maximum number of regions in a kd-tree with n points that intersect a vertical (horizontal) line
+ - Q(n) satisfies the following recurrence relation: Q(n) = 2Q(n/4) + O(1)
+ - It solves to Q(n) = O(√n) 
+- Therefore, the complexity of range search in kd-trees is O(k + sqrt(n))
+
+Variations of k-d trees:
+- store points in nodes
+- also store x <= xi or y <= yi in nodes
+- just store the separating line in nodes
+
+###kd-tree: Higher Dimensions
+- kd-trees for d-dimensional space
+􏰀- at the root the point set is partitioned based on the first coordinate
+􏰀- at the children of the root the partition is based on the second coordinate
+􏰀- at depth d − 1 the partition is based on the last coordinate
+􏰀- at depth d we start all over again, partitioning on first coordinate
+- Storage: O(n)
+- Construction time: O(n log n) *******why?
+- Range query time: O(n^(1 − 1/d) + k) Note: d is considered to be a constant
+
+----
+##March 12
+
+###Range Trees
+- We have n points P = {(x0, y0), (x1, y1), · · · , (xn−1, yn−1)} in the plane
+- A range tree is a tree of trees (a multi-level data structure) 
+- How to build a range tree on P:
+􏰀 - Build a balanced binary search tree τ determined by the x-coordinates of the n points
+􏰀 - For every node v ∈ τ, build a balanced binary search tree τassoc(v) (associated structure of τ) whose keys are the y-coordinates and whose nodes are those of the subtree of τ with root node v
+
+Operations:
+- Search: trivially as in a binary search tree 
+- Insert: insert point in τ by x-coordinate
+ - From inserted leaf, walk back up to the root and insert the point in all associated trees τassoc(v) of nodes v on path to the root
+- Delete: analogous to insertion 
+ - Note: re-balancing is a problem!
+
+Range Trees: Range Search
+- A two stage process
+- To perform a range search query R = [x1, x2] × [y1, y2]:
+􏰀 - Perform a range search (on the x-coordinates) for the interval [x1,x2] in τ (BST-RangeSearch(τ, x1, x2))
+􏰀 - For every outside node, do nothing.
+􏰀 - For every “top” inside node v, perform a range search (on the y-coordinates) for the interval [y1,y2] in τassoc(v). During the range search of τassoc(v), do not check any x-coordinates (they are all within range).
+􏰀 - For every boundary node, test to see if the corresponding point is within the region R (the y coordinate is stored in the node)
+
+Complexities
+- Running time: O(k + log^2 n)
+- Range tree construction time: O(n log n) *****justify
+- Range tree space usage: O(n log n)
+
+Range trees for d-dimensional space Trees 􏰀 
+- Storage: O(n (log n)^(d−1))
+-􏰀 Construction time: O(n (log n)^(d−1)) 
+- Range query time: O((logn)^d + k) 
+
+
+###Tries
+
+Trie (Radix Tree): A dictionary for binary strings
+- Comes from retrieval, but pronounced “try”
+- A binary tree based on bitwise comparisons
+- Similar to radix sort: use individual bits, not the whole key
+- Structure of trie:
+ - A left child corresponds to a 0 bit
+ - A right child corresponds to a 1 bit
+- Keys can have different numbers of bits
+- Keys are not stored in the trie: a node x is flagged if the path from root to x is a binary string present in the dictionary
+
+see slides for example
+
+Search(x):
+- start from the root
+- take the left link if the current bit in x is 0 and take the right link if it is 1 (return failure if the link is missing)
+- if there are no extra bits in x left and the current node is flagged then success (x is found)
+- else, if the current node is a leaf, then - failure (x is missing)
+- recurse
+
+Insert(x)
+- First search for x
+- If we finish at a leaf with key x, then x is already in trie: do nothing
+- If we finish at a leaf v and x has extra bits then flag v and expand the trie from the node v by adding necessary nodes that correspond to extra bits.
+- If we finish at an internal node and there are no extra bits: the node is then flagged
+I If we finish at an internal node and there are extra bits: expand trie by adding necessary nodes that correspond to extra bits
+
+Delete(x)
+- Search for x
+- if x found at an internal flagged node, then unflag the node
+- if x found at a leaf vx , delete the leaf and all ancestors of vx until we reach an ancestor that has two children or we reach a flagged node
+
+Time Complexity of all operations: 
+- Θ(|x|)
+- |x|: length of binary string x, i.e., the number of bits in x
+
+-----
+##March 17
+
+##Compressed Tries (Patricia Tries)
+- Reduces storage requirement: eliminate unflagged nodes with only one child
+- Every path of one-child unflagged nodes is compressed to a single edge
+- Each node stores an index indicating the next bit to be tested during a search (e.g. index= 0 for the first bit, index= 2 for the second bit, etc)
+- A compressed trie storing n keys always has at most n − 1 internal (non-leaf) nodes
+
+Search(x):
+- Follow the proper path from the root down in the tree to a leaf
+- If search ends in an internal flagged node, it is successful *********** you still have to check, right?
+- If search ends in an internal unflagged node, it is unsuccessful
+- If search ends in a leaf, we need to check again if the key stored at the
+leaf is indeed x
+
+Delete(x):
+- Perform Search(x)
+- if search ends in an internal node, then
+ - if the node has two children, then unflag the node and delete the key
+ - else delete the node and make its only child the child of its parent
+- if search ends in a leaf, then delete the leaf and
+- if its parent is unflagged, then delete the parent
+
+Insert(x):
+- Perform Search(x)
+- If the search ends at a leaf L with key y, compare x against y to determine the first index i where they disagree.
+- Create a new node N with index i.
+- Insert N along the path from the root to L so that the parent of N has index < i and one child of N is either L or an existing node on the path from the root to L that has index > i.
+- The other child of N will be a new leaf node containing x.
+- If the search ends at an internal node, we find the key corresponding to that internal node and proceed in a similar way to the previous case
+
+***** there are no examples on the slides - make sure you find some (tutorial? other class notes?)
+
+##Multiway Tries
+
+- To represent Strings over any fixed alphabet Σ
+- Any node will have at most |Σ| children
+- this looks realllly similar to initial state diagram things in cs241
+- Append a special end-of-word character, say $, to all keys - this lets us store substrings of other strings in the tree easily
+- we can have Compressed multi-way tries just like patricia trees
+
+###Pattern Matching
+
+Search for a string (pattern) in a large body of text
+- T[0..n − 1] – The *text* (or *haystack*) being searched within
+- P[0..m − 1] – The pattern (or needle) being searched for
+- Strings over alphabet Σ
+- Return the first i such that P[j] = T[i + j] for 0 ≤ j ≤ m − 1
+- This is the first occurrence of P in T
+- If P does not occur in T, return FAIL
+
+Some terms:
+- Substring T[i..j] 0 ≤ i ≤ j < n: a string of length j − i + 1 which consists of characters T[i], . . .T[j] in order
+- A prefix of T: a substring T[0..i] of T for some 0 ≤ i < n
+- A suffix of T: a substring T[i..n − 1] of T for some 0 ≤ i ≤ n − 1
+
+A *guess* is a position i such that P might start at T[i].
+- Valid guesses (initially) are 0 ≤ i ≤ n − m.
+
+A *check* of a guess is a single position j with 0 ≤ j < m where we compare T[i + j] to P[j]. 
+- We must perform m checks of a single correct guess, 
+- but may make (many) fewer checks of an incorrect guess.
+
+####Brute-force Algorithm --  Idea: Check every possible guess.
+
+BruteforcePM(T[0..n − 1], P[0..m − 1]) T: String of length n (text), P: String of length m (pattern)
+
+	for i ← 0 to n − m do
+		match ← true
+		j ← 0
+		while j < m and match do
+			if T[i + j] = P[j] then
+				j ← j + 1
+			else
+				match ← false
+		if match then
+			return i
+	return FAIL
+
+Worst case performance Θ((n − m + 1)m)
+- m ≤ n/2 ⇒ Θ(mn) ***************? point
+
+Pattern Matching
+- More sophisticated algorithms
+- Deterministic finite automata (DFA)
+- KMP, Boyer-Moore and Rabin-Karp
+- Do extra preprocessing on the pattern P
+- We eliminate guesses based on completed matches and mismatches.
+
+####String matching with finite automata
+
+- Let T be a text string over a finite alphabet Σ and P a pattern to find in T.
+- Many string-matching algorithms build a finite automaton that scans the text string T for all occurrences of the pattern P
+- String-matching automata are very efficient: they examine each text character exactly once, taking constant time per text character
+- The time to build the automaton, however, can be large if Σ is large
+
+Note - This is a DFA from cs 241
+- Let T be the text string of length n,
+- P - the pattern to search of length m and
+- δ the transition function of a finite automaton for pattern P
+- the below algorithm only makes sense to me because I'm in cs241 - I'm assuming m is the final state (which here is the 'last state' or length of pattern) and the transition function works the same as 241 - if you're confused check out my 241 notes which are also posted here
+
+FINITE-AUTOMATON-MATCHER(T, δ, m)
+
+	n ← length[T]
+	q ← 0
+	for i ← 1 to n do
+		q ← δ(q,T[i])
+		if q = m
+			then print ”Pattern occurs with shift” i − m
+
+Analysis
+- matching time on a text string of length n is Θ(n)
+- this does not include the preprocessing time required to compute the transition function δ.
+- we can find all occurrences of a length-m pattern in a length-n text over a finite alphabet Σ with O(m|Σ|) preprocessing time and Θ(n) matching time.
+
+####KMP Algorithm
+- Compares the pattern to the text in left-to-right
+- Shifts the pattern more intelligently than the brute-force algorithm
+- When a mismatch occurs, what is the most we can shift the pattern (reusing knowledge from previous matches)?
+- Answer: the largest prefix of P[0..j] that is a suffix of P[1..j]
+
+You're gonna want to view the examples on the slides for this one, but here's the overview:
+- Define F[j] as the value of the first sliding position past the current one that matches the text T, up to position T[i − 1] = P[j − 1]
+- This can be computed by trying all sliding positions until finding the first one matching the text
+- F[j] is the length of the largest prefix of P[0..j] that is also a suffix of P[1..j]
+- so we can preprocess the pattern to find matches of prefixes of the pattern with the pattern itself
+- when you shift, you can start at the offset of F[j] to continue to comparing, since you know the first F[j] bits match
+
+failureArray(P) --  P: String of length m (pattern)
+
+	F[0] ← 0
+	i ← 1
+	j ← 0
+	while i < m do
+		if P[i] = P[j] then
+			F[i] ← j + 1
+			i ← i + 1
+			j ← j + 1
+		else if j > 0 then
+			j ← F[j − 1] ---- it took me a bit to figure out why this is, make sure you get it
+		else
+			F[i] ← 0
+			i ← i + 1
+
+KMP(T, P) -- T: String of length n (text), P: String of length m (pattern)
+
+	F ← failureArray (P)
+	i ← 0
+	j ← 0
+	while i < n do
+		if T[i] = P[j] then
+			if j = m − 1 then
+				return i − j //match
+			else
+				i ← i + 1
+				j ← j + 1
+			else
+				if j > 0 then
+					j ← F[j − 1]
+				else
+					i ← i + 1
+	return −1 // no match
+
+Analysis
+- failureArray
+ - At each iteration of the while loop, either i increases by one, or the guess index i − j increases by at least one (F[j − 1] < j)
+ - There are no more than 2m iterations of the while loop
+ - Running time: Θ(m)
+- KMP
+ - failureArray can be computed in Θ(m) time
+ - At each iteration of the while loop, either i increases by one, or the guess index i − j increases by at least one (F[j − 1] < j)
+ - There are no more than 2n iterations of the while loop
+ - Running time: Θ(n)
+
+Another example
+- T =abacaabaccabacabaabb
+- P =abacab
+- TRY THIS! You weren't paying attention / not in lecture so make sure you can do this
+
+###Boyer-Moore Algorithm
+
+Based on three key ideas:
+- Reverse-order searching: Compare P with a subsequence of T moving backwards
+- Bad character jumps: When a mismatch occurs at T[i] = c
+ - If P contains c, we can shift P to align the last occurrence of c in P with T[i]
+ - Otherwise, we can shift P to align P[0] with T[i + 1]
+- Good suffix jumps: If we have already matched a suffix of P, then get a mismatch, we can shift P forward to align with the previous occurence of that suffix (with a mismatch from the actual suffix).
+ - Similar to failure array in KMP.
+- Can skip large parts of T
+
+isn't second bad character example 6 checks? - yes
+
+####Last-Occurrence Function
+- Preprocess the pattern P and the alphabet Σ
+- Build the last-occurrence function L mapping Σ to integers
+- L(c) is defined as
+ - the largest index i such that P[i] = c or
+ - −1 if no such index exists
+- The last-occurrence function can be computed in time O(m + |Σ|)
+- In practice, L is stored in a size-|Σ| array.
+
+boyer-moore(T,P)
+
+	L ← last occurrance array computed from P
+	S ← good suffix array computed from P
+	i ← m − 1, j ← m − 1
+	while i < n and j ≥ 0 do
+		if T[i] = P[j] then
+			i ← i − 1
+			j ← j − 1
+		else
+			i ← i + m − 1 − min(L[T[i]], S[j])
+			j ← m − 1
+	if j = −1 return i +1
+	else return FAIL
+
+***I had to stare at this for a while to get it - make sure you get why and how this works*** Check out examples from tutorial
+
+Exercise: Prove that i − j always increases on lines 9–10 - I might have done this - check with Andreas and maybe post something more formal here
+
+
+Boyer-Moore algorithm conclusion
+- Worst-case running time ∈ O(n + |Σ|) -- This complexity is difficult to prove.
+- What is the worst case?
+ - On typical English text the algorithm probes approximately 25% of the characters in T (****what does probe mean?)
+- Faster than KMP in practice on English text.
+
+###Rabin-Karp Fingerprint Algorithm
+- Idea: use hashing
+- Compute hash function for each text position
+- No explicit hash table: just compare with pattern hash
+- If a match of the hash value of the pattern and a text position found, then compares the pattern with the substring by naive approach
+
+Example:
+
+	Hash ”table” size = 97
+	Search Pattern P: 5 9 2 6 5
+	SearchTextT: 314159265358979323846 
+	Hash function: h(x) = x mod 97 and h(P) = 95.
+	31415 mod 97 = 84
+	14159 mod 97 = 94
+	41592 mod 97 = 76
+	15926 mod 97 = 18
+	59265 mod 97 = 95 - found!
+
+Guaranteeing correctness - need full compare on hash match to guard against collisions (since multiple strings could hash to the same goal number)
+
+Running time
+- Hash function depends on m characters
+- Running time is Θ(mn) for search miss (how can we fix this?) *****what do they mean by search miss?
+- The initial hashes are called fingerprints.
+
+Rabin & Karp discovered a way to update these fingerprints in constant time.
+- To go from the hash of a substring in the text string to the next hash value only requires constant time.
+- Use previous hash to compute next hash O(1) time per hash, except first one
+- use mod arithmetic:
+
+example:
+
+	15926 mod97 = (41592 − (4 ∗ 10000 )) ∗ 10 + 6 
+				= (76    − (4 ∗ 9 ))     ∗ 10 + 6
+                = 406 = 18
+
+Conclusion:
+- Choose table size at random to be huge prime 
+- Expected running time is O(m + n)
+- Θ(mn) worst-case, but this is (unbelievably) unlikely
+- Main advantage: extends to 2d patterns and other generalizations
+
+###Suffix Tries and Suffix Trees
+- What if we want to search for many patterns P within the same fixed text T?
+- Idea: Preprocess the text T rather than the pattern P
+- Observation: P is a substring of T if and only if P is a prefix of some
+suffix of T.
+- We will call a suffix trie, a trie that stores all suffixes of a text T, and a
+suffix tree the compressed suffix trie of T.
+- Build the suffix trie, i.e. the trie containing all the suffixes of the text
+- Build the suffix tree by compressing the trie above (like in Patricia trees)
+- Store two indexes l,r on each node v (both internal nodes and leaves) where node v corresponds to substring T[l..r] 
+
+see pictures on slides for trie and tree examples!
+**********confused about the numbers on the trie... why is [3..3] in multiple places? shouldn't they each be subtrings?*****
+
+note on the slides how to use indices to show which substring is at the roots of the tree (easier to write)
+
+####Suffix Trees: Pattern Matching
+
+To search for pattern P of length m:
+- Similar to Search in compressed trie with the difference that we are looking for a prefix match rather than a complete match
+- If we reach a leaf with a corresponding string length less than m, then search is unsuccessful
+- Otherwise, we reach a node v (leaf or internal) with a corresponding string length of at least m
+- It only suffices, to check the first m characters against the substring of the text between indices of the node, to see if there indeed is a match
+
+*****slide 90 - shouldn't it be checking at index 6?*****
+
+Pattern Matching Conclusion 
+(insert pic from slides! and make sure things make sense)
+
