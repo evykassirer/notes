@@ -1666,14 +1666,16 @@ What do we do about this?
 - use heuristics ("precedence") to guide the derivation proccess
 - Make the grammar unambiguous
 
+unambiguous grammar:
 	E -> E Op T | T
 	T -> a|b|c|(E)
 	Op -> +|-|*|/
 
 Then we have a strict left to right precedence
-(picture)
 
 	E => E Op T => E Op T Op T => T Op T Op T
+
+![ ](/cs241/Feb26-lefttoright.jpg)
 
 new producton rules:
 
@@ -1698,7 +1700,7 @@ new derivation:
 	  => a + b x F
 	  => a + b x c
 
-(picture of tree)
+![ ](/cs241/Feb26-tree.jpg)
 
 If L is context-free, is there always an unambiguous grammar?
 - L={a^i b^j c^k | i=j or j=k}
@@ -1713,7 +1715,7 @@ But we need more than a yes/no answer. We don't want to have a program and the c
 
 We can use grammars to specify the syntax of a language. For example, a while loop
  	
- 	statement -> WHILE LPAREN test RPARENT LBRACE statements RBRACE
+ 	statement -> WHILE LPAREN test RPAREN LBRACE statements RBRACE
 
  Parse trees allow us to understand the program. We need to know the derivation (parse tree) and error diagnosis. The problem of finding the derivation is called parsing. How do we use grammar to go from source program to a parse tree?
 
@@ -1721,12 +1723,18 @@ We can use grammars to specify the syntax of a language. For example, a while lo
 
 We have two choices:
 - forwards - "top down" - start at S, work to w
+
+![ ](/cs241/Feb26-forwards.jpg)
+
 - backwards - "bottom up" - start at w, work to S
-(took pictures of triangles)
+ 
+![ ](/cs241/Feb26-backwards.jpg)
 
 ####Top-Down Parsing
 
-Example
+Example:
+
+Rules
 
 	S->AyB
 	A->ab
@@ -1735,16 +1743,19 @@ Example
 	B->wx
 
 How can we derive S=>abywx?
-We want an algoirthm to generate the derivation
+We want an algorithm to generate the derivation
 
 Consider a leftmost derivation:
-S=>AyB=>abyB=>......
+
+	S=>AyB=>abyB=>......
+
 What are we doing here? Match input symbols startng from left until you encounter a non-terminal. Replace non-terminal with RHS of a rule and continue matching more formally.
 
-S=>alpha=>alpha1=>alpha2=>...=>alphan=>w
-Use the stack to store alphas in reverse and match atgainst characters in input.
+	S=>α=>α1=>α2=>...=>αn=>w
 
-Invariant: the consumed input plus the reverse of the stack contents is equal to alpha_i
+Use the stack to store α's in reverse and match against characters in input.
+
+**Invariant**: the consumed input plus the reverse of the stack contents is equal to α_i
 
 For simplicity, we will use **augmented grammars** for parsing. We invent two new symbols BOF and EOF and a new start symbol S'
 
@@ -1759,8 +1770,8 @@ say w = BOF a b y w x EOF
 
 		Stack  			Read Input 			Unread Input 			Action
 		-----------------------------------------------------------------------
-		S'  			ɛ 					BOF a b y w x EOF   	Pop S', push EOF S BOF
-		EOF S BOF 		ɛ 					BOF a b y w x EOF 		match BOF (first in unread input)
+		S'  			ɛ 				BOF a b y w x EOF   	Pop S', push EOF S BOF
+		EOF S BOF 		ɛ 				BOF a b y w x EOF 		match BOF (first in unread input)
 		EOF S 			BOF 				a b y w x EOF 			Pop S, push ByA
 		EOF B y A 		BOF 				a b y w x EOF 			Pop A, Push ba
 		EOF B y b a 	BOF 				a b y w x EOF 			match a
@@ -1770,7 +1781,7 @@ say w = BOF a b y w x EOF
 		EOF x w   		BOF a b y 			w x EOF 				match w
 		EOF x 			BOF a b y w 		x EOF 					match x
 		EOF 			BOF a b y w x   	EOF 					match EOF
-		ɛ 				BOF a b y w x EOF  epsilon					accept
+		ɛ 			BOF a b y w x EOF   	epsilon					accept
 
 ----
 ##March 3 
