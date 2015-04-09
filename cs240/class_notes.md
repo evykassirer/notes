@@ -2294,4 +2294,239 @@ To search for pattern P of length m:
 
 Pattern Matching Conclusion 
 (insert pic from slides! and make sure things make sense)
+(why do suffix trees only take up O(n) space?)
 
+##Compression
+
+The problem: How to store and transmit data?
+
+Terms:
+- Source text: The original data, string of characters S from the source alphabet Σ_S (can be any sort of data, not always text)
+- Coded text: The encoded data, string of characters C from the coded alphabet Σ_C - usually binary
+- Encoding: An algorithm mapping source texts to coded texts
+- Decoding: An algorithm mapping coded texts back to their original source text
+
+Encoding schemes that try to minimize |C|, the size of the coded text, perform data compression. We will measure the **compression ratio**:
+
+	|C|·log|Σ_C| / |S|·log|Σ_S|
+
+Types of Data Compression
+- Logical vs. Physical
+ - Logical Compression uses the meaning of the data and only applies to a certain domain (e.g. sound recordings)
+ - Physical Compression only knows the physical bits in the data, not the meaning behind them
+- Lossy vs. Lossless
+ - Lossy Compression achieves better compression ratios, but the decoding is approximate; the exact source text S is not recoverable
+ - Lossless Compression always decodes S exactly
+- For media files, lossy, logical compression is useful (e.g. JPEG, MPEG)
+- We will concentrate on physical, lossless compression algorithms. These techniques can safely be used for any application.
+
+**character encodings** provide a matching from the source alphabet ΣS (sometimes called a **charset**) to binary strings.
+
+ASCII (American Standard Code for Information Interchange): 
+- 7 bits to encode 128 possible characters: “control codes”, spaces, letters, digits, punctuation
+- Not well-suited for non-English text:
+- ISO-8859 extends to 8 bits, handles most Western languages
+
+**decoding dictionary D** is a mapping from (Σ_C)* → (Σ_S)*:
+- Must be prefix-free, or else we wouldn't know when to stop parsing the encoded text to translate
+- Might be used and stored *explicitly* (e.g. as a trie), or only *implicitly*
+- Might be agreed in advance (*fixed*), stored alongside the message (*static*), or stored implicitly within the message (*adaptive*)
+- ASCII is called a *fixed-length code* because every key string in D has the same length (7 bits)
+- *variable-length codes* means different key strings in D have different lengths
+
+###Huffman Coding
+
+Observation: Some letters in Σ occur more often than others. So let’s use shorter codes for more frequent characters.
+
+Source alphabet is arbitrary (say Σ), coded alphabet is {0, 1} We build a binary trie to store the decoding dictionary D Each character of Σ is a leaf of the trie. We minimize the length of the encoded message by giving letters that occur more frequently shorter encodings (higher in the trie).
+
+Determining the best trie:
+1. Determine the frequency of each character c ∈ Σ in S
+2. Make |Σ| height-0 tries holding each character c ∈ Σ. Assign a “weight” to each trie: sum of frequencies of all letters in trie (initially, these are just the character frequencies)
+3. Merge two tries with the least weights, new weight is their sum 
+4. Repeat previous step until there is only 1 trie left; this is D.
+
+What data structure should we store the tries in to make this efficient? A min-ordered heap! Step 3 is two delete-mins and one insert
+
+(examples on slides)
+
+Summary
+- Encoder must do lots of work:
+ - Build decoding trie (one pass through S, cost is O(|S| + |Σ| log |Σ|))
+ - Construct encoding dictionary from the trie mapping Σ → {0, 1}∗
+ - Encode S → C (second pass through S)
+- Note: constructed trie is not necessarily unique -- because when deleting min in creating the trie, there could be two tries that have the same least weights - can pick either of them
+- Decoding trie must be transmitted along with the coded text C
+- Decoding is faster; this is an asymmetric scheme.
+- The constructed trie is an optimal one that will give the shortest C (we will not go through the proof)
+- Huffman is the best we can do for encoding one character at a time.
+￼￼￼￼￼￼￼￼￼
+###Run-Length Encoding
+- Variable-length code with a fixed decoding dictionary, but one which is not explicitly stored.
+- Not a character-encoding (multiple characters represented by one dictionary-entry)
+- The source alphabet and coded alphabet are both binary: {0, 1}. 
+
+Observation: 0’s and 1’s in S may be repeated many times in a row (called a “run”).
+- S is encoded as the first bit of S (either 0 or 1), followed by a sequence of integers indicating run lengths.
+- We don’t have to encode the value of each bit since it will alternate.
+
+Question: How to encode a run length k in binary?
+- The encoding of run-length k must be prefix-free, because the decoder has to know when to stop reading k.
+- We will encode the binary length of k in unary, followed by the actual value of k in binary.
+- The binary length of k is len(k) = ⌊log k⌋ + 1 (it's just the number of digits of k in binary)
+- Since k ≥ 1, we will encode len(k) − 1, which is at least 0 (so we encode the number of digits coming up, minus 1)
+- The prefix-free encoding of the positive integer k is in two parts:
+ - len(k)-1 0s, followed by
+ - k in binary
+- examples: 1, 3 → 011, 5 → 00101, 23 → 000010111
+
+see slides for more examples
+
+RLE Properties
+- Compression ratio could be smaller than 1% Usually, we are not that lucky:
+􏰀- No compression until run-length k ≥ 6
+􏰀- Expansion when run-length k = 2 or 4!
+- so this is pretty bad with English text
+- Method can be adapted to larger alphabet sizes 
+- Used in some image formats (e.g. TIFF)
+
+###Adaptive Dictionaries
+- ASCII, UTF-8, and RLE use fixed dictionaries.
+- In Huffman, the dictionary is not fixed, but it is static: the dictionary is
+the same for the entire encoding/decoding.
+- Properties of adaptive encoding:
+ - There is an initial dictionary D0. Usually this is fixed.
+ - For i ≥ 0, Di is used to determine the i’th output character
+ - After writing the i’th character to output, both encoder and decoder update Di to Di+1
+- Note that both encoder and decoder must have the same information. Usually encoding and decoding algorithms will have the same cost.
+
+###Lempel-Ziv
+
+Huffman and RLE mostly take advantage of frequent or repeated single characters. Observation: Certain substrings are much more frequent than others.
+
+Lempel-Ziv is a family of adaptive compression algorithms.
+
+Main Idea: Each character in the coded text C either refers to a single character in ΣS , or a substring of S that both encoder and decoder have already seen.
+- Fixed-width encoding using k bits (e.g. k = 12). Store decoding dictionary with 2k entries
+- First |ΣS| entries are for single characters, remaining entries involve multiple characters
+- After encoding/decoding a substring y of S, add xc to D, where x is previously encoded/decoded substring of S, and c is the first character of y
+- Note: start adding to D after second substring of S is encoded/decoded
+
+(look at examples to get how this works)
+
+LZW-encode(S)
+
+	w ← NIL
+	while there is input in S do
+		K ← next symbol from S
+		if wK exists in the dictionary
+			w ← wK 
+		else
+			output index(w)
+			add wK to the dictionary // note wK is added before we go to parse K
+			w←K
+
+Decoding works pretty much exactly the same
+- because of the code where I added the comment ^ the decoder will be one step behind the encoder
+- problem occurs if we want to use a code that we’re about to build (there are examples on slides)
+- but then because of how the encoder algorithm works, we know that our string is sprev + sprev[0]
+
+LZW-decode(S )
+
+	D ← dictionary that maps {0, . . . , 127} to ASCII
+	idx ← 127
+	code ← first code from S
+	s ← D(code); output s
+	while there are more codes in S do
+		sprev ← s
+		code ← next code of S
+		if code == idx do
+			s ← sprev + sprev[0]
+		else
+			s ← D(code)
+		D.insert(idx,sprev +s[0])
+		idx ← idx + 1
+
+compression summary - (picture)
+
+###Text transformations
+- For efficient compression, we need frequently repeating characters and/or 
+- frequently repeating substrings
+- Idea: Modify the text first so that these are likely.
+
+###Move-to-Front
+- Recall the MTF heuristic for self-organizing search:
+- Dictionary is stored as an unsorted linked list
+- After an element is accessed, move it to the front of the list.
+
+How can we use this idea for text transformations?
+- Take advantage of **locality** in the data.
+- If we see a character now, we’ll probably see it again soon.
+- Specifics: MTF is an **adaptive** compression algorithm. If the source alphabet is ΣS with size |ΣS| = m, then the coded alphabet will be ΣC = {0,1,...,m−1}
+
+Encoding
+
+	L ← linked list with ΣS in some pre-agreed, fixed order 
+	while S has more characters do
+		c ← next character of S
+		output index i such that L[i] = c 
+		Move c to position L[0]
+
+Decoding works in exactly the same way:
+
+	L ← linked list with ΣS in some pre-agreed, fixed order 
+	while C has more characters do
+		i ← next integer from C output L[i]
+		Move L[i] to position L[0]
+
+(examples are on slides)
+
+What does a run in S encode to in C?
+- 0s
+What does a run in C mean about the source S?
+- not much
+
+So far, MTF does not provide any compression on its own - we need to encode the integer sequence with
+- Prefix-free integer encoding (like in RLE) 
+- Huffman coding
+
+Using MTF helps to compress because it often creates more runs and numbers that are more frequent
+
+###Burrows-Wheeler Transform
+
+The Burrows-Wheeler Transform is a sophisticated compression technique
+- Transforms source text to a coded text with the same letters, just in a different order
+- The coded text will be more easily compressible with MTF
+- Compression algorithm does not make just a few “passes” over S. BWT is a *block compression* method.
+- (As we will see) decoding is more efficient than encoding, so BWT is an *asymmetric scheme*
+- best compression of any algorithm we have seen (at least on English text).
+
+Encoding:
+- A *cyclic shift* of a string X of length n is the concatenation of X[i + 1..n − 1] and X[0..i], for 0 ≤ i < n
+- For Burrows-Wheeler, we assume the source text S ends with a special end-of-word character $ that occurs nowhere else in S
+- The Burrows-Wheeler Transform proceeds in three steps:
+ - Place all cyclic shifts of S in a list L
+ - Sort the strings in L lexicographically
+ - C is the list of trailing characters of each string in L
+
+(see slides for examples of encoding - took a screenshot)
+
+Decoding:
+
+View the coded text C as an array of characters.
+
+1. Make array of A of tuples (C[i],i)
+2. Sort A by the characters, record integers in array N (Note: C[N[i]] follows C[i] in S, for all 0 ≤ i < n)
+3. Set j to index of $ in C and S to empty string
+4. Set j ← N[j] and append C[j] to S
+5. Repeat Step 4 until C[j] = $
+
+(it took me a bit to convince myself why this works - make sure you get it)
+
+BWT Overview
+- Encoding cost: O(n2) (using radix sort)
+ - Sorting cyclic shifts is equivalent to sorting suffixes - can be done by traversing suffix trie in O(n) time
+- Decoding cost: O(n) (faster than encoding) 
+
+Encoding and decoding both use O(n) space.
+Tends to be slower than other methods but (combined with MTF and Huffman) give better compression.
