@@ -7,19 +7,19 @@ DC 2305C
 dmaftule@uwaterloo.ca
 
 Classes:
-* [Jan 6](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-6)
-* [Jan 8](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-8)
-* [Jan 13](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-13)
-* [Jan 15](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-15)
-* [Jan 20](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-20)
-* [Jan 22](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-22)
-* [Jan 27](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-27)
-* [Jan 29](https://github.com/evykassirer/notes/blob/master/class_notes.md#jan-29)
-* [Feb 3](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-3)
-* [Feb 5](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-5)
-* [Feb 10](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-10)
-* [Feb 12](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-12)
-* [Feb 24](https://github.com/evykassirer/notes/blob/master/class_notes.md#feb-24)
+* [Jan 6](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-6)
+* [Jan 8](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-8)
+* [Jan 13](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-13)
+* [Jan 15](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-15)
+* [Jan 20](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-20)
+* [Jan 22](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-22)
+* [Jan 27](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-27)
+* [Jan 29](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#jan-29)
+* [Feb 3](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#feb-3)
+* [Feb 5](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#feb-5)
+* [Feb 10](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#feb-10)
+* [Feb 12](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#feb-12)
+* [Feb 24](https://github.com/evykassirer/notes/blob/master/cs240/class_notes.md#feb-24)
 
 Tutorials:
 * [Jan 12](https://www.student.cs.uwaterloo.ca/~cs240/w15/tutorials/Tutorial1.pdf)
