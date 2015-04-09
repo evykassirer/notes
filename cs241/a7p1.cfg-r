@@ -1,0 +1,34 @@
+6
+BOF
+EOF
+id
+-
+(
+)
+3
+S
+expr
+term
+S
+5
+S BOF expr EOF
+expr term
+expr expr - term
+term id
+term ( expr )
+term id
+expr term
+term id
+exp term
+term id
+expr expr - term
+term ( expr )
+expr expr - term
+term ( expr )
+expr term
+
+term id
+expr expr - term
+S BOF expr EOF
+
+BOF ( id - ( id - id ) ) - id EOF
