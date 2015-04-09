@@ -1516,7 +1516,7 @@ Problem - if we end up with a loop where we're skipping over empty spaces
 ####Cuckoo Hashing
 
 - h1, h2 are independent hash functions
-- insert - k is inserted into h1(k) - if it's later kicked out it'll go to h2(k) - if it's kicked out again goes back to h1(k0
+- insert - k is inserted into h1(k) - if it's later kicked out it'll go to h2(k) - if it's kicked out again goes back to h1(k0)
 - this makes it easier to search!
 
 ------ 
@@ -1593,6 +1593,7 @@ External memory:
 
 
 If we have a very large dictionary that must be stored externally, how can we hash and minimize disk transfers? Say external memory is stored in blocks (or “pages”) of size S.
+
 Most hash strategies covered access many pages (data is scattered) - except linear probing where they're usually in the same page, but linear hashing is bad for clustering and stuff anyways. Let's try something new:
 
 ###Extendible Hashing
@@ -1772,7 +1773,7 @@ Summary of Skip Lists
 􏰀 - Running time: O(log n + k), k: number of reported items
 􏰀 - Problem: does not generalize to higher dimensions
 - Second solution: balanced BST (e.g., AVL tree)
-￼￼
+
 BST-RangeSearch(T , k1 , k2 ) - T: A balanced search tree, k1,k2: search keys Report keys in T that are in range [k1,k2]
 
 	1if T = nil then return
