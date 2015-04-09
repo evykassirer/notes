@@ -1666,14 +1666,16 @@ What do we do about this?
 - use heuristics ("precedence") to guide the derivation proccess
 - Make the grammar unambiguous
 
+unambiguous grammar:
 	E -> E Op T | T
 	T -> a|b|c|(E)
 	Op -> +|-|*|/
 
 Then we have a strict left to right precedence
-(picture)
 
 	E => E Op T => E Op T Op T => T Op T Op T
+
+![ ](/cs241/Feb26-lefttoright.jpg)
 
 new producton rules:
 
@@ -1698,7 +1700,7 @@ new derivation:
 	  => a + b x F
 	  => a + b x c
 
-(picture of tree)
+![ ](/cs241/Feb26-tree.jpg)
 
 If L is context-free, is there always an unambiguous grammar?
 - L={a^i b^j c^k | i=j or j=k}
@@ -1713,7 +1715,7 @@ But we need more than a yes/no answer. We don't want to have a program and the c
 
 We can use grammars to specify the syntax of a language. For example, a while loop
  	
- 	statement -> WHILE LPAREN test RPARENT LBRACE statements RBRACE
+ 	statement -> WHILE LPAREN test RPAREN LBRACE statements RBRACE
 
  Parse trees allow us to understand the program. We need to know the derivation (parse tree) and error diagnosis. The problem of finding the derivation is called parsing. How do we use grammar to go from source program to a parse tree?
 
@@ -1721,12 +1723,18 @@ We can use grammars to specify the syntax of a language. For example, a while lo
 
 We have two choices:
 - forwards - "top down" - start at S, work to w
+
+![ ](/cs241/Feb26-forwards.jpg)
+
 - backwards - "bottom up" - start at w, work to S
-(took pictures of triangles)
+ 
+![ ](/cs241/Feb26-backwards.jpg)
 
 ####Top-Down Parsing
 
-Example
+Example:
+
+Rules
 
 	S->AyB
 	A->ab
@@ -1735,32 +1743,35 @@ Example
 	B->wx
 
 How can we derive S=>abywx?
-We want an algoirthm to generate the derivation
+We want an algorithm to generate the derivation
 
 Consider a leftmost derivation:
-S=>AyB=>abyB=>......
+
+	S=>AyB=>abyB=>......
+
 What are we doing here? Match input symbols startng from left until you encounter a non-terminal. Replace non-terminal with RHS of a rule and continue matching more formally.
 
-S=>alpha=>alpha1=>alpha2=>...=>alphan=>w
-Use the stack to store alphas in reverse and match atgainst characters in input.
+	S=>α=>α1=>α2=>...=>αn=>w
 
-Invariant: the consumed input plus the reverse of the stack contents is equal to alpha_i
+Use the stack to store α's in reverse and match against characters in input.
+
+**Invariant**: the consumed input plus the reverse of the stack contents is equal to α_i (Sean calls these left/right sentential forms - for leftmost/rightmost derivations)
 
 For simplicity, we will use **augmented grammars** for parsing. We invent two new symbols BOF and EOF and a new start symbol S'
 
-1) S' -> BOF S EOF
-2) S -> AyB
-3) A -> ab
-4) A -> cd
-5) B -> z
-6) B -> wx
+1. S' -> BOF S EOF
+2. S -> AyB
+3. A -> ab
+4. A -> cd
+5. B -> z
+6. B -> wx
 
 say w = BOF a b y w x EOF
 
 		Stack  			Read Input 			Unread Input 			Action
 		-----------------------------------------------------------------------
-		S'  			ɛ 					BOF a b y w x EOF   	Pop S', push EOF S BOF
-		EOF S BOF 		ɛ 					BOF a b y w x EOF 		match BOF (first in unread input)
+		S'  			ɛ   				 BOF a b y w x EOF   	 Pop S', push EOF S BOF
+		EOF S BOF 		ɛ   				 BOF a b y w x EOF 		 match BOF (first in unread input)
 		EOF S 			BOF 				a b y w x EOF 			Pop S, push ByA
 		EOF B y A 		BOF 				a b y w x EOF 			Pop A, Push ba
 		EOF B y b a 	BOF 				a b y w x EOF 			match a
@@ -1770,14 +1781,14 @@ say w = BOF a b y w x EOF
 		EOF x w   		BOF a b y 			w x EOF 				match w
 		EOF x 			BOF a b y w 		x EOF 					match x
 		EOF 			BOF a b y w x   	EOF 					match EOF
-		ɛ 				BOF a b y w x EOF  epsilon					accept
+		ɛ   			 BOF a b y w x EOF   epsilon				 accept
 
 ----
 ##March 3 
 
 
 Let's codify this
-- When the top of othe stack is a terminal pop and matched against the input
+- When the top of other stack is a terminal pop and matched against the input
 - when TOS (top of stack) is a non-terminal A, pop A and push reverse (alpha), where A->alpha is a grammar rule
 - accept when stack and input are empty
 - brute force: try all combinations until one works - this is inefficient
@@ -1795,29 +1806,29 @@ Construct a **predictor table** - given a non-terminal on the stack and an input
 
 The rest of the table can be used for descriptive error mesesages: "Parse error at row, col: expecting one of (symbols where the predictor table does have entries)"
 
-What if a cell contains more than one rule? THe method breaks down
+What if a cell contains more than one rule? The method breaks down
 
-A grammar is called LL(1)
+This grammar is called **LL(1)**
 - L: left to right scan of input
-- leftmost derivations produced
+- L: leftmost derivations produced
 - 1: 1 symbol of lookahead
 
 (top down parsing - starting with s ending at w - recall that triangle diagram)
 
 We can automatically compute the predictor table
-- Predict(A,a) -> rules that apply when A is on the setack and a is the next input character
- - Predict(A,a) = {A->B | a is elem of First(beta)}
+- Predict(A,a) -> rules that apply when A is on the stack and a is the next input character
+ - Predict(A,a) = {A->beta | a is elem of First(beta)}
 - First(beta), beta in V* is the set of characters thata can be the first letter of a derivation starting from beta
- - First(beta) = {a|beta =>* a gamma}
+ - First(beta) = {a|beta =>*  a gamma}
  - For example: First(AyB) = {a,c}
 - So Predict(A,a) = {A->beta | beta =>* a gamma}
 
-However, this is not quite right. What if A=>*epsilon?
+However, this is not quite right. What if A=>* epsilon?
 - Then a might not come from A, but from something AFTER A.
-- we missed something - what if there is more than one production with the same LHS? How do we know which one to pick?
+- We missed something - what if there is more than one production with the same LHS? How do we know which one to pick?
 - So, Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
-- Nullable(beta) = true if B=>*epsilon, false otherwise
-- Follow(A) = {b | S' =>* alpha A b beta}: the set of terminal symbmols that can come immediatly after A in a derivation of S'. 
+- Nullable(beta) = true if beta =>* epsilon, false otherwise
+- Follow(A) = {b | S' =>* alpha A b beta}: the set of terminal symbols that can come immediately after A in a derivation of S'. 
  - In our example: Follow(A) = {y}
 
 Computing Nullable -  Nullable(Beta) = true if beta =>* epsilon
@@ -1834,10 +1845,10 @@ First(beta) = {a|beta =>* a gamma}
 	initialize First[A] <- {} for all A //an array
 	for all rule A -> B1...Bk do
 		for i in 1...k do 
-			if Bi in sum terminal then
-				First[A] <- FIrst[A] U Bi
+			if Bi is a terminal then
+				First[A] <- First[A] U Bi
 				break
-			else (Bi in N (non terminal))
+			else (Bi is in N (non terminal))
 				First[A] <- First[A] U First[Bi]
 				if not Nullable[Bi] then
 					break
@@ -1851,7 +1862,7 @@ First*(B)
 				result <- result U Yi
 				break
 			else (Yi in N)
-				result <- result U first[Yi]
+				result <- result U First[Yi]
 				if not Nullable[Yi] then
 					break
 		return result
@@ -1865,21 +1876,19 @@ Follow(A)
 				if Bi in N then
 					Follow[Bi]<-Follow[Bi] U First*(Bi+1 ... Bn)
 				if all of Bi+1...Bn are Nullable then
-					Follow[Bi]<-
+					Follow[Bi] ← Follow[Bi] ∪ Follow[A]
+	until nothing changes
 
-
-
-					THESE ARE BEING POSTED :C
 
 
 Sample Trace:
 
-	1) S' -> BOF S EOF
-	2) S -> bSd
-	3) S -> pSq
-	4) S -> C
-	5) C -> lC
-	6) C -> epsilon
+1. S' -> BOF S EOF
+2. S -> bSd
+3. S -> pSq
+4. S -> C
+5. C -> lC
+6. C -> epsilon
 
 Nullable
 
@@ -1891,19 +1900,21 @@ Nullable
 	iterator   0   1   2   3
 	--------------------------
 	S'         F   F   F   F 
-	S 		   F   F   T   T
+	S          F   F   T   T
 	C          F   T   T   T
 
 First
 
-	iteration   0     1      2       3-same as 2
+	iteration   0     1      2        3-same as 2
 	----------------------------------------------
-	S'         {}   {BOF}    {BOF}
-	S          {}   {b,p}    {b,p,l}
-	C          {}   {l}      {l}
+	S'         {}    {BOF}   {BOF}
+	S          {}    {b,p}   {b,p,l}
+	C          {}    {l}     {l}
 
 Follow
-   iter  0    1                2
+
+   iter  0    1              2
+   -------------------------------------
    S    {}   {BOF, d, q}    {BOF, d, q}
    C    {}   {BOF, d, q}    {BOF, d, q}
 
