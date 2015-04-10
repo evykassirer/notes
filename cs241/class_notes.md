@@ -1667,6 +1667,7 @@ What do we do about this?
 - Make the grammar unambiguous
 
 unambiguous grammar:
+
 	E -> E Op T | T
 	T -> a|b|c|(E)
 	Op -> +|-|*|/
@@ -1677,7 +1678,7 @@ Then we have a strict left to right precedence
 
 ![ ](/cs241/Feb26-lefttoright.jpg)
 
-new producton rules:
+new producton rules that prevent uncessary brackets:
 
 	E -> E PM T | T
 	T -> T TD F | F
@@ -1913,36 +1914,36 @@ First
 
 Follow
 
-   iter  0    1              2
-   -------------------------------------
-   S    {}   {BOF, d, q}    {BOF, d, q}
-   C    {}   {BOF, d, q}    {BOF, d, q}
+	iter  0    1              2
+	-------------------------------------
+	S    {}   {BOF, d, q}    {BOF, d, q}
+	C    {}   {BOF, d, q}    {BOF, d, q}
 
 ------
 ##March 5
 
 ###Last time
-- LL(1) Parsing
 
+LL(1) Parsing
 
-	1) S' -> BOF S EOF
-	2) S -> bSd
-	3) S -> pSq
-	4) S -> C
-	5) C -> lC
-	6) C -> epsilon
+1. S' -> BOF S EOF
+2. S -> bSd
+3. S -> pSq
+4. S -> C
+5. C -> lC
+6. C -> epsilon
 
-Nullable:  S' false    S true	L true
+Nullable:  S' false    S true	C true
 
-First: S' {BOF}    S {b,p,l}    L {l}
+First: S' {BOF}    S {b,p,l}    C {l}
 
-Follow: S {BOF, d, q}  L {BOF, d, q}
+Follow: S {EOF, d, q}  C {EOF, d, q}
 
 Now since Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
 
 	    BOF   EOF   b   d   p   q   l
 	S'   1                             <-- rule numbers
-	S          4    2   4   3   4   4 
+	S          4    2   4   3   4   4
 	C          6        6       6   5
 
 This makes a very good exam question
@@ -1956,16 +1957,16 @@ Weakness: LL must predict which production to use based on first (k) tokens of R
 
 ###Bottom-up parsing
 
-We want w to S. THe stack stores partially reduced input: s <= alpha_k <= ... <= S
+We want w to S. The stack stores partially reduced input: s <= alpha_k <= ... <= S
 
 Our invariant: the stack and unread input are equal to alpha_i
 
-[some slides that will be posted]
+example: https://www.student.cs.uwaterloo.ca/~cs241/LRSlides.pdf
 
 We have two choices at each step
 - shift a character from input to top of stack
 - reduce - top of stack is RHS of a grammar rule, replace with the LHS
-- accept if the stack contains S' and input epsilon (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting END of is good enough too
+- accept if the stack contains S' and input epsilon (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting EOF is good enough too
 
 How do we know whether to shift or reduce? We know
 - the next character of input
@@ -1989,8 +1990,6 @@ Definition: An **item** is a production with a dot (·) somewhere on the RHS, in
 
 Label an arc with the symbol that follows the dot. Advance the dot in the next state. If the dot preceeds a non-terminal A, add all the productions with A on the LHS to the state (dot in the leftmost position
 
-[more slides]
-
 ####Using the Automaton
 
 Start in the start state with an empty stack
@@ -1999,28 +1998,28 @@ Start in the start state with an empty stack
  2. follow the transition labeled with that chracter in themachine, to the next state (if there is one)
  3. if none - error or reduce
 
-Reducing
+- Reducing
 1. Reduce states have only one item and the dot is rightmost
 2. Reduce by the rule in the stack - pop RHS off the stack, backtrack size(RHS) states in DFA, psush LHS onto stack and then follow the transition for LHS
 - accept when you shift EOF
-- backtracking in a DFA is accomplished by remmebering the previous DFA states. We can push the DFA states onto the setack as well. We can use 2 stack or comine into one stack.
+- backtracking in a DFA is accomplished by remmebering the previous DFA states. We can push the DFA states onto the stack as well. We can use 2 stacks or combine into one stack.
 
 Example: BOF id + id + id EOF
 
-Stack 					Read 			Unread					Action
-1 						epsilon			BOF id + id + id EOF 	Shift BOF, goto 2
-1 BOF 2 				BOF 			id + id + id EOF 		shift 6
-1 BOF 2 id 6  			BOF id 			+ id + id EOF 			R T->id (Now in state 2) 
-1 BOF 2 T S				BOF id 			+ id + id EOF			R E->T
-1 BOF 2 E 3 			BOF id 			+ id + id EOF 			S 7
-1 BOF 2 E 3 + 7  		BOF id + 		id + id EOF 			S 6
-1 BOF 2 E3 + 7 id 6 	BOF id + id 	+ id EOF                R T->id
-1 BOF 2 E 3 + 7 T 8     BOF id + id     + id EOF    			R E->E+T
-1 BOF 2 E + 7
+	Stack 					Read 			Unread					Action
+	1 						epsilon			BOF id + id + id EOF 	Shift BOF, goto 2
+	1 BOF 2 				BOF 			id + id + id EOF 		shift 6
+	1 BOF 2 id 6  			BOF id 			+ id + id EOF 			R T->id (Now in state 2) 
+	1 BOF 2 T S				BOF id 			+ id + id EOF			R E->T
+	1 BOF 2 E 3 			BOF id 			+ id + id EOF 			S 7
+	1 BOF 2 E 3 + 7  		BOF id + 		id + id EOF 			S 6
+	1 BOF 2 E3 + 7 id 6 	BOF id + id 	+ id EOF                R T->id
+	1 BOF 2 E 3 + 7 T 8     BOF id + id     + id EOF    			R E->E+T
+	1 BOF 2 E + 7
 
 ...etc (I think it's in Brad's notes I have from somewhere)
 
-Note this is a DFA (from NFA)
+Note this is a DFA (from our NFA)
 
 What can go wrong? 
 
@@ -2029,7 +2028,7 @@ What if a state looks like:
 	A -> alpha dot c beta
 	B -> gamma dot
 
-Do we shift c (as suggested by reule 1) or reduce by second rule?
+Do we shift c (as suggested by rule 1) or reduce by second rule?
 
 This is a shift-reduce conflict
 Also what about
@@ -2047,8 +2046,8 @@ If any item
 	T -> id
 
 For each A->alpha dot, attach Follow(A) 
-Follow(E) = {BOF}
-Follow(T) = {+, EOF}
+- Follow(E) = {BOF}
+- Follow(T) = {+, EOF}
 
 
 -----
@@ -2074,14 +2073,14 @@ If any item which has a dot at the end occurs in a state which it is not alone, 
 	E -> dot T + E
 	E -> dot T
 
-Right associative expressions (slides)
+Right associative expressions ?****?
 
 We see a shift reduct conflict in state 5. For example, if the input starts with BOF id, we go from state 1 to 2 to 6 to 5. Then should we reduce E->T? IT DEPENDS. If the input is BOF id EOF then YES. If the input is BOF id + ... EOF then NO. Add lookahead to the automaton to resolve the conflict.
 
 For each A -> alpha, attach Follow(A): 
 Follow(E) = {EOF}, Follow(T) = {+, EOF}
 
-THe interpretation: A reduce action applies only if the next character is in the follow set of the non-terminal. Thus, the first rule only applies if the next char is EOF, and the second only applies if the next char is + (for state 5). Conflict resolved.
+The interpretation: A reduce action applies only if the next character is in the follow set of the non-terminal. Thus, the first rule only applies if the next char is EOF, and the second only applies if the next char is + (for state 5). Conflict resolved.
 
 The result is called an SLR(1) parser (simple left-to-right, rightmost derivation, 1 character lookahead).
 - SLR resolves many (but not all) conflicts. LR(1) is more sophisticated than SLR(1), parsing more grammars.
@@ -2114,12 +2113,14 @@ Let's try right recursion:
 But this is still not LL(1), since T, T+E generate the same first symbols. So we do this:
 
 	E -> T E'
-	E' -> epsilon | + epsilon
+	E' -> epsilon | + F
 	T -> F T'
 	T' -> epsilon | * F
 	F -> a | b | c
 
-Left factoring - This is LL(1) but it's ugly and we've changed the associativity of expressions. So LL(1) is a odds with left associativity.
+*********? where the recursion?
+
+Left factoring - This is LL(1) but it's ugly and we've changed the associativity of expressions. So LL(1) is at odds with left associativity.
 
 Building a parse tree:
 - Top Down: 
