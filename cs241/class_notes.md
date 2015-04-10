@@ -1999,8 +1999,8 @@ Start in the start state with an empty stack
  3. if none - error or reduce
 
 - Reducing
-1. Reduce states have only one item and the dot is rightmost
-2. Reduce by the rule in the stack - pop RHS off the stack, backtrack size(RHS) states in DFA, psush LHS onto stack and then follow the transition for LHS
+ 1. Reduce states have only one item and the dot is rightmost
+ 2. Reduce by the rule in the stack - pop RHS off the stack, backtrack size(RHS) states in DFA, psush LHS onto stack and then follow the transition for LHS
 - accept when you shift EOF
 - backtracking in a DFA is accomplished by remmebering the previous DFA states. We can push the DFA states onto the stack as well. We can use 2 stacks or combine into one stack.
 
@@ -2132,41 +2132,41 @@ Building a parse tree:
 
  ### Context sensitive Analysis
 
- Now that we have a grammar and can parse, if our program is not rejected by this point, do we have a valid C program?
+Now that we have a grammar and can parse, if our program is not rejected by this point, do we have a valid C program?
 
- No, but hopefully we haven't excluded any valid programs.
+No, but hopefully we haven't excluded any valid programs.
 
- What do we know? - The program is syntactically well-formed. What properties of valid C programs cannot be enforced by CFGs?
+What do we know? - The program is syntactically well-formed. What properties of valid C programs cannot be enforced by CFGs?
 - Variables and Functions - declaration before use, multiple declarations
 - Scope
 - Types - operators, parameter lists
 
 Third step of our compiler: parse tree -> [semantic analysis] -> symbol table and parse tree
 
-Note: our compiler is broken into separate programs to isolate the pieces of each assignment . Remember the tree question from A3 for A8.
+Note: our compiler is broken into separate programs to isolate the pieces of each assignment. Remember the tree question from A3 for A8.
 
 To solve these, we need more complex programs. We will perform context sensitive analysis by traversing the parse tree. To use the given parse tree we need the following 
 
 Example: expr - three children expr + expr
 
-Class Tree {
-	public
-		string rule; //expr expr PLUS term
-		vector<string> tokens; // "expr, "expr", "PLUS", "term"
-		vector<Tree*> children; // 3 children
-}
+	Class Tree {
+		public
+			string rule; //expr expr PLUS term
+			vector<string> tokens; // "expr, "expr", "PLUS", "term"
+			vector<Tree*> children; // 3 children
+	}
 
 -----
 ## March 12
 
 Traversal through a tree:
 
-void doSomething(const Tree &t) {
-	// do something with t
-	for(vector<TREE*>::const_iterator it = t.children.begin(); it != t.children.end(); ++it) {
-		dosomething(**it);
+	void doSomething(const Tree &t) {
+		// do something with t
+		for(vector<TREE*>::const_iterator it = t.children.begin(); it != t.children.end(); ++it) {
+			dosomething(**it);
+		}
 	}
-}
 
 ###Declaration Errors - Multiple/Missing
 
@@ -2185,6 +2185,8 @@ To actually implement the symbol table, we could use a global variable:
 - map<string, string> symbolTable  (where the first string is the name, second is the type)
 - but, this does not take scope into consideration:
 
+for example:
+
 	int f() {
 		int x = 0;
 		return 1;
@@ -2194,15 +2196,19 @@ To actually implement the symbol table, we could use a global variable:
 		return x;
 	}
 
-Likewise, if we declared x in f and used it in wain, it would appear valid. We also haven't checked procedure declarations. How can we forbid duplicate declarations in the same procedure, but permit them in different procedures? The solution is to have a separate symbol table for each procedure. Have one top-level symbol table that collects all procedure names: map<string, map<string, string>> topSymbolTable (where the first string is procedure name, the map is the procedure's symbol table)
+Likewise, if we declared x in f and used it in wain, it would appear valid. We also haven't checked procedure declarations. How can we forbid duplicate declarations in the same procedure, but permit them in different procedures? The solution is to have a separate symbol table for each procedure. Have one top-level symbol table that collects all procedure names: 
 
-When traversing, if the rule is "procedure -> INT ID LPAREN ..." or "main -> INT WAIN LPAREN ..." then we have a new procedure. If the name is not in the symbmol table, create a new entry (and a new symbol table)
+	map<string, map<string, string>> topSymbolTable
+
+(where the first string is procedure name, the map is the procedure's symbol table)
+
+When traversing, if the rule is "procedure -> INT ID LPAREN ..." or "main -> INT WAIN LPAREN ..." then we have a new procedure. If the name is not in the symbol table, create a new entry (and a new symbol table)
 . Note - you probably want a variable that determines what procedure is currently being parsed. Update each time we encounter one of the two procedure rules above.
 
-For variables, the declared type is stored in the symbol table. For procedures, we still need the signature (the types of the parameters). Note that all procedures return int for this language So we don't need to worry about the return type. We re-update the table again:
+For variables, the declared type is stored in the symbol table. For procedures, we still need the signature (the types of the parameters). Note that all procedures return int for this language, so we don't need to worry about the return type. We re-update the table again:
 
-#include<utility>
-map<string, pair<vector<string>, map<string,string>>> topSybolTable;    (where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
+	#include<utility>
+	map<string, pair<vector<string>, map<string,string>>> topSybolTable;    (where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
 
 To compute the signature:
 - traverse nodes of the form: 
@@ -2228,10 +2234,12 @@ In WLP4, there are only two types: int and int*. To check type correctness, we n
 		if not possible, error
 	}
 
-For example, how do we type check on ID? We get its type from the symbol table: look if <id.name, T> is in dcls
-- <id.name, T> in dcls => id.name : T (notation on the board shows as a/b instead of a=>b - recall notation from CS 245)
+For example, how do we type check on ID? We get its type from the symbol table: look if \<id.name, T\> is in dcls
+- \<id.name, T\> in dcls => id.name : T (notation on the board shows as a/b instead of a=>b - recall notation from CS 245)
 - x:y means x has type y
 - if id.name was declared to have type T, then id.name has type T
+
+code for typeOf
 
 	string typeOf(const Tree &t) {
 		....
@@ -2271,7 +2279,7 @@ Singleton Productions:
  - <f,()> in dcls => f():int
  - <f,(T1..Tn)> in dcls E1:T1 ... En:Tn => f(E1,...,En):int
 
-For while loops and if statements, the condition should be booelean, not int or int*, but there is no boolean type in WLp4. The grammar forces T to be a comparison (expr comparison expr). However, the comparison stil needs to be checked. Any expression witha  type is well-typed.
+For while loops and if statements, the condition should be booelean, not int or int*, but there is no boolean type in WLp4. The grammar forces T to be a comparison (expr comparison expr). However, the comparison still needs to be checked. Any expression witha  type is well-typed.
 - E:T => wellTyped(E)
 
 For comparisons
@@ -2311,7 +2319,8 @@ Wain (using mips.twoints or mips.array):
 
 The results so far:
 
-	source -> [lexical analysis] -> tokens -> [parsing] -> parse tree -> [semantic analysis] -> symbol table and parse tree -> [code gen] -> assembly
+	source -> [lexical analysis] -> tokens -> [parsing] -> parse tree -> [semantic analysis] 
+	-> symbol table and parse tree -> [code gen] -> assembly
 
 We're at the code gen stage! 
 
@@ -2416,11 +2425,11 @@ stack:  $30-> c b a
 	add $30, $30, $4
 	jr $31
 
-Problem: we dont konw the offsetes until all declarations have been processed. Since $30 changes with each new declaration and if we ever use the stack for temporary data, $30 changes and all the offsets in the symbol table are wrong.
+Problem: we dont know the offsets until all declarations have been processed. Since $30 changes with each new declaration and if we ever use the stack for temporary data, $30 changes and all the offsets in the symbol table are wrong.
 
-Solution: $29 points ot the bottom of the stack frame, aka the "frame pointer". We compute the offsets relative to $29, and they won't move. A stack frame consists of all the state information stored on the stack for an active procedure call. 
+Solution: $29 points to the bottom of the stack frame, aka the "frame pointer". We compute the offsets relative to $29, and they won't move. A stack frame consists of all the state information stored on the stack for an active procedure call. 
 
-A convention taht we will follow is that $4 will always contain the value 4.
+A convention that we will follow is that $4 will always contain the value 4.
 
 New symbol table:
 
@@ -2693,9 +2702,10 @@ For pointer arithmetic, the exact memory depends on the types involved
 
 expr1 -> expr2 + term
 - if expr2:int, term:int - as before
-- if expr2:int*, term:int - expr2 + 4*term
+- if expr2:int\*, term:int - expr2 + 4\*term
 
-code: 
+code:
+
 	code(expr2)
 	push($3)
 	code(term)
