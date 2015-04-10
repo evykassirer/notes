@@ -1663,7 +1663,7 @@ Summary of extendible hashing
 - use the key (if it's a number) to guess its location
 - check index l + floor( ( k−A[l]  /  A[r]−A[l] ) (r −l))
 - Works well if keys are uniformly distributed: O(log log n) on average (**** calcuate this?)
-- Bad worst case performance: O(n)
+- Bad worst case performance: O(n) if not uniformly distributed
 
 ###Gallop Search
 
@@ -1674,9 +1674,10 @@ Gallop-Search(A, k) 	A: An ordered array, k: a key
 	i←0
 	while i < size(A) and k > A[i] do 
 		i ← 2i + 1
-	return Binary-Search(A􏰄⌈i /2⌉, min(i , size(A) − 1)􏰅, k )
+	return Binary-Search(A􏰄⌈i/2⌉, min(i , size(A) − 1)􏰅, k )
 
-- O(log m) comparisons (m: location of k in A)
+- if k is at position m in the array A, we take log(m) jumps to get there and the binary search takes log(m/2)
+- O(log m) comparisons 
 
 ###Self-Organizing Search
 - Unordered linked list is search: Θ(n), insert: Θ(1), delete: Θ(1) (after a search)
@@ -1684,7 +1685,7 @@ Gallop-Search(A, k) 	A: An ordered array, k: a key
  - No: if items are accessed equally likely
  - Yes: otherwise (we have a probability distribution for items)
 
-Optimal static ordering: sorting items by their probabilities of access in non-increasing order minimizes the expected cost of Search.
+Optimal static ordering: sorting items by their probabilities of access in non-increasing order minimizes the expected cost of Search (we know probabilities beforehand)
 
 Proof Idea: For any other ordering, exchanging two items that are out-of-order according to their access probabilities makes the total cost decrease.
 
@@ -1696,7 +1697,8 @@ Dynamic Ordering
 Performance of dynamic ordering:
 - Both can be implemented in arrays or linked lists
 - Transpose can perform very badly on certain input (e.g. last two keys are most accessed, and keep getting swapped with each other)
-- MTF works well in practice. Theoretically MTF is “competitive”: No more than twice as bad as the optimal “offline” ordering - where offline is optimal static ordering where we know the probabilities beforehand - transpose is worse
+- MTF works well in practice. Theoretically MTF is “competitive”: No more than twice as bad as the optimal “offline” ordering - where offline is optimal static ordering where we know the probabilities beforehand 
+- transpose is worse, converges to OSO slower
 
 ###Skip Lists
 - Randomized data structure for dictionary ADT 
@@ -1723,8 +1725,8 @@ skip-search(L, k) L: A skip list, k: a key
 			p ← after(p) 
 		push p onto S
 	return S
-	
-S contains positions of the largest key less than k at each level. after(top(S)) will have key k, iff k is in L. (*****why stack...?)
+
+S contains positions of the largest key less than k at each level. after(top(S)) will have key k, iff k is in L. (we use a stack because of the insert algorithm)
 
 see slides for examples
 
@@ -1752,7 +1754,6 @@ see slides for examples
 Summary of Skip Lists
 - Expected space usage: O(n)
 - Expected height: O(log n)
-- Worst case height is n *********what - shouldn't it be infinite?
 - A skip list with n items has height at most 3 log n with probability at least 1 − 1/n^2
 - Skip-Search: O(log n) expected time, O(n) worst if we have to go through all the items in some way
 - Skip-Insert and delete have same run time as search
@@ -1830,6 +1831,7 @@ see slides for examples
 - Insert:
 􏰀 - Search for the point
 􏰀 - Split the leaf if there are two points
+ - insertion might change the height of the tree
 - Delete:
 􏰀 - Search for the point
 􏰀 - Remove the point
@@ -1857,7 +1859,7 @@ height of quadtree:
 	2*sqrt2*dmax/dmin > 2^h > sqrt2*dmax/dmin
 	so h ∈ Θ(log_2 dmax/dmin)
 
-Worst-case complexity to build initial tree = Θ(#nodes · height) = Θ(nh) *****why 
+Worst-case complexity to build initial tree = Θ(#nodes inserted · height) = Θ(nh)  
 
 Worst-case complexity of range search = O(#nodes · height) = O(nh) even if the answer is ∅
 
@@ -1913,6 +1915,10 @@ Variations of k-d trees:
 - also store x <= xi or y <= yi in nodes
 - just store the separating line in nodes
 
+![points](/cs240/March_10_points.jpg)
+
+![Therese](/cs240/March_10_Therese-example.jpg)
+
 ###kd-tree: Higher Dimensions
 - kd-trees for d-dimensional space
 􏰀- at the root the point set is partitioned based on the first coordinate
@@ -1932,6 +1938,8 @@ Variations of k-d trees:
 - How to build a range tree on P:
 􏰀 - Build a balanced binary search tree τ determined by the x-coordinates of the n points
 􏰀 - For every node v ∈ τ, build a balanced binary search tree τassoc(v) (associated structure of τ) whose keys are the y-coordinates and whose nodes are those of the subtree of τ with root node v
+
+![rangetree](/cs240/march_12_range_tree.jpg)
 
 Operations:
 - Search: trivially as in a binary search tree 
@@ -2079,6 +2087,10 @@ BruteforcePM(T[0..n − 1], P[0..m − 1]) T: String of length n (text), P: Stri
 Worst case performance Θ((n − m + 1)m)
 - m ≤ n/2 ⇒ Θ(mn) ***************? point
 
+##March 19
+
+(ish - I wasn't super paying attention this week)
+
 Pattern Matching
 - More sophisticated algorithms
 - Deterministic finite automata (DFA)
@@ -2112,6 +2124,7 @@ Analysis
 - matching time on a text string of length n is Θ(n)
 - this does not include the preprocessing time required to compute the transition function δ.
 - we can find all occurrences of a length-m pattern in a length-n text over a finite alphabet Σ with O(m|Σ|) preprocessing time and Θ(n) matching time.
+
 
 ####KMP Algorithm
 - Compares the pattern to the text in left-to-right
@@ -2161,6 +2174,8 @@ KMP(T, P) -- T: String of length n (text), P: String of length m (pattern)
 					i ← i + 1
 	return −1 // no match
 
+##March 24
+
 Analysis
 - failureArray
  - At each iteration of the while loop, either i increases by one, or the guess index i − j increases by at least one (F[j − 1] < j)
@@ -2171,6 +2186,8 @@ Analysis
  - At each iteration of the while loop, either i increases by one, or the guess index i − j increases by at least one (F[j − 1] < j)
  - There are no more than 2n iterations of the while loop
  - Running time: Θ(n)
+ - worst case is like when T=aaaaaaaaaa and P = aaab because you move it only once over each time
+ - O(n/m)**********?
 
 Another example
 - T =abacaabaccabacabaabb
@@ -2225,11 +2242,19 @@ Boyer-Moore algorithm conclusion
  - On typical English text the algorithm probes approximately 25% of the characters in T (****what does probe mean?)
 - Faster than KMP in practice on English text.
 
+**Exercise**: Consider KMP modified, comparing P against T from right to left
+
+## March 24
+
 ###Rabin-Karp Fingerprint Algorithm
 - Idea: use hashing
 - Compute hash function for each text position
 - No explicit hash table: just compare with pattern hash
 - If a match of the hash value of the pattern and a text position found, then compares the pattern with the substring by naive approach
+
+![hash](/cs240/march_24_hashfunction.jpg)
+
+**** is the hash function always this function? what does this function even mean exactly
 
 Example:
 
@@ -2294,10 +2319,12 @@ To search for pattern P of length m:
 *****slide 90 - shouldn't it be checking at index 6?*****
 
 Pattern Matching Conclusion 
-(insert pic from slides! and make sure things make sense)
-(why do suffix trees only take up O(n) space?)
+![patter](/cs240/pattern_matching.png)
+*****make sure things make sense --  (why do suffix trees only take up O(n) space?)
 
-##Compression
+##March 26
+
+###Compression
 
 The problem: How to store and transmit data?
 
@@ -2349,7 +2376,7 @@ Determining the best trie:
 
 What data structure should we store the tries in to make this efficient? A min-ordered heap! Step 3 is two delete-mins and one insert
 
-(examples on slides)
+(examples on slides and in pics I took of the board, but they're pretty much same so I won't here)
 
 Summary
 - Encoder must do lots of work:
@@ -2362,6 +2389,8 @@ Summary
 - The constructed trie is an optimal one that will give the shortest C (we will not go through the proof)
 - Huffman is the best we can do for encoding one character at a time.
 ￼￼￼￼￼￼￼￼￼
+##March 31
+
 ###Run-Length Encoding
 - Variable-length code with a fixed decoding dictionary, but one which is not explicitly stored.
 - Not a character-encoding (multiple characters represented by one dictionary-entry)
@@ -2400,6 +2429,9 @@ the same for the entire encoding/decoding.
  - For i ≥ 0, Di is used to determine the i’th output character
  - After writing the i’th character to output, both encoder and decoder update Di to Di+1
 - Note that both encoder and decoder must have the same information. Usually encoding and decoding algorithms will have the same cost.
+- we store the adaptive dictionary as a TRIE!
+
+##April 2
 
 ###Lempel-Ziv
 
@@ -2427,6 +2459,15 @@ LZW-encode(S)
 			add wK to the dictionary // note wK is added before we go to parse K
 			w←K
 
+What if size of dicitonary is reached? (2^12) ****why do they say 2^12? 
+
+Different options:
+
+1. nothing is added and encode the text with the dictionary we have at this point
+2. throw away the dictionary (keeping the fixed part)
+3. keep track of frequencies of strings in the dictionary and delete the least frequent ones
+
+
 Decoding works pretty much exactly the same
 - because of the code where I added the comment ^ the decoder will be one step behind the encoder
 - problem occurs if we want to use a code that we’re about to build (there are examples on slides)
@@ -2448,7 +2489,7 @@ LZW-decode(S )
 		D.insert(idx,sprev +s[0])
 		idx ← idx + 1
 
-compression summary - (picture)
+![summary](/cs240/compression_summary.png)
 
 ###Text transformations
 - For efficient compression, we need frequently repeating characters and/or 
@@ -2510,7 +2551,7 @@ Encoding:
  - Sort the strings in L lexicographically
  - C is the list of trailing characters of each string in L
 
-(see slides for examples of encoding - took a screenshot)
+![btwt](/cs240/bwt.png)
 
 Decoding:
 
