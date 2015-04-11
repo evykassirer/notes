@@ -2130,7 +2130,7 @@ Building a parse tree:
  - Reduce A -> ab
  - attach the old nodes as children of the new node
 
- ### Context sensitive Analysis
+### Context sensitive Analysis
 
 Now that we have a grammar and can parse, if our program is not rejected by this point, do we have a valid C program?
 
@@ -2208,7 +2208,9 @@ When traversing, if the rule is "procedure -> INT ID LPAREN ..." or "main -> INT
 For variables, the declared type is stored in the symbol table. For procedures, we still need the signature (the types of the parameters). Note that all procedures return int for this language, so we don't need to worry about the return type. We re-update the table again:
 
 	#include<utility>
-	map<string, pair<vector<string>, map<string,string>>> topSybolTable;    (where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
+	map<string, pair<vector<string>, map<string,string>>> topSymbolTable;    
+
+(where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
 
 To compute the signature:
 - traverse nodes of the form: 
@@ -2791,9 +2793,9 @@ lvalue -> STAR factor
 
 How do you run starting at wain, when it is not the first procedure?
 
-(see pic)
+![ ](/cs241/March26-startatwain.jpg)
 
-The main line will always have a prologue and epilogue. THe procedures must also have a procedure specific prologue and epilogue. In procedures we don't need to setup the constants or imports. We do need to set $29, save registers, and restore registers at the end, as well as jr $31
+The main line will always have a prologue and epilogue. The procedures must also have a procedure specific prologue and epilogue. In procedures we don't need to setup the constants or imports. We do need to set $29, save registers, and restore registers at the end, as well as jr $31
 
 ####Saving and restoring registers: 
 
@@ -2831,7 +2833,7 @@ f:
 
 Parameters:
 - we can use registers for parameters
-- alternatively, we can (should) push parameters on th stack
+- alternatively, we can (should) push parameters on the stack
 - a call to a function looks like 
 
 factor-> ID (Expr1, ..., exprn)
@@ -2862,7 +2864,7 @@ then we have code(procedure) =
 
 currently, on the stack we have the caller, then the arguments, then $29, and $31 (f's frame), then anything g pushes, then local variables
 
-(see pic)
+![ ](/cs241/March26-currentstack.jpg)
 
 the issue here is that there are registers in between the offsets originally recorded in the symbol table are wrong, because there are things stored between them
 
