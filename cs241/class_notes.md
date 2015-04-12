@@ -2113,9 +2113,9 @@ Let's try right recursion:
 But this is still not LL(1), since T, T+E generate the same first symbols. So we do this:
 
 	E -> T E'
-	E' -> epsilon | + F
+	E' -> epsilon | + E
 	T -> F T'
-	T' -> epsilon | * F
+	T' -> epsilon | * T
 	F -> a | b | c
 
 *********? where the recursion?
