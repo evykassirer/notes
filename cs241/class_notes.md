@@ -1667,6 +1667,7 @@ What do we do about this?
 - Make the grammar unambiguous
 
 unambiguous grammar:
+
 	E -> E Op T | T
 	T -> a|b|c|(E)
 	Op -> +|-|*|/
@@ -1677,7 +1678,7 @@ Then we have a strict left to right precedence
 
 ![ ](/cs241/Feb26-lefttoright.jpg)
 
-new producton rules:
+new producton rules that prevent uncessary brackets:
 
 	E -> E PM T | T
 	T -> T TD F | F
@@ -1913,36 +1914,36 @@ First
 
 Follow
 
-   iter  0    1              2
-   -------------------------------------
-   S    {}   {BOF, d, q}    {BOF, d, q}
-   C    {}   {BOF, d, q}    {BOF, d, q}
+	iter  0    1              2
+	-------------------------------------
+	S    {}   {BOF, d, q}    {BOF, d, q}
+	C    {}   {BOF, d, q}    {BOF, d, q}
 
 ------
 ##March 5
 
 ###Last time
-- LL(1) Parsing
 
+LL(1) Parsing
 
-	1) S' -> BOF S EOF
-	2) S -> bSd
-	3) S -> pSq
-	4) S -> C
-	5) C -> lC
-	6) C -> epsilon
+1. S' -> BOF S EOF
+2. S -> bSd
+3. S -> pSq
+4. S -> C
+5. C -> lC
+6. C -> epsilon
 
-Nullable:  S' false    S true	L true
+Nullable:  S' false    S true	C true
 
-First: S' {BOF}    S {b,p,l}    L {l}
+First: S' {BOF}    S {b,p,l}    C {l}
 
-Follow: S {BOF, d, q}  L {BOF, d, q}
+Follow: S {EOF, d, q}  C {EOF, d, q}
 
 Now since Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
 
 	    BOF   EOF   b   d   p   q   l
 	S'   1                             <-- rule numbers
-	S          4    2   4   3   4   4 
+	S          4    2   4   3   4   4
 	C          6        6       6   5
 
 This makes a very good exam question
@@ -1956,16 +1957,16 @@ Weakness: LL must predict which production to use based on first (k) tokens of R
 
 ###Bottom-up parsing
 
-We want w to S. THe stack stores partially reduced input: s <= alpha_k <= ... <= S
+We want w to S. The stack stores partially reduced input: s <= alpha_k <= ... <= S
 
 Our invariant: the stack and unread input are equal to alpha_i
 
-[some slides that will be posted]
+example: https://www.student.cs.uwaterloo.ca/~cs241/LRSlides.pdf
 
 We have two choices at each step
 - shift a character from input to top of stack
 - reduce - top of stack is RHS of a grammar rule, replace with the LHS
-- accept if the stack contains S' and input epsilon (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting END of is good enough too
+- accept if the stack contains S' and input epsilon (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting EOF is good enough too
 
 How do we know whether to shift or reduce? We know
 - the next character of input
@@ -1989,8 +1990,6 @@ Definition: An **item** is a production with a dot (·) somewhere on the RHS, in
 
 Label an arc with the symbol that follows the dot. Advance the dot in the next state. If the dot preceeds a non-terminal A, add all the productions with A on the LHS to the state (dot in the leftmost position
 
-[more slides]
-
 ####Using the Automaton
 
 Start in the start state with an empty stack
@@ -1999,28 +1998,28 @@ Start in the start state with an empty stack
  2. follow the transition labeled with that chracter in themachine, to the next state (if there is one)
  3. if none - error or reduce
 
-Reducing
-1. Reduce states have only one item and the dot is rightmost
-2. Reduce by the rule in the stack - pop RHS off the stack, backtrack size(RHS) states in DFA, psush LHS onto stack and then follow the transition for LHS
+- Reducing
+ 1. Reduce states have only one item and the dot is rightmost
+ 2. Reduce by the rule in the stack - pop RHS off the stack, backtrack size(RHS) states in DFA, psush LHS onto stack and then follow the transition for LHS
 - accept when you shift EOF
-- backtracking in a DFA is accomplished by remmebering the previous DFA states. We can push the DFA states onto the setack as well. We can use 2 stack or comine into one stack.
+- backtracking in a DFA is accomplished by remmebering the previous DFA states. We can push the DFA states onto the stack as well. We can use 2 stacks or combine into one stack.
 
 Example: BOF id + id + id EOF
 
-Stack 					Read 			Unread					Action
-1 						epsilon			BOF id + id + id EOF 	Shift BOF, goto 2
-1 BOF 2 				BOF 			id + id + id EOF 		shift 6
-1 BOF 2 id 6  			BOF id 			+ id + id EOF 			R T->id (Now in state 2) 
-1 BOF 2 T S				BOF id 			+ id + id EOF			R E->T
-1 BOF 2 E 3 			BOF id 			+ id + id EOF 			S 7
-1 BOF 2 E 3 + 7  		BOF id + 		id + id EOF 			S 6
-1 BOF 2 E3 + 7 id 6 	BOF id + id 	+ id EOF                R T->id
-1 BOF 2 E 3 + 7 T 8     BOF id + id     + id EOF    			R E->E+T
-1 BOF 2 E + 7
+	Stack 					Read 			Unread					Action
+	1 						epsilon			BOF id + id + id EOF 	Shift BOF, goto 2
+	1 BOF 2 				BOF 			id + id + id EOF 		shift 6
+	1 BOF 2 id 6  			BOF id 			+ id + id EOF 			R T->id (Now in state 2) 
+	1 BOF 2 T S				BOF id 			+ id + id EOF			R E->T
+	1 BOF 2 E 3 			BOF id 			+ id + id EOF 			S 7
+	1 BOF 2 E 3 + 7  		BOF id + 		id + id EOF 			S 6
+	1 BOF 2 E3 + 7 id 6 	BOF id + id 	+ id EOF                R T->id
+	1 BOF 2 E 3 + 7 T 8     BOF id + id     + id EOF    			R E->E+T
+	1 BOF 2 E + 7
 
 ...etc (I think it's in Brad's notes I have from somewhere)
 
-Note this is a DFA (from NFA)
+Note this is a DFA (from our NFA)
 
 What can go wrong? 
 
@@ -2029,7 +2028,7 @@ What if a state looks like:
 	A -> alpha dot c beta
 	B -> gamma dot
 
-Do we shift c (as suggested by reule 1) or reduce by second rule?
+Do we shift c (as suggested by rule 1) or reduce by second rule?
 
 This is a shift-reduce conflict
 Also what about
@@ -2047,8 +2046,8 @@ If any item
 	T -> id
 
 For each A->alpha dot, attach Follow(A) 
-Follow(E) = {BOF}
-Follow(T) = {+, EOF}
+- Follow(E) = {BOF}
+- Follow(T) = {+, EOF}
 
 
 -----
@@ -2074,14 +2073,14 @@ If any item which has a dot at the end occurs in a state which it is not alone, 
 	E -> dot T + E
 	E -> dot T
 
-Right associative expressions (slides)
+Right associative expressions ?****?
 
 We see a shift reduct conflict in state 5. For example, if the input starts with BOF id, we go from state 1 to 2 to 6 to 5. Then should we reduce E->T? IT DEPENDS. If the input is BOF id EOF then YES. If the input is BOF id + ... EOF then NO. Add lookahead to the automaton to resolve the conflict.
 
 For each A -> alpha, attach Follow(A): 
 Follow(E) = {EOF}, Follow(T) = {+, EOF}
 
-THe interpretation: A reduce action applies only if the next character is in the follow set of the non-terminal. Thus, the first rule only applies if the next char is EOF, and the second only applies if the next char is + (for state 5). Conflict resolved.
+The interpretation: A reduce action applies only if the next character is in the follow set of the non-terminal. Thus, the first rule only applies if the next char is EOF, and the second only applies if the next char is + (for state 5). Conflict resolved.
 
 The result is called an SLR(1) parser (simple left-to-right, rightmost derivation, 1 character lookahead).
 - SLR resolves many (but not all) conflicts. LR(1) is more sophisticated than SLR(1), parsing more grammars.
@@ -2114,12 +2113,14 @@ Let's try right recursion:
 But this is still not LL(1), since T, T+E generate the same first symbols. So we do this:
 
 	E -> T E'
-	E' -> epsilon | + epsilon
+	E' -> epsilon | + F
 	T -> F T'
 	T' -> epsilon | * F
 	F -> a | b | c
 
-Left factoring - This is LL(1) but it's ugly and we've changed the associativity of expressions. So LL(1) is a odds with left associativity.
+*********? where the recursion?
+
+Left factoring - This is LL(1) but it's ugly and we've changed the associativity of expressions. So LL(1) is at odds with left associativity.
 
 Building a parse tree:
 - Top Down: 
@@ -2129,43 +2130,43 @@ Building a parse tree:
  - Reduce A -> ab
  - attach the old nodes as children of the new node
 
- ### Context sensitive Analysis
+### Context sensitive Analysis
 
- Now that we have a grammar and can parse, if our program is not rejected by this point, do we have a valid C program?
+Now that we have a grammar and can parse, if our program is not rejected by this point, do we have a valid C program?
 
- No, but hopefully we haven't excluded any valid programs.
+No, but hopefully we haven't excluded any valid programs.
 
- What do we know? - The program is syntactically well-formed. What properties of valid C programs cannot be enforced by CFGs?
+What do we know? - The program is syntactically well-formed. What properties of valid C programs cannot be enforced by CFGs?
 - Variables and Functions - declaration before use, multiple declarations
 - Scope
 - Types - operators, parameter lists
 
 Third step of our compiler: parse tree -> [semantic analysis] -> symbol table and parse tree
 
-Note: our compiler is broken into separate programs to isolate the pieces of each assignment . Remember the tree question from A3 for A8.
+Note: our compiler is broken into separate programs to isolate the pieces of each assignment. Remember the tree question from A3 for A8.
 
 To solve these, we need more complex programs. We will perform context sensitive analysis by traversing the parse tree. To use the given parse tree we need the following 
 
 Example: expr - three children expr + expr
 
-Class Tree {
-	public
-		string rule; //expr expr PLUS term
-		vector<string> tokens; // "expr, "expr", "PLUS", "term"
-		vector<Tree*> children; // 3 children
-}
+	Class Tree {
+		public
+			string rule; //expr expr PLUS term
+			vector<string> tokens; // "expr, "expr", "PLUS", "term"
+			vector<Tree*> children; // 3 children
+	}
 
 -----
 ## March 12
 
 Traversal through a tree:
 
-void doSomething(const Tree &t) {
-	// do something with t
-	for(vector<TREE*>::const_iterator it = t.children.begin(); it != t.children.end(); ++it) {
-		dosomething(**it);
+	void doSomething(const Tree &t) {
+		// do something with t
+		for(vector<TREE*>::const_iterator it = t.children.begin(); it != t.children.end(); ++it) {
+			dosomething(**it);
+		}
 	}
-}
 
 ###Declaration Errors - Multiple/Missing
 
@@ -2184,6 +2185,8 @@ To actually implement the symbol table, we could use a global variable:
 - map<string, string> symbolTable  (where the first string is the name, second is the type)
 - but, this does not take scope into consideration:
 
+for example:
+
 	int f() {
 		int x = 0;
 		return 1;
@@ -2193,15 +2196,21 @@ To actually implement the symbol table, we could use a global variable:
 		return x;
 	}
 
-Likewise, if we declared x in f and used it in wain, it would appear valid. We also haven't checked procedure declarations. How can we forbid duplicate declarations in the same procedure, but permit them in different procedures? The solution is to have a separate symbol table for each procedure. Have one top-level symbol table that collects all procedure names: map<string, map<string, string>> topSymbolTable (where the first string is procedure name, the map is the procedure's symbol table)
+Likewise, if we declared x in f and used it in wain, it would appear valid. We also haven't checked procedure declarations. How can we forbid duplicate declarations in the same procedure, but permit them in different procedures? The solution is to have a separate symbol table for each procedure. Have one top-level symbol table that collects all procedure names: 
 
-When traversing, if the rule is "procedure -> INT ID LPAREN ..." or "main -> INT WAIN LPAREN ..." then we have a new procedure. If the name is not in the symbmol table, create a new entry (and a new symbol table)
+	map<string, map<string, string>> topSymbolTable
+
+(where the first string is procedure name, the map is the procedure's symbol table)
+
+When traversing, if the rule is "procedure -> INT ID LPAREN ..." or "main -> INT WAIN LPAREN ..." then we have a new procedure. If the name is not in the symbol table, create a new entry (and a new symbol table)
 . Note - you probably want a variable that determines what procedure is currently being parsed. Update each time we encounter one of the two procedure rules above.
 
-For variables, the declared type is stored in the symbol table. For procedures, we still need the signature (the types of the parameters). Note that all procedures return int for this language So we don't need to worry about the return type. We re-update the table again:
+For variables, the declared type is stored in the symbol table. For procedures, we still need the signature (the types of the parameters). Note that all procedures return int for this language, so we don't need to worry about the return type. We re-update the table again:
 
-#include<utility>
-map<string, pair<vector<string>, map<string,string>>> topSybolTable;    (where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
+	#include<utility>
+	map<string, pair<vector<string>, map<string,string>>> topSymbolTable;    
+
+(where the first of our pair is the types of the parameters of that procedure to make sure we call it correctly)
 
 To compute the signature:
 - traverse nodes of the form: 
@@ -2227,10 +2236,12 @@ In WLP4, there are only two types: int and int*. To check type correctness, we n
 		if not possible, error
 	}
 
-For example, how do we type check on ID? We get its type from the symbol table: look if <id.name, T> is in dcls
-- <id.name, T> in dcls => id.name : T (notation on the board shows as a/b instead of a=>b - recall notation from CS 245)
+For example, how do we type check on ID? We get its type from the symbol table: look if \<id.name, T\> is in dcls
+- \<id.name, T\> in dcls => id.name : T (notation on the board shows as a/b instead of a=>b - recall notation from CS 245)
 - x:y means x has type y
 - if id.name was declared to have type T, then id.name has type T
+
+code for typeOf
 
 	string typeOf(const Tree &t) {
 		....
@@ -2270,7 +2281,7 @@ Singleton Productions:
  - <f,()> in dcls => f():int
  - <f,(T1..Tn)> in dcls E1:T1 ... En:Tn => f(E1,...,En):int
 
-For while loops and if statements, the condition should be booelean, not int or int*, but there is no boolean type in WLp4. The grammar forces T to be a comparison (expr comparison expr). However, the comparison stil needs to be checked. Any expression witha  type is well-typed.
+For while loops and if statements, the condition should be booelean, not int or int*, but there is no boolean type in WLp4. The grammar forces T to be a comparison (expr comparison expr). However, the comparison still needs to be checked. Any expression witha  type is well-typed.
 - E:T => wellTyped(E)
 
 For comparisons
@@ -2310,7 +2321,8 @@ Wain (using mips.twoints or mips.array):
 
 The results so far:
 
-	source -> [lexical analysis] -> tokens -> [parsing] -> parse tree -> [semantic analysis] -> symbol table and parse tree -> [code gen] -> assembly
+	source -> [lexical analysis] -> tokens -> [parsing] -> parse tree -> [semantic analysis] 
+	-> symbol table and parse tree -> [code gen] -> assembly
 
 We're at the code gen stage! 
 
@@ -2415,11 +2427,11 @@ stack:  $30-> c b a
 	add $30, $30, $4
 	jr $31
 
-Problem: we dont konw the offsetes until all declarations have been processed. Since $30 changes with each new declaration and if we ever use the stack for temporary data, $30 changes and all the offsets in the symbol table are wrong.
+Problem: we dont know the offsets until all declarations have been processed. Since $30 changes with each new declaration and if we ever use the stack for temporary data, $30 changes and all the offsets in the symbol table are wrong.
 
-Solution: $29 points ot the bottom of the stack frame, aka the "frame pointer". We compute the offsets relative to $29, and they won't move. A stack frame consists of all the state information stored on the stack for an active procedure call. 
+Solution: $29 points to the bottom of the stack frame, aka the "frame pointer". We compute the offsets relative to $29, and they won't move. A stack frame consists of all the state information stored on the stack for an active procedure call. 
 
-A convention taht we will follow is that $4 will always contain the value 4.
+A convention that we will follow is that $4 will always contain the value 4.
 
 New symbol table:
 
@@ -2692,9 +2704,10 @@ For pointer arithmetic, the exact memory depends on the types involved
 
 expr1 -> expr2 + term
 - if expr2:int, term:int - as before
-- if expr2:int*, term:int - expr2 + 4*term
+- if expr2:int\*, term:int - expr2 + 4\*term
 
-code: 
+code:
+
 	code(expr2)
 	push($3)
 	code(term)
@@ -2780,9 +2793,9 @@ lvalue -> STAR factor
 
 How do you run starting at wain, when it is not the first procedure?
 
-(see pic)
+![ ](/cs241/March26-startatwain.jpg)
 
-The main line will always have a prologue and epilogue. THe procedures must also have a procedure specific prologue and epilogue. In procedures we don't need to setup the constants or imports. We do need to set $29, save registers, and restore registers at the end, as well as jr $31
+The main line will always have a prologue and epilogue. The procedures must also have a procedure specific prologue and epilogue. In procedures we don't need to setup the constants or imports. We do need to set $29, save registers, and restore registers at the end, as well as jr $31
 
 ####Saving and restoring registers: 
 
@@ -2820,7 +2833,7 @@ f:
 
 Parameters:
 - we can use registers for parameters
-- alternatively, we can (should) push parameters on th stack
+- alternatively, we can (should) push parameters on the stack
 - a call to a function looks like 
 
 factor-> ID (Expr1, ..., exprn)
@@ -2851,7 +2864,7 @@ then we have code(procedure) =
 
 currently, on the stack we have the caller, then the arguments, then $29, and $31 (f's frame), then anything g pushes, then local variables
 
-(see pic)
+![ ](/cs241/March26-currentstack.jpg)
 
 the issue here is that there are registers in between the offsets originally recorded in the symbol table are wrong, because there are things stored between them
 
@@ -2936,21 +2949,22 @@ Some of the code written is really long. For example, consider 5+2. We could com
 	//x doesn't change
 	return x+x;
 
-If we never changes, we could recognize that this will return 2. If that is the only place x is used, it doesn't een need a stack entry.
+If x never changes, we could recognize that this will return 2. If that is the only place x is used, it doesn't even need a stack entry.
 
 	lis $3
 	.word 2
 	jr $31
 
-When trying to determine that x nevre changs, what problem can you run into?
-Alias - when two or more variables denote the same memory address they are aliases of each other.
+When trying to determine that x never changes, what problem can you run into?
+
+*Alias* - when two or more variables denote the same memory address they are aliases of each other.
 
 	int *y =  &x;
 	*y = 5; // x = 5 now
 
 Be careful, you may overlook that the value of x is changed. 
 
-If x's value is not known, we can still recogize that $3 aleady contains x. This is called *Common Subexpression Elimination*
+If x's value is not known, we can still recognize that $3 already contains x. This is called *Common Subexpression Elimination*
 
 	lw $3, -12($29)
 	add $3, $3, $3
@@ -2958,11 +2972,11 @@ If x's value is not known, we can still recogize that $3 aleady contains x. This
 
 (a+b)*(a+b)
 - use a register to hold a+b, then multiply by itself rather than computing twice
-- this might not work with function calls (f()+f()) since f ma print something
+- this might not work with function calls (f()+f()) since f might print something
 
 *Dead Code Elimination*
 
-If we are certain that some part of the program willnever run, then we don't output code for it.
+If we are certain that some part of the program will never run, then we don't output code for it.
 
 	while(false) {
 		// don't compile this!
@@ -3012,7 +3026,7 @@ This could be accomplished with a smaller program
 
 We can replace the function call with its body in the caller. The downside is that if f is called many times, we get many copies of the body.
 
-This could be good or bad - it depends on relative sizes of the body of f, or the code to call f. Some functions are harder to inline than others (e.g. recursive). If al calls to f are successfully inline, then we don't need f anymore
+This could be good or bad - it depends on relative sizes of the body of f, or the code to call f. Some functions are harder to inline than others (e.g. recursive). If all calls to f are successfully inline, then we don't need f anymore
 
 *Tail recursion*
 
@@ -3025,7 +3039,7 @@ The last thing that a function does is make a recursive call. There is no pendin
 
 This is tricky in wlp4, because we can only return at the end of a procedure, meaning that there is no base case. Here is the basic transformation after parsing, expand language language and then mutate the parse tree. Whenever a return immediately follows if-then-else, push inside both branches.
 
-	(see picture of transformed code)
+![ ](/cs241/March31-tailrecursion.jpg)
 
 Whenever return x follows assignment to x, we merge.
 - merge ret = f(); return ret; -> return f();
@@ -3038,7 +3052,7 @@ Whenever return x follows assignment to x, we merge.
 ###New and Delete
 
 ####We will talk about scope vs extend
-- scope: the part of the pgoram in which a variable's name is visible. It is a static property which can be determined at compile time
+- scope: the part of the program in which a variable's name is visible. It is a static property which can be determined at compile time
 - extent: the part of the program's execution in which the content of a variable's memory is live; a dynamic (runtime) property
 
 some code:
@@ -3051,7 +3065,7 @@ some code:
 
 what is the scope of x? what is the extent of x? (here they're the same)
 
-In many situations, these two are equivalent. For example, stack allocated, the data lives uintil the declared variable has gone out of scope or the block in whihc the variable is defined is finished executing. Sometimes, we want the data to outlive the variable that contained it - here we use the heap.
+In many situations, these two are equivalent. For example, stack allocated, the data lives uintil the declared variable has gone out of scope or the block in which the variable is defined is finished executing. Sometimes, we want the data to outlive the variable that contained it - here we use the heap.
 
 memory model:
 
@@ -3096,7 +3110,7 @@ suppose the heap is 100 bytes, suppose 16 bytes bytes are allowed
 
 Then the user has access to 16 bytes of memory. The free list and the amount of free RAM are updated. Do we need a list of used memory? No! Used memory is pointed at by program variables (directly or indirectly). Otherwise, memory leak!
 
-But then, how do we know what to delete? We actually allocate 20 byetes; 16 bytes plus 1 int. We erturn the pointer to the second word, while the first word stores the size of the memory it came with.
+But then, how do we know what to delete? We actually allocate 20 bytes; 16 bytes plus 1 int. We return the pointer to the second word, while the first word stores the size of the memory it came with.
 
 	 4   16
 	[16|     ]   pointer points to | line
@@ -3107,11 +3121,11 @@ Now if we allocate 28 bytes, we actually allocate 32. Suppose, we free the 16 al
 	free->[20 bytes]->[48 bytes left]   
 
 Now suppose the first block is freed
-- we check p[-1]  (memory before pointer) to determine how much memory came back, and then we add it to the free list.
+- we check p\[-1\]  (memory before pointer) to determine how much memory came back, and then we add it to the free list.
 - then if the other block is freed, we will recognize that the blocks were adjacent in RAM and merge them (100 bytes of free memory)
 - then repeated allocation and deallocation creates holes in the heap
 - Allocate 20, then 40. Free 20, then allocate 5. Then allocating 20 more cannot fill that space and has to go after the 40 
-- a subsequent allocation of 24 words would fail even thugh there is enough space on the heap, but not enough continuous space
+- a subsequent allocation of 24 bytes would fail even thugh there is enough space on the heap, but not enough continuous space
 
 heap:
 
@@ -3125,9 +3139,10 @@ heap:
 This is called fragmentation - what this means is that even if n bytes are free, we may not be able to allocate a coninuous block of n bytes.
 - We cannot eliminate fragmenation, but if we choose the smallest block that can hold the requested data then we can limit it.
 - However, searching the RAM takes time, it is not free. 
-- First fit (best fit) model: the smallest block that is big enough
+- First fit: select the first available block that is big enough for the requested memory size.
+- Best fit: select the smallest block that is big enough for the requested memory size.
 
-###Garbage collectoin in Implicit Memory Management:
+###Garbage collection in Implicit Memory Management:
 
 This is more in languages with a known type runtime environment like Java or Scheme
 
@@ -3142,17 +3157,17 @@ Scan the entire stack looking for pointers. For each pointer found, mark the hea
 
 Then scan the heap; reclaim any blocks which are not marked and clear the marks. This does not work well in c++ where the runtime types of stack elements are not known. 
 
-A disadvantage here is that the proram must be stopped temporarily to do this.
+A disadvantage here is that the program must be stopped temporarily to do this.
 
 ####Reference counting
 
 - Reference counting does not require a program stop. 
 - For each heap block, keep track of the number of pointers which point to it. 
 - This means that we watch every pointer and update the reference count (decrement old, increment new) each time a pointer is reassigned.
-- if a block's reference count reaches - then it can be reclaimed
+- if a block's reference count reaches 0 - then it can be reclaimed
 - A problem with this is circular references. If two objects point to each other and nothing else points to them,then they are still gargabe, but have a reference count of 1 (each)
 
-####Coping Garbage Collector
+####Copying Garbage Collector
 - the heap is in 2 halves: "from" and "to"
 - we only allocate memory from "from"
 - at some point "from" fills up, all the memory reachable is copied into "to"
@@ -3160,4 +3175,4 @@ A disadvantage here is that the proram must be stopped temporarily to do this.
 - then we just reverse the roles of "from" and "to"
 - once again, this requires a program stop
 
-This scheme is no susceptible to fragmentation: when memory is copied over it can be copied into continuous blocks. This is also a trash compactor. However, only half of the heap can be used at any given time. 
+This scheme is not susceptible to fragmentation: when memory is copied over it can be copied into continuous blocks. This is also a trash compactor. However, only half of the heap can be used at any given time. 
