@@ -2949,21 +2949,22 @@ Some of the code written is really long. For example, consider 5+2. We could com
 	//x doesn't change
 	return x+x;
 
-If we never changes, we could recognize that this will return 2. If that is the only place x is used, it doesn't een need a stack entry.
+If x never changes, we could recognize that this will return 2. If that is the only place x is used, it doesn't even need a stack entry.
 
 	lis $3
 	.word 2
 	jr $31
 
-When trying to determine that x nevre changs, what problem can you run into?
-Alias - when two or more variables denote the same memory address they are aliases of each other.
+When trying to determine that x never changes, what problem can you run into?
+
+*Alias* - when two or more variables denote the same memory address they are aliases of each other.
 
 	int *y =  &x;
 	*y = 5; // x = 5 now
 
 Be careful, you may overlook that the value of x is changed. 
 
-If x's value is not known, we can still recogize that $3 aleady contains x. This is called *Common Subexpression Elimination*
+If x's value is not known, we can still recognize that $3 already contains x. This is called *Common Subexpression Elimination*
 
 	lw $3, -12($29)
 	add $3, $3, $3
@@ -2971,11 +2972,11 @@ If x's value is not known, we can still recogize that $3 aleady contains x. This
 
 (a+b)*(a+b)
 - use a register to hold a+b, then multiply by itself rather than computing twice
-- this might not work with function calls (f()+f()) since f ma print something
+- this might not work with function calls (f()+f()) since f might print something
 
 *Dead Code Elimination*
 
-If we are certain that some part of the program willnever run, then we don't output code for it.
+If we are certain that some part of the program will never run, then we don't output code for it.
 
 	while(false) {
 		// don't compile this!
@@ -3025,7 +3026,7 @@ This could be accomplished with a smaller program
 
 We can replace the function call with its body in the caller. The downside is that if f is called many times, we get many copies of the body.
 
-This could be good or bad - it depends on relative sizes of the body of f, or the code to call f. Some functions are harder to inline than others (e.g. recursive). If al calls to f are successfully inline, then we don't need f anymore
+This could be good or bad - it depends on relative sizes of the body of f, or the code to call f. Some functions are harder to inline than others (e.g. recursive). If all calls to f are successfully inline, then we don't need f anymore
 
 *Tail recursion*
 
@@ -3038,7 +3039,7 @@ The last thing that a function does is make a recursive call. There is no pendin
 
 This is tricky in wlp4, because we can only return at the end of a procedure, meaning that there is no base case. Here is the basic transformation after parsing, expand language language and then mutate the parse tree. Whenever a return immediately follows if-then-else, push inside both branches.
 
-	(see picture of transformed code)
+![ ](/cs241/March31-tailrecursion.jpg)
 
 Whenever return x follows assignment to x, we merge.
 - merge ret = f(); return ret; -> return f();
@@ -3051,7 +3052,7 @@ Whenever return x follows assignment to x, we merge.
 ###New and Delete
 
 ####We will talk about scope vs extend
-- scope: the part of the pgoram in which a variable's name is visible. It is a static property which can be determined at compile time
+- scope: the part of the program in which a variable's name is visible. It is a static property which can be determined at compile time
 - extent: the part of the program's execution in which the content of a variable's memory is live; a dynamic (runtime) property
 
 some code:
@@ -3064,7 +3065,7 @@ some code:
 
 what is the scope of x? what is the extent of x? (here they're the same)
 
-In many situations, these two are equivalent. For example, stack allocated, the data lives uintil the declared variable has gone out of scope or the block in whihc the variable is defined is finished executing. Sometimes, we want the data to outlive the variable that contained it - here we use the heap.
+In many situations, these two are equivalent. For example, stack allocated, the data lives uintil the declared variable has gone out of scope or the block in which the variable is defined is finished executing. Sometimes, we want the data to outlive the variable that contained it - here we use the heap.
 
 memory model:
 
@@ -3109,7 +3110,7 @@ suppose the heap is 100 bytes, suppose 16 bytes bytes are allowed
 
 Then the user has access to 16 bytes of memory. The free list and the amount of free RAM are updated. Do we need a list of used memory? No! Used memory is pointed at by program variables (directly or indirectly). Otherwise, memory leak!
 
-But then, how do we know what to delete? We actually allocate 20 byetes; 16 bytes plus 1 int. We erturn the pointer to the second word, while the first word stores the size of the memory it came with.
+But then, how do we know what to delete? We actually allocate 20 bytes; 16 bytes plus 1 int. We return the pointer to the second word, while the first word stores the size of the memory it came with.
 
 	 4   16
 	[16|     ]   pointer points to | line
@@ -3120,11 +3121,11 @@ Now if we allocate 28 bytes, we actually allocate 32. Suppose, we free the 16 al
 	free->[20 bytes]->[48 bytes left]   
 
 Now suppose the first block is freed
-- we check p[-1]  (memory before pointer) to determine how much memory came back, and then we add it to the free list.
+- we check p\[-1\]  (memory before pointer) to determine how much memory came back, and then we add it to the free list.
 - then if the other block is freed, we will recognize that the blocks were adjacent in RAM and merge them (100 bytes of free memory)
 - then repeated allocation and deallocation creates holes in the heap
 - Allocate 20, then 40. Free 20, then allocate 5. Then allocating 20 more cannot fill that space and has to go after the 40 
-- a subsequent allocation of 24 words would fail even thugh there is enough space on the heap, but not enough continuous space
+- a subsequent allocation of 24 bytes would fail even thugh there is enough space on the heap, but not enough continuous space
 
 heap:
 
@@ -3138,9 +3139,10 @@ heap:
 This is called fragmentation - what this means is that even if n bytes are free, we may not be able to allocate a coninuous block of n bytes.
 - We cannot eliminate fragmenation, but if we choose the smallest block that can hold the requested data then we can limit it.
 - However, searching the RAM takes time, it is not free. 
-- First fit (best fit) model: the smallest block that is big enough
+- First fit: select the first available block that is big enough for the requested memory size.
+- Best fit: select the smallest block that is big enough for the requested memory size.
 
-###Garbage collectoin in Implicit Memory Management:
+###Garbage collection in Implicit Memory Management:
 
 This is more in languages with a known type runtime environment like Java or Scheme
 
@@ -3155,17 +3157,17 @@ Scan the entire stack looking for pointers. For each pointer found, mark the hea
 
 Then scan the heap; reclaim any blocks which are not marked and clear the marks. This does not work well in c++ where the runtime types of stack elements are not known. 
 
-A disadvantage here is that the proram must be stopped temporarily to do this.
+A disadvantage here is that the program must be stopped temporarily to do this.
 
 ####Reference counting
 
 - Reference counting does not require a program stop. 
 - For each heap block, keep track of the number of pointers which point to it. 
 - This means that we watch every pointer and update the reference count (decrement old, increment new) each time a pointer is reassigned.
-- if a block's reference count reaches - then it can be reclaimed
+- if a block's reference count reaches 0 - then it can be reclaimed
 - A problem with this is circular references. If two objects point to each other and nothing else points to them,then they are still gargabe, but have a reference count of 1 (each)
 
-####Coping Garbage Collector
+####Copying Garbage Collector
 - the heap is in 2 halves: "from" and "to"
 - we only allocate memory from "from"
 - at some point "from" fills up, all the memory reachable is copied into "to"
@@ -3173,4 +3175,4 @@ A disadvantage here is that the proram must be stopped temporarily to do this.
 - then we just reverse the roles of "from" and "to"
 - once again, this requires a program stop
 
-This scheme is no susceptible to fragmentation: when memory is copied over it can be copied into continuous blocks. This is also a trash compactor. However, only half of the heap can be used at any given time. 
+This scheme is not susceptible to fragmentation: when memory is copied over it can be copied into continuous blocks. This is also a trash compactor. However, only half of the heap can be used at any given time. 
