@@ -1782,7 +1782,7 @@ say w = BOF a b y w x EOF
 		EOF x w   		BOF a b y 			w x EOF 				match w
 		EOF x 			BOF a b y w 		x EOF 					match x
 		EOF 			BOF a b y w x   	EOF 					match EOF
-		ɛ   			 BOF a b y w x EOF   epsilon				 accept
+		ɛ   			 BOF a b y w x EOF   ε				 accept
 
 ----
 ##March 3 
@@ -1790,7 +1790,7 @@ say w = BOF a b y w x EOF
 
 Let's codify this
 - When the top of other stack is a terminal pop and matched against the input
-- when TOS (top of stack) is a non-terminal A, pop A and push reverse (alpha), where A->alpha is a grammar rule
+- when TOS (top of stack) is a non-terminal A, pop A and push reverse (α), where A->α is a grammar rule
 - accept when stack and input are empty
 - brute force: try all combinations until one works - this is inefficient
 - we want a Deterministc Procedure with no backtracking
@@ -1818,21 +1818,21 @@ This grammar is called **LL(1)**
 
 We can automatically compute the predictor table
 - Predict(A,a) -> rules that apply when A is on the stack and a is the next input character
- - Predict(A,a) = {A->beta | a is elem of First(beta)}
-- First(beta), beta in V* is the set of characters thata can be the first letter of a derivation starting from beta
- - First(beta) = {a|beta =>*  a gamma}
+ - Predict(A,a) = {A->β | a is elem of First(β)}
+- First(β), β in V* is the set of characters thata can be the first letter of a derivation starting from β
+ - First(β) = {a|β =>*  a gamma}
  - For example: First(AyB) = {a,c}
-- So Predict(A,a) = {A->beta | beta =>* a gamma}
+- So Predict(A,a) = {A->β | β =>* a gamma}
 
-However, this is not quite right. What if A=>* epsilon?
+However, this is not quite right. What if A=>* ε?
 - Then a might not come from A, but from something AFTER A.
 - We missed something - what if there is more than one production with the same LHS? How do we know which one to pick?
-- So, Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
-- Nullable(beta) = true if beta =>* epsilon, false otherwise
-- Follow(A) = {b | S' =>* alpha A b beta}: the set of terminal symbols that can come immediately after A in a derivation of S'. 
+- So, Predict(A,a) = {A->β | a in First(β)} U {A->β | Nullable(β), a in Follow(A)}
+- Nullable(β) = true if β =>* ε, false otherwise
+- Follow(A) = {b | S' =>* α A b β}: the set of terminal symbols that can come immediately after A in a derivation of S'. 
  - In our example: Follow(A) = {y}
 
-Computing Nullable -  Nullable(Beta) = true if beta =>* epsilon
+Computing Nullable -  Nullable(β) = true if β =>* ε
 
 	initialize Nullable[A] <- false for all A // an array
 	repeat
@@ -1841,7 +1841,7 @@ Computing Nullable -  Nullable(Beta) = true if beta =>* epsilon
 				Nullable[A]<-true
 	until nothing changes
 
-First(beta) = {a|beta =>* a gamma}
+First(β) = {a|β =>* a gamma}
 
 	initialize First[A] <- {} for all A //an array
 	for all rule A -> B1...Bk do
@@ -1889,7 +1889,7 @@ Sample Trace:
 3. S -> pSq
 4. S -> C
 5. C -> lC
-6. C -> epsilon
+6. C -> ε
 
 Nullable
 
@@ -1931,7 +1931,7 @@ LL(1) Parsing
 3. S -> pSq
 4. S -> C
 5. C -> lC
-6. C -> epsilon
+6. C -> ε
 
 Nullable:  S' false    S true	C true
 
@@ -1939,7 +1939,7 @@ First: S' {BOF}    S {b,p,l}    C {l}
 
 Follow: S {EOF, d, q}  C {EOF, d, q}
 
-Now since Predict(A,a) = {A->beta | a in First(beta)} U {A->beta | Nullable(beta), a in Follow(A)}
+Now since Predict(A,a) = {A->β | a in First(β)} U {A->β | Nullable(β), a in Follow(A)}
 
 	    BOF   EOF   b   d   p   q   l
 	S'   1                             <-- rule numbers
@@ -1950,23 +1950,23 @@ This makes a very good exam question
 
 A grammar is LL(1) if
 - no two distinct productions with the same LHS can generate the first terminal symbol (the first set in the union for predict is at most 1)
-- there is only one way to send a nullable symbol to epsilon (the second set in the union for predict must be at most 1)
+- there is only one way to send a nullable symbol to ε (the second set in the union for predict must be at most 1)
 - no nullable symbol has the same terminal in both its first set and its follow set (only one of the sets has size 1)
 
 Weakness: LL must predict which production to use based on first (k) tokens of RHS
 
 ###Bottom-up parsing
 
-We want w to S. The stack stores partially reduced input: s <= alpha_k <= ... <= S
+We want w to S. The stack stores partially reduced input: s <= α_k <= ... <= S
 
-Our invariant: the stack and unread input are equal to alpha_i
+Our invariant: the stack and unread input are equal to α_i
 
 example: https://www.student.cs.uwaterloo.ca/~cs241/LRSlides.pdf
 
 We have two choices at each step
 - shift a character from input to top of stack
 - reduce - top of stack is RHS of a grammar rule, replace with the LHS
-- accept if the stack contains S' and input epsilon (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting EOF is good enough too
+- accept if the stack contains S' and input ε (equivlalently, if the stack is BOF S EOF on empty input) and equivalently shifting EOF is good enough too
 
 How do we know whether to shift or reduce? We know
 - the next character of input
@@ -2007,7 +2007,7 @@ Start in the start state with an empty stack
 Example: BOF id + id + id EOF
 
 	Stack 					Read 			Unread					Action
-	1 						epsilon			BOF id + id + id EOF 	Shift BOF, goto 2
+	1 						ε			BOF id + id + id EOF 	Shift BOF, goto 2
 	1 BOF 2 				BOF 			id + id + id EOF 		shift 6
 	1 BOF 2 id 6  			BOF id 			+ id + id EOF 			R T->id (Now in state 2) 
 	1 BOF 2 T S				BOF id 			+ id + id EOF			R E->T
@@ -2025,7 +2025,7 @@ What can go wrong?
 
 What if a state looks like:	
 
-	A -> alpha dot c beta
+	A -> α dot c β
 	B -> gamma dot
 
 Do we shift c (as suggested by rule 1) or reduce by second rule?
@@ -2033,8 +2033,8 @@ Do we shift c (as suggested by rule 1) or reduce by second rule?
 This is a shift-reduce conflict
 Also what about
 
-	A->alpha dot
-	B-> beta dot
+	A->α dot
+	B-> β dot
 
 Which rule do we reduce? This is a reduce-reduce conflict	
 
@@ -2045,7 +2045,7 @@ If any item
 	E -> T
 	T -> id
 
-For each A->alpha dot, attach Follow(A) 
+For each A->α dot, attach Follow(A) 
 - Follow(E) = {BOF}
 - Follow(T) = {+, EOF}
 
@@ -2055,13 +2055,13 @@ For each A->alpha dot, attach Follow(A)
 
 
 Reduce-shift conflict
-- A -> alpha dot c beta
-- beta -> alpha dot
+- A -> α dot c β
+- β -> α dot
 - do we shift c or reduce second rule?
 
 Reduce-reduce conflict
-- A -> alpha dot
-- B -> beta dot
+- A -> α dot
+- B -> β dot
 
 If any item which has a dot at the end occurs in a state which it is not alone, then there is a conflict and the grammar is not LR(0).
 
@@ -2077,7 +2077,7 @@ Right associative expressions ?****?
 
 We see a shift reduct conflict in state 5. For example, if the input starts with BOF id, we go from state 1 to 2 to 6 to 5. Then should we reduce E->T? IT DEPENDS. If the input is BOF id EOF then YES. If the input is BOF id + ... EOF then NO. Add lookahead to the automaton to resolve the conflict.
 
-For each A -> alpha, attach Follow(A): 
+For each A -> α, attach Follow(A): 
 Follow(E) = {EOF}, Follow(T) = {+, EOF}
 
 The interpretation: A reduce action applies only if the next character is in the follow set of the non-terminal. Thus, the first rule only applies if the next char is EOF, and the second only applies if the next char is + (for state 5). Conflict resolved.
@@ -2113,9 +2113,9 @@ Let's try right recursion:
 But this is still not LL(1), since T, T+E generate the same first symbols. So we do this:
 
 	E -> T E'
-	E' -> epsilon | + E
+	E' -> ε | + E
 	T -> F T'
-	T' -> epsilon | * T
+	T' -> ε | * T
 	F -> a | b | c
 
 *********? where the recursion?
@@ -2216,7 +2216,7 @@ To compute the signature:
 - traverse nodes of the form: 
  - paramlist -> dcl   
  - paramlist -> dcl COMMA paramlist
-- if params -> epsilon, the signature is empty
+- if params -> ε, the signature is empty
 
 All this analysis can be done in a single pass
 
@@ -2310,7 +2310,7 @@ Loops:
 - welltyped(T) welltyped(S) => welltyped(while(T) {S})
 
 Statement sequences (including empty):
--    => welltyped(epsilon)
+-    => welltyped(ε)
 - welltyped(S1) welltyped(S2) => welltyped(S1 S2)
 
 Procedures:
