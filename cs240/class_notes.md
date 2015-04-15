@@ -1545,10 +1545,10 @@ Complexities of open addressing (we won't do the analysis, just state costs)
 - load factor must be  < 1
 - cuckoo requires load factor < 1/2
 - linear
- - search and delete: 1/(1-alpha)^2  
+ - search and insert: 1/(1-alpha)^2  
  - delete: 1/(1-alpha)
 - double hashing
- - search and delete: 1/(1-alpha) 
+ - search and insert: 1/(1-alpha) 
  - delete: 1/alpha * log(1/(1-alpha))
 - cuckoo hashing
  - search and delete: 1
@@ -1565,7 +1565,7 @@ A good hash function should:
 
 If all keys are integers (or can be mapped to integers), the following two approaches tend to work well:
 - Division method: h(k) = k mod M.
- - We should choose M to be a prime not close to a power of 2 (***why)
+ - We should choose M to be a prime not close to a power of 2 (the reason why is out of the scope of the course)
 - Multiplication method: h(k) = floor(M(kA − floor(kA))),
  - for some constant floating-point number A with 0 < A < 1.
  - Knuth suggests A = φ = root5−1 / 2 ≈ 0.618.
