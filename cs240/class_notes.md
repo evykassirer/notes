@@ -1623,8 +1623,8 @@ insert(k,v)
 - Search for h(k) to find the proper block B for insertion 
 - If the B has space, then put (k,v) there
 - ElseIf the block is full and kB < d, perform a block split:
-􏰀 - Split B into two blocks B0 and B1.
-􏰀 - Separate items according to the (kB + 1)-th bit. 􏰀 
+􏰀 - Split B into two blocks B0 and B1
+􏰀 - Separate items according to the (kB + 1)-th bit􏰀 
  - Set local depth in B0 and B1 to kB + 1
 􏰀 - Update references in the directory
 - ElseIf the block is full and kB = d, perform a directory grow:
@@ -1777,7 +1777,7 @@ Summary of Skip Lists
 
 BST-RangeSearch(T , k1 , k2 ) - T: A balanced search tree, k1,k2: search keys Report keys in T that are in range [k1,k2]
 
-	1if T = nil then return
+	if T = nil then return
 	if key(T) < k1 then
 		BST-RangeSearch(T .right , k1 , k2 )
 	if key(T) > k2 then
