@@ -1565,7 +1565,8 @@ A good hash function should:
 
 If all keys are integers (or can be mapped to integers), the following two approaches tend to work well:
 - Division method: h(k) = k mod M.
- - We should choose M to be a prime not close to a power of 2 (***why)
+ - We should choose M to be a prime not close to a power of 2 
+ - We choose a prime so that it's more likely to be coprime with the values being multiplied in the hash function; this helps minimize collisions if there are patterns in the data. There's a lot that goes in to hash functions and while we cover what makes one has function better than another we don't really go into how they're designed to perform better in this course
 - Multiplication method: h(k) = floor(M(kA − floor(kA))),
  - for some constant floating-point number A with 0 < A < 1.
  - Knuth suggests A = φ = root5−1 / 2 ≈ 0.618.
@@ -1883,7 +1884,7 @@ Quadtree Conclusion
 - Initially, we sort the n points according to their x-coordinates, so the root of the tree is the point with median x coordinate (index floor(n/2) in the sorted list)
 􏰀- All other points with x coordinate less than or equal to this go into the left subtree; points with larger x-coordinate go in the right subtree.
 􏰀- At alternating levels, we sort and split according to y-coordinates instead.
-- *******how do we deal with multiple points on boundary?
+- Q: how do we deal with multiple points on boundary? A: you can choose either point
 
 see slides for examples
 
@@ -1926,7 +1927,7 @@ Variations of k-d trees:
 􏰀- at depth d − 1 the partition is based on the last coordinate
 􏰀- at depth d we start all over again, partitioning on first coordinate
 - Storage: O(n)
-- Construction time: O(n log n) *******why?
+- Construction time: O(n log n) *****why?
 - Range query time: O(n^(1 − 1/d) + k) Note: d is considered to be a constant
 
 ----
@@ -2015,7 +2016,7 @@ Time Complexity of all operations:
 
 Search(x):
 - Follow the proper path from the root down in the tree to a leaf
-- If search ends in an internal flagged node, it is successful *********** you still have to check, right?
+- If search ends in an internal flagged node, it is successful *** you still have to check, right?
 - If search ends in an internal unflagged node, it is unsuccessful
 - If search ends in a leaf, we need to check again if the key stored at the
 leaf is indeed x
@@ -2036,7 +2037,7 @@ Insert(x):
 - The other child of N will be a new leaf node containing x.
 - If the search ends at an internal node, we find the key corresponding to that internal node and proceed in a similar way to the previous case
 
-***** there are no examples on the slides - make sure you find some (tutorial? other class notes?)
+(look in tutorial slides for examples)
 
 ##Multiway Tries
 
@@ -2085,7 +2086,7 @@ BruteforcePM(T[0..n − 1], P[0..m − 1]) T: String of length n (text), P: Stri
 	return FAIL
 
 Worst case performance Θ((n − m + 1)m)
-- m ≤ n/2 ⇒ Θ(mn) ***************? point
+- if m ≤ n/2 ⇒ Θ(mn) 
 
 ##March 19
 
@@ -2187,7 +2188,7 @@ Analysis
  - There are no more than 2n iterations of the while loop
  - Running time: Θ(n)
  - worst case is like when T=aaaaaaaaaa and P = aaab because you move it only once over each time
- - O(n/m)**********?
+ - O(n/m) ****
 
 Another example
 - T =abacaabaccabacabaabb
@@ -2231,7 +2232,7 @@ boyer-moore(T,P)
 	if j = −1 return i +1
 	else return FAIL
 
-***I had to stare at this for a while to get it - make sure you get why and how this works*** Check out examples from tutorial
+I had to stare at this for a while to get it - make sure you get why and how this works - Check out examples from tutorial
 
 Exercise: Prove that i − j always increases on lines 9–10 - I might have done this - check with Andreas and maybe post something more formal here
 
@@ -2304,7 +2305,7 @@ suffix tree the compressed suffix trie of T.
 - Store two indexes l,r on each node v (both internal nodes and leaves) where node v corresponds to substring T[l..r] 
 
 see pictures on slides for trie and tree examples!
-**********confused about the numbers on the trie... why is [3..3] in multiple places? shouldn't they each be subtrings?*****
+***confused about the numbers on the trie... why is [3..3] in multiple places? shouldn't they each be subtrings
 
 note on the slides how to use indices to show which substring is at the roots of the tree (easier to write)
 
@@ -2316,11 +2317,11 @@ To search for pattern P of length m:
 - Otherwise, we reach a node v (leaf or internal) with a corresponding string length of at least m
 - It only suffices, to check the first m characters against the substring of the text between indices of the node, to see if there indeed is a match
 
-*****slide 90 - shouldn't it be checking at index 6?*****
+*****slide 90 - shouldn't it be checking at index 6?
 
 Pattern Matching Conclusion 
 ![patter](/cs240/pattern_matching.png)
-*****make sure things make sense --  (why do suffix trees only take up O(n) space?)
+***make sure things make sense --  (why do suffix trees only take up O(n) space?)
 
 ##March 26
 
@@ -2459,7 +2460,7 @@ LZW-encode(S)
 			add wK to the dictionary // note wK is added before we go to parse K
 			w←K
 
-What if size of dicitonary is reached? (2^12) ****why do they say 2^12? 
+What if size of dictionary is reached? (2^12)  
 
 Different options:
 
