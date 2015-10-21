@@ -157,15 +157,15 @@ Algorithms and Programs
 
 Running Time
 
-- Running Time of a Program: T_M(I) denotes the running time (in seconds) of a program M on a problem instance I
-- Worst-case Running Time as a Function of Input Size: T_M(n) =   max run time of program M on instances of size n 
-- Average-case Running Time as a Function of Input Size: T_avg(n) = (sum of all run times of program M over all instances of size n)/(number of instances of size n)
+- Running Time of a Program: T\_M(I) denotes the running time (in seconds) of a program M on a problem instance I
+- Worst-case Running Time as a Function of Input Size: T\_M(n) =   max run time of program M on instances of size n 
+- Average-case Running Time as a Function of Input Size: T\_avg(n) = (sum of all run times of program M over all instances of size n)/(number of instances of size n)
 
 We focus on complexity - here are some really mathy definitions
 
-- Worst-case complexity of an algorithm: Let f : Z+ → R. An algorithm A has worst-case complexity f(n) if there exists a program M implementing the algorithm A such that T_M(n) ∈ Θ(f(n)).
+- Worst-case complexity of an algorithm: Let f : Z+ → R. An algorithm A has worst-case complexity f(n) if there exists a program M implementing the algorithm A such that T\_M(n) ∈ Θ(f(n)).
 - Average-case complexity of an algorithm: Let f : Z+ → R. An
-algorithm A has average-case complexity f(n) if there exists a program M implementing the algorithm A such that T^avg_M(n) ∈ Θ(f(n))
+algorithm A has average-case complexity f(n) if there exists a program M implementing the algorithm A such that T^avg\_M(n) ∈ Θ(f(n))
 
 Running Time vs Complexity:
 
@@ -183,28 +183,28 @@ ORDER NOTATION
 
 O-notation (<=)
 
-- f(n) ∈ O(g(n)) if there exist constants c > 0 and n_0 > 0 such that 0 ≤ f(n) ≤ c\*g(n) for all n ≥ n_0
+- f(n) ∈ O(g(n)) if there exist constants c > 0 and n\_0 > 0 such that 0 ≤ f(n) ≤ c\*g(n) for all n ≥ n\_0
 - g(n)is worst case time of f(n)
-- to figure out what n\_0 is, find an intersection point --- n_0 has to be a natural number
+- to figure out what n\_0 is, find an intersection point --- n\_0 has to be a natural number
 - note that this means if something is O(n) it's also O(n^2)
 
 Ω-notation (>=)
 
-- f (n) ∈ Ω(g(n)) if there exist constants c > 0 and n_0 > 0 such that 0 ≤ c\*g(n) ≤ f(n) for all n ≥ n_0
+- f (n) ∈ Ω(g(n)) if there exist constants c > 0 and n\_0 > 0 such that 0 ≤ c\*g(n) ≤ f(n) for all n ≥ n\_0
 - opposite of O-notatoion - g(n) is best case time of f(n)
 
 Θ-notation (=)
 
-- f (n) ∈ Θ(g(n)) if there exist constants c1, c2 > 0 and n_0 > 0 such that 0 ≤ c1\*g(n) ≤ f (n) ≤ c2\*g(n) for all n ≥ n_0
+- f (n) ∈ Θ(g(n)) if there exist constants c1, c2 > 0 and n\_0 > 0 such that 0 ≤ c1\*g(n) ≤ f (n) ≤ c2\*g(n) for all n ≥ n\_0
 - grows at same rate
 
 o-notation (<)
 
-- f (n) ∈ o(g(n)) if for ALL constants c > 0, there exists a constant n_0 > 0 such that 0 ≤ f(n) < c\*g(n) for all n ≥ n_0
+- f (n) ∈ o(g(n)) if for ALL constants c > 0, there exists a constant n\_0 > 0 such that 0 ≤ f(n) < c\*g(n) for all n ≥ n\_0
 
 ω-notation (>)
 
-- f (n) ∈ ω(g(n)) if for ALL constants c > 0, there exists a constant n_0 > 0 such that 0 ≤ c g(n) < f (n) for all n ≥ n_0
+- f (n) ∈ ω(g(n)) if for ALL constants c > 0, there exists a constant n\_0 > 0 such that 0 ≤ c g(n) < f (n) for all n ≥ n\_0
 
 Preferred notation
 
@@ -362,21 +362,21 @@ Example of computing Arithmetic-Geometric sequence:
 
 ####There's a slide with misc. formulae
 
-Proving a^(log_b(c)) + c^(log_b(a))
+Proving a^(log\_b(c)) + c^(log\_b(a))
 
-- let x = log_b(c) so b^x = c
-- let y = log_b(a) so b^y = a
+- let x = log\_b(c) so b^x = c
+- let y = log\_b(a) so b^y = a
 - we want to show a^x is equivalent to c^y
 - a^x = (b^y)^x = b^yx = b^xy = (b^x)^y = c^y
 
-**Exercise: Prove log_b(a) = log_c(a)/log_c(b)
+**Exercise: Prove log\_b(a) = log\_c(a)/log\_c(b)
 
 why is this formula useful?
 
 - replace a by n and b, c are constant
-- then log_c(n) = lob_c(b) \* log_b(n)
+- then log\_c(n) = lob\_c(b) \* log\_b(n)
 - log function = constant \* log function
-- so log_c(n) = theta(log_b(n))
+- so log\_c(n) = theta(log\_b(n))
 - this shows that all log functions have the same growth rate
 - this formula is also helpful for changing base of logarithms (like with your calculator if there's no button for your base)
 
@@ -464,7 +464,7 @@ Third loop analysis
 ![loopanal3](loopanalysis3.png)
 
 - each iteration of the whole loop takes theta(1) time
-- for a given value of i, the while loop requires log_2(i) iterations
+- for a given value of i, the while loop requires log\_2(i) iterations
 - so inner while loop takes theta(log(i)) time
 - so overall complexity is sum i=1..n theta(log(i))
 - = theta(sum i=1..n logi)
@@ -478,10 +478,10 @@ Third loop analysis
 
 Defining it
 
-- recurrence relation: a formula that expresses a general term a_n in
-terms of one or more previous terms a_1,...,a_(n-1)
-- also specifies initial values starting at a_1
-- solving a recurrence relation means finding a formula for a_n that does not
+- recurrence relation: a formula that expresses a general term a\_n in
+terms of one or more previous terms a\_1,...,a\_(n-1)
+- also specifies initial values starting at a\_1
+- solving a recurrence relation means finding a formula for a\_n that does not
 involve any previous terms 
 - there are many methods of solving recurrence relations
  - guess-and-check 
@@ -543,7 +543,7 @@ using this:
 - values at each level is c\*2^j for every level except d\*2^j on the last level
 - therefore, T(2^j) = j\*c\*2^j + d\*2^j
 - ^ this is an exact formula and it is a mathematical proof!
-- if n = 2^j, j = log_2(n)
+- if n = 2^j, j = log\_2(n)
 - T(n) = dn + logn\*c\*n
 - T(n) is theta(nlogn)
 
@@ -562,17 +562,17 @@ Example:
 - T(n) = 2T(n/2) + theta(n)
 - a=3
 - b=2
-- so x=log_2(3) =approx 1.59
+- so x=log\_2(3) =approx 1.59
 - y = 1
 - so x > y
-T(n) = theta(n^log_2(3)) =approx theta(n^1.59)
+T(n) = theta(n^log\_2(3)) =approx theta(n^1.59)
 
 Example (mergesort):
 
 - a = 2
 - b = 2
 - y = 1
-- x = log_2(2) = 1
+- x = log\_2(2) = 1
 - x = y, so
 - T(n) = theta(nlogn) like we got before
 
@@ -616,7 +616,7 @@ Modified genereal version of Master Theorem
 
 Example: T(n) = 3T(n/4) + nlogn
 
-- a = 3, b = 4, sp x = log_4(3) approx= 0.793
+- a = 3, b = 4, sp x = log\_4(3) approx= 0.793
 - we will apply case 3 of the modified general version of the MT because:
 - fn)/n^(x+epsilon) = nlogn / n^(0.793-epsilon) = n^(0.207-eps) \* logn
 - let epsilon = 0.1
@@ -636,7 +636,7 @@ Example: T(n) = 2T(n/2) + nlogn
 We can solve this recurrence using the recursion tree method!
 
 - let n = 2^j
-- T(n) = 2T(n/2) + nlog_2(n)
+- T(n) = 2T(n/2) + nlog\_2(n)
 - t(1) = 1 (base case - this comes from initial condition given that T(1) = 1)
 - tree:
  - level j has 1 node, value nlogn or 2^j\*j
@@ -647,7 +647,7 @@ We can solve this recurrence using the recursion tree method!
  - level 0 has 2^j nodes, value 1
 - values on the levels are j\*2^j, (j-1)\*2^j, (j-2)\*2^j, ... 2^j and level 0 is also 2^j
 - T(2^j) = 2^j[j + j-1 + j-2 + ... + 1] + 2^j = 2^j \* [j(j+1)/2 + 1]
-- since n = 2^j, j = log_2(n) so T(n) is theta(n\*log^2(n))
+- since n = 2^j, j = log\_2(n) so T(n) is theta(n\*log^2(n))
 
 Example: T(n) = T(floor(n/2)) + T(floor(n/3)) + n
 
@@ -813,7 +813,7 @@ We are interested in the bit complexity
 
 - determining the complexity as a function of k, the number of bits in the binary representation
 - size(X) = k = # bits (not the value of X)
-- X approx= 2^k, k = log_2(x)
+- X approx= 2^k, k = log\_2(x)
 
 Multiprecision Multiplication
 
@@ -837,14 +837,14 @@ Divide and Conquer
 
 Finding the algorithm
 
-- x = x_l x_r (divide digits in half) = 2^(k/2)x_l + x_r
-- y = y_l y_R (divide digits in half) = 2^(k/2)y_l + y_r
+- x = x\_l x\_r (divide digits in half) = 2^(k/2)x\_l + x\_r
+- y = y\_l y\_R (divide digits in half) = 2^(k/2)y\_l + y\_r
 - e.g. in base 10:
  - x = 4655 = 10^2\*46 + 55
  - y = 1232 = 10^2\*12 + 32
-- xy = (2^(k/2)\*x_l + x_r)(2^(k/2)\*y_l + y_r)
-- xy = 2^k(x_l)(y_l) + 2^(k/2)\*(x_l\*y_l + x_r\*y_l) + x_r\*y_r
-- this gives us 4 subproblems (x_l\*y_l, x_l\*y_r, x_r\*y_l, and x_r\*y_r), each with size k/2, then shifting and adding
+- xy = (2^(k/2)\*x\_l + x\_r)(2^(k/2)\*y\_l + y\_r)
+- xy = 2^k(x\_l)(y\_l) + 2^(k/2)\*(x\_l\*y\_l + x\_r\*y\_l) + x\_r\*y\_r
+- this gives us 4 subproblems (x\_l\*y\_l, x\_l\*y\_r, x\_r\*y\_l, and x\_r\*y\_r), each with size k/2, then shifting and adding
 
 ![code](notsofastmultiply.png)
 
@@ -853,14 +853,14 @@ Run time
 - assume k is a power of 2, we use a recurrence relation
 - T(k) = 4T(k/2) + theta(k)
 - the theta(k) is from the additons of k (maybe shifted up to k more) digit numbers
-- MT: a=4, b=2, y=1, x = log_b(a) = log_2(4) = 2
+- MT: a=4, b=2, y=1, x = log\_b(a) = log\_2(4) = 2
 - x > y so T(k) is theta(k^x) = theta(k^2)
 - no improvement over gradeschool algorithm!
 
 Improvement? try reducing number of subproblems from 4 to 3
 
 - T(k) = 3T(k/2) + theta(k)
-- so T(k) would be theta(k^log_2(3)) = theta(k^1.59) -- (this was an example from a previous lecture)
+- so T(k) would be theta(k^log\_2(3)) = theta(k^1.59) -- (this was an example from a previous lecture)
 
 Reducing subproblems
 
@@ -872,7 +872,7 @@ Reducing subproblems
 
 Doing better? (outside the scope of this course)
 
-- Toom Cook came up with a way to split x and y into 3 parts and do 5 multiplications (this is not that intutiive and we didn't say how to do it) and it's theta(k^log_3(5)) which is approx theta(k^1.47)
+- Toom Cook came up with a way to split x and y into 3 parts and do 5 multiplications (this is not that intutiive and we didn't say how to do it) and it's theta(k^log\_3(5)) which is approx theta(k^1.47)
 - in 1971, Schontage-Strussen came up with an O(k\*logk\*loglogk) algorithm based on fast fourier transform
 - in 2007, Furer came up with O(klogk\*2^O(log\*(k))
  - log\* is the inverse of the ackerman function and grows realllly slowly
@@ -881,10 +881,10 @@ Doing better? (outside the scope of this course)
 
 Matrix multipliation
 
-- A = (a_ij) B = (b_ij) C = (c_ij)
-- c_ij = sum k=1..n (a_ik \* b_kj) = (row i of A)\*(col j of B)
+- A = (a\_ij) B = (b\_ij) C = (c\_ij)
+- c\_ij = sum k=1..n (a\_ik \* b\_kj) = (row i of A)\*(col j of B)
 - here: multiplication of integers takes theta(1) time
-- To compute c_ij we need n multiplications and n-1 additions - theta(n) time
+- To compute c\_ij we need n multiplications and n-1 additions - theta(n) time
 - n^2 entries in C -> total time is theta(n^3)
 
 Problem Decomposition
@@ -893,7 +893,7 @@ Problem Decomposition
 - there's a property that's hard to type out, but see slide 82, where you can divide the matrices into four sections of n/2 by n/2 matrices, and do some multiplication and addition, and then put them back together to get the same thing as if you did the multiplication all together -- so pretty much a divide and conquer thing
 - T(n) = 8T(n/2) + theta(n^2)
  - n^2 comes from four additions of n/2 by n/2 matrices
-- MT: a=8, b=2, y=2, x = log_2(8) = 3
+- MT: a=8, b=2, y=2, x = log\_2(8) = 3
 - x > y so T(n) is theta(n^3)
 - no improvement over naive algorithm!
 
@@ -956,8 +956,8 @@ What we want: worst case theta(n)
 
 - suppose n = 5 x odd# = 5(2x+1) = 10x + 5
 - so we have an odd number of groups of 5 elements
-- m_i is median of each section of 5 elements B_i
- - compute these non recursively, e.g. find min, next smallest, next smallest until m_i
+- m\_i is median of each section of 5 elements B\_i
+ - compute these non recursively, e.g. find min, next smallest, next smallest until m\_i
 - take M to be the array of medians, and then find it's median recursively (quickselect) - THIS is the pivot
 - e.g.  
  - 1 10 5 8 21 -- 34 6 7 12 23 -- 2 4 30 11 25
@@ -1051,21 +1051,21 @@ fibinacci numbers
 - recurrence relation 
  - f0 = 0
  - f1 = 1
- - f_n = f_{n-1} + f_{n-2} if n >=2
-- input n, compte f_n
+ - f\_n = f\_{n-1} + f\_{n-2} if n >=2
+- input n, compte f\_n
 
 badfib 
 
 - recurse to find fib(n-1) and then fib(n-2)
 - think about the tree - with n-1 to the left and n-2 to the right - this is getting really big! and there's a lot of repetition
 - properties of this recursion tree
- - there are f_n leaf nodes having the value 1
- - there are f_{n-1} leaf nodes having the value 0
- - f_n + f_{n-1} = f_{n+1} leaf nodes
- - # interior nodes = #leaf-nodes -1 = f_{n+1} - 1
- - so the total #nodes = 2f_{n+1} - 1!
- - this is concerning because the complexity is omega(# nodes) = omega(2f_{n+1}-1) = omega(f_{n+1})
- - f_n = (goldenratio^n - (-goldenratio)^(-n) / root5
+ - there are f\_n leaf nodes having the value 1
+ - there are f\_{n-1} leaf nodes having the value 0
+ - f\_n + f\_{n-1} = f\_{n+1} leaf nodes
+ - # interior nodes = #leaf-nodes -1 = f\_{n+1} - 1
+ - so the total #nodes = 2f\_{n+1} - 1!
+ - this is concerning because the complexity is omega(# nodes) = omega(2f\_{n+1}-1) = omega(f\_{n+1})
+ - f\_n = (goldenratio^n - (-goldenratio)^(-n) / root5
   - goldenratio^n grows exponentially, the (-goldenratio)^(-n) is negligable
   - goldenratio = (1+root5)/2 approx= 1.6
 - so fn is approx theta(1.6^n) which grows very fast!
@@ -1075,3 +1075,57 @@ why is it so inefficient?
 
 - we have to compute everything multiple times - each time we compute f3 we go through the whole f3 tree (e.g. when computing f4 and also when computing f5)
 - better: compute f0, f1, f2, f3, ... , fn in order
+- comment: we only need to keep track of the two 'last' fi's at any point in time to compute next one -> reduces storage (does not affect complexity)
+- if addition takes theta(1) time, then complexity would be theta(n)
+
+What's the problem?
+
+- the numbers are growing exponentially quickly - need to consider "multiplicaiton arithmetic" (bit complexity) to add the k-bit integers, it takes theta(k)
+- how many bits are in f\_i?
+- f\_i is theta(1.6^i)
+- # bits in f\_i is log\_2(1.6^i) which is theta(i)
+- time to compute the addition is theta(i) 
+- so overall complexity is sum i=2..n theta(i) = theta(n^2)
+
+Algorithm: BetterFib(n)
+
+	f[0] <- 0
+	f[1] <- 1
+	for i <-2 to n
+		do f[i] <- f[i-1] + f[i-2]
+	return f[n]
+
+###Designing Dynamic Programming Algorithms for Optimization Problems
+
+Optimal Structure
+
+- Examine the structure of an optimal solution to a problem instance I, and determine if an optimal solution for I can be expressed in terms of optimal solutions to certain subproblems of I.
+
+Define Subproblems
+
+- Define a set of subproblems S(I) of the instance I, the solution of which enables the optimal solution of I to be computed. I will be the last or largest instance in the set S(I).
+
+Recurrence Relation
+
+- Derive a recurrence relation on the optimal solutions to the instances in S(I). This recurrence relation should be completely specified in terms of optimal solutions to (smaller) instances in S(I) and/or base cases.
+
+Compute Optimal Solutions
+
+- Compute the optimal solutions to all the instances in S(I). Compute these solutions using the recurrence relation in a bottom-up fashion, filling in a table of values containing these optimal solutions. Whenever a particular table entry is filled in using the recurrence relation, the optimal solutions of relevant subproblems can be looked up in the table (they have been computed already). The final table entry is the solution to I.
+
+####0-1 Knapsack problem
+
+- instance: an array of profits, array of weights, and capacity M - all +ve integers
+- feasible solution: an ntuple [x1, ... xn] where each xi is 0 or 1 and the sum of wi\*xi <= M
+- find: a feasible solution that maximizes the sum of pi\*xi
+
+thinking about the problem:
+
+- consider xn which = 0 or 1
+- case xn = 0
+ - let X' be the solution to the subproblem consisting of the first n-1 items
+ - then X = [X], 0]
+- case xn = 1
+ - subproblem: first n-1 objects with capacity M' <- M-w\_n
+ - optimal solution X = [X', 1]
+- the subproblem profit(x) = profit(x') + p\_n
