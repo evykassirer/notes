@@ -38,7 +38,7 @@ Efficiency can be measured in a few ways:
 
 DESIGN
 
-Design: strategies to create new algoirthms to be correct and efficient and easy to understand
+Design: strategies to create new algorithms to be correct and efficient and easy to understand
 
 We'll be talking about:
 
@@ -170,13 +170,13 @@ algorithm A has average-case complexity f(n) if there exists a program M impleme
 Running Time vs Complexity:
 
 - Running time 
-- can only be determined by implementing a program and running it on a specific computer
-- is influenced by many factors, including the programming language, processor, operating system, etc.
+ - can only be determined by implementing a program and running it on a specific computer
+ - is influenced by many factors, including the programming language, processor, operating system, etc.
 - Complexity (AKA growth rate) 
-- can be analyzed by high-level mathematical analysis
-- is independent of the above-mentioned factors affecting running time.
-- is a less precise measure than running time since it is asymptotic and it incorporates unspecified constant factors and unspecified lower order terms
-- If algorithm A has lower complexity than algorithm B, then a program implementing algorithm A will be faster than a program implementing algorithm B for sufficiently large inputs
+ - can be analyzed by high-level mathematical analysis
+ - is independent of the above-mentioned factors affecting running time.
+ - is a less precise measure than running time since it is asymptotic and it incorporates unspecified constant factors and unspecified lower order terms
+ - If algorithm A has lower complexity than algorithm B, then a program implementing algorithm A will be faster than a program implementing algorithm B for sufficiently large inputs
 
 
 ORDER NOTATION
@@ -472,7 +472,7 @@ Third loop analysis
 - = theta(logn!)
 - = theta(nlogn) - given in the formulae slide
 
-###Divide and Concur
+###Divide and Conquer
 
 ####Recurrence relations
 
@@ -1129,3 +1129,231 @@ thinking about the problem:
  - subproblem: first n-1 objects with capacity M' <- M-w\_n
  - optimal solution X = [X', 1]
 - the subproblem profit(x) = profit(x') + p\_n
+
+##Oct 26
+
+reviewing from last time:
+
+- suppose X = [x_1 ... x_i] is the optimal solution to instance I
+- we have two cases:
+- case 1:
+ - if x_n=0, then X' = [x_2, ...., x_{n-1}] is an optimal solution to the instance consisting of the first n-1 items with capacity M
+ - profit(X) = profit(X')
+- case 2:
+ - if x_n = 1, then X' is an optimal solution to the instance consisting of the first n-1 items with capacity M-W_n
+ - profit(X) = profit(X') + p_n
+- we pick whichever case gives us the better answer
+- subproblems: define P[i,m] 1<=1<=n, 1<=m<=M
+ - the first i items, with some capacity between 1 and M
+
+recurrence relation: 
+
+- P[i,m] = max{P[i-1, m], P[i-1, m-w_i]+pi}
+ - this is the min of when x_i = 0 and when x_i = 1
+ - this is also assuming i >= 2,  and m >= w_i
+- P[i,m] = P[i-1, m] if i >= 2 and m < wi
+- P[i,m] = p_1 if i=1 and m >= w_i
+- P[i,m] = 0 if i=1 and m < w_1
+
+computing:
+
+- compute all the optimal solutions P[i,m]
+- table of values P[i, m] 1<=i<=n, -<=m<=M
+- fill in the table one row at a time (i=1,2,...,n)
+ - note the first row is all the base cases
+- fill in each row from left to right
+- each entry can be computed in theta(1) time
+- the final answer is the last element in the last row - bottom right of the table, at i=n, m=M
+- note: we only need to compute the entry P[n,M] in the last row (and none of the rest of that row)
+- we technically don't need every entry in every row (only m and m-w_i, for each m from the last row) but we're just going to compute them all cause it's easier
+
+how do we determine the optimal solution X?
+
+- assume we have already computed the table P[i,m]
+- remember P[n,M] = max{P[n-1, M], P[n-1, M-w_n]+pn}, where it's the first value if x_n = 0 and the second if x_n = 1
+- so we can look in the previous table to see if it's equal to P[n-1, M] to decide if x_n = 0 or 1
+- we continue in the same way, tracing back - this takes theta(n)
+
+so total complexity is theta(nM), assuming theta(1) time additon
+
+
+Example:
+	
+	M = 30
+
+	i =       1   2   3   4   5   6
+	---------------------------------
+	weights   2   3   5   8   13  16
+	profits   1   2   3   5   7   10
+
+	    m = 0 1 2 3 4 5 6 7 8 9 10 ...... 30
+	-----------------------------------------
+	i = 1 : 0 0 1 1 1 1 ..................1
+        2 : 0 0 1 2 2 3 ..................3
+        3 : 0 0 1 2 2 3 3 4 5 5 6 ........6
+        4 :
+        5 :
+        6 :                               18
+
+    This is a good exercise to fill out the table and do a traceback 
+
+
+Is this a poly-time algorithm?
+
+- the 0-1 backpack is NP-hard, which means there is no poly time algorithm known to solve it
+
+###polytime algorithm
+
+- a polynomial time algorithm is O((size(I))^c), for some c>0 where c is a constant
+- size(I) = # bits required to store I
+ - for 0-1 knapsack, I = w1, ... , wn, p1, ..., pn, M
+ - so the size of I is sum log2(wi) + sum log2(pi) + log2(M)
+ - M is exponentially large compared to log2(M)
+ - so this algorithm has complexity theta(nM) which is exponentially large compared to the number of bits 
+
+backtracking solution (recursive)
+
+ - this is theta(2^n), practical if n is small
+ - we don't discuss backtracking algorithms in this course
+
+###Coin Changing
+
+- Instance: a list of coin demonimations d1...dn and a positive integer T (target sum)
+- Find: a tuple of non-negative integers a1...an such that T = sum ai*di and N= sum ai is minimized
+- 0 <= a_n <= floor(T/dn)
+- optimal solution consists of j coins of denomination dn along with an optimal solution using the first n-1 denominations for target T - jdn
+ - compute this for all j, take the min
+
+subproblems:
+
+- 1 <= i <= n
+- 0 <= t <= T
+- N[i, t] first i denomations with target t
+
+recurrence:
+
+- N[i,t] = min{N[i-1], t-jdi]+j : 0 <= j <= floor(t/di)}
+ - j is the #coins of denomination di, 0 <= j <= floor(t/di)
+ - this is if i<=2
+- N[i,t] = t if i=1 (because we've decided d1 = 1)
+
+traceback to compute the # coins of each denomination in the optimal solution:
+
+- A[i,t]'s (# coins in denomination di in the optimal soluiton) makes the trace back more efficient 
+
+note: this is not polytime for the same reason as knapsack
+
+##Oct 28
+
+###Longest common subsequence
+
+- instance: two sequences x1,...,xm and y1,...,yn over some finite alphabet T
+- find: a maximum length sequnce Z that is a subsequence of both X and Y
+- the order of letters have to be the same in both sequences, but they don't have to be a substring
+
+e.g. 
+
+- x = gdvegta
+- y = gvcekst
+- LCS = gvet
+
+define LCS(X,Y) to be the length of the longest common subsequence of X and Y
+
+optimal structure:
+
+- x = (x_1 ... x_m) 
+- x' = (x_1 ... x_{m-1})
+- y = (y_1 ... y_n) 
+- y' = (y_1 ... y_{n-1})
+- if x_m = y_n, then LCS(X, Y) = 1 + LCS(X', Y') - aka we're including x_m=y_n in the LCS
+- if x_m != y_n then there are these possiblities:
+ - case 1: suppose x_m is the last element in the LCS (so y_n is not the last element) - then LCS(X,Y) = LCS(X,Y')
+ - case 2: suppose y_n is the last element in the LCS (so x_m is not the last element) - then LCS(X,Y) = LCS(X',Y)
+ - case 3: suppose neither xm nor yn is the last element in the LCS -- then LCS(X,Y) = LCS(X', Y')
+- so LCS(X,Y) = max{LCS(X,Y'), LCS(X', Y), LCS(X, Y')}
+- note that LCS(X', Y') <= LCS(X, Y') and is also <= LCS(X', Y), so the third case is redundant and LCS(X, Y) = max{LCS(X,Y'), LCS(X', Y)}
+
+define subproblems:
+
+- we consider all prefixes of X and Y: (x1...xi) for 1 <= i <= m and (y1,...,yj) for 1<=j<=n
+- let c[i,j] denote the length of LCS of (x1,...,xi) and (y1,...,yj)
+- c[i,j] = 1 + c[i-1, j-1] if x_i = y_j and i>=1 and j>=1
+- c[i,j] = max{c[i-1, j], c[i, j-1]} if x_i != y_j and i>=1 and j>=1
+- c[i,j] = 0 if i=0 or j=0
+
+the chart:
+
+- each entry needs the ones directly above, directly left, and diagonal up/left
+- so we can fill it out by rows left to right starting at top row, or go by columns top to bottom, starting at left, we could even do diagonals in a way to still have the right information
+- the answer is bottom right
+- complexity will be theta(mn)
+
+Traceback- 3 cases:
+
+- case UL (upperleft)
+ - x_i = y_j
+ - it was included in the LCS
+ - so we decrement i and j
+- case L
+ - j decrements
+- case U
+ - i decrements
+
+example:
+
+ 			        g    d    v    e    g    t    a
+		   j = 0    1    2    3    4    5    6    7
+
+	i = 0      0*   0    0    0    0    0    0    0    
+	g   1      0   UL1*  L1*  L1   UL1  UL1  L1   L1
+	v   2      0    U1   U1   UL2* L2   L2   L2   L2
+	c   3      0    U1   U1   U2*  U2   U2   U2   U2
+	e   4      0    U1   U1   U2   UL3* L3*  L3   L3
+	k   5      0    U1   U1   U2   U3   U3*  U3   U3
+	s   6      0    U1   U1   U2   U3   U3*  U3   U3
+	t   7      0    U1   U1   U2   U3   U3   UL4* L4*
+
+to backtrace, follow arrows from bottom right (I added astrixes)
+
+
+###Minimum Length Triangulation
+
+- instance: n points q1 ... qn that form a convex n-gon P
+- version 1: find a triangulation of P such that the sum S_c of the length of the n-3 chords is minimized
+- version 2: find a triangulation of P such that the sum S_p of the perimeters of the n-2 triangles is minimized
+
+triangulation:
+
+- n-3 chords (non-intersecting) between vertices
+- this makes n-2 disjoint triangles
+- convex means the angles are all <180
+
+how many triangulations of an n-gon are there?
+
+- triangle - 1
+- 4 sides - 2 triangulations (across each diagonal)
+- 5 sides - 5
+- 6 sides - 14
+- 7 sides - 42
+- 8 sides - 132
+- 9 sides - 429
+- 10 sides - 1430
+- this is a famous sequence of numbers - the catalan numbers - (2n choose n)/(n+1)
+- this grows exponentially! we want to avoid this
+
+we're going to consider version 2 of the triangle. for a given k we have
+
+- the triangle q1-qk-2n
+- the polygon q1 ... qk
+- the polygon qk ... qn
+- the polygons are subproblems
+
+subproblems:
+
+- what subproblems will we need to solve?
+- each subproblem consists of a polygon where vertices are consecutive vertices in the original polygon
+- how many subproblems are there? n choose 2 which is theta(n^2)
+
+recurrence relation
+
+- 
