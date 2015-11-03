@@ -1356,4 +1356,143 @@ subproblems:
 
 recurrence relation
 
-- 
+- see slides, this was kinda rushed at the end
+
+## Nov 2
+
+###Graphs
+
+A graph is a pair G = (V, E)
+
+- V is a set whose elements are called vertices
+- E is a set whose elements are called edges
+- Each edge joins two distinct vertices
+- An edge can be represented as a set of two vertices, e.g., {u, v}, where u != v. We may also write this edge as uv or vu
+- often we say n = # vertices and m = # edges, and clearly m <= (n choose 2)
+
+directed graph or dirgraph 
+
+- directed edges or arcs
+- an arc is an ordered pair (u,v) from u (the tail) to v (the head)
+- we allow u = v
+- here m <= n^2 (where m is number of arcs)
+
+Adjacency Matrices
+
+- nxn matrix A = (a_{u,v}) 
+- is indexed by V such that a_{u,v} = 1 if {u,v} is an edge, and 0 otherwise
+- there are 2m entries of A equal to 1
+- for a digraph, a__{u,v} = 1 if (u,v) is an arc, 0 otherwise, and there are m entries equal to 1
+
+There was an example on the board but I don't wanna draw it
+
+here's an example I found on Google:
+![here's an example I found on Google](http://sourcecodemania.com/wp-content/uploads/2012/06/adjacency-matrix-of-graph.jpg)
+
+Adjacency Lists
+
+- n linked lists
+- for each vertex u, there's a linked list Adj[u] of all adjacent vertices to u
+- in an undirected graph, for edge uv there would be v in Adj[u] and u in Adj[v]
+- in a directed graph, every edge corresponds to a node in only one adjacency list
+- list is better than matrix because it saves space and time - the matrix has lots of 0s, the list doesn't have that waste
+
+### Breadth First Search in undirected graph
+
+- begins at a specified vertex s
+- the search “spreads out” from s, proceeding in layers
+- first, all the neighbours of s are explored
+- next, the neighbours of those neighbours are explored
+- this process continues until all vertices have been explored. A queue is used to keep track of the vertices to be explored
+
+Notes for algorithm:
+
+- π(v) = "predecessor" of v
+- colour[v] can be white or gray or black
+ - A vertex is white if it is undiscovered
+ - A vertex is gray if it has been discovered, but we are still processing its
+adjacent vertices
+ - A vertex becomes black when all the adjacent vertices have been processed
+- If G is connected, then every vertex eventually is coloured black.
+
+def BFS(G,s):
+
+	for each v in V(g):
+		colour[v] = white
+		π(v) = empty list
+	colour[s] = gray
+	InitializeQueue(Q)
+	Enqueue(Q, s)
+
+	while Q is empty:
+		u = Dequeue(Q)
+		for each v in adj[u]:
+			if colour[v] = white
+				colour[v] = gray
+				π(v) = u
+				Enqueue(Q, u)
+		colour[u] = black
+
+we did an example but it's hard to draw out, since the colour states keep changing
+
+observation - when we explore an edge {u, v} starting from u
+
+- if v is white, then uv is a tree edge (hangs down) and π[v] = u is the predecessor of v in the BFS tree
+- otherwise, uv is a cross edge (goes across the 'tree' of the graph - think of it hanging)
+- The BFS tree consists of all the tree edges.
+- Every vertex v != s has a unique predecessor π[v] in the BFS tree.
+
+###Single source shortest path problem (via BFS)
+
+problem
+
+- source s
+- find the shortest paths from s to v, for all vertices v
+- length (# edges) of path is as small as possible
+
+code
+
+- same as BFS, but 
+- after we set colour[s] to gray, we make dist[s] = 0
+- after setting v to gray and u as v's predecessor, make dist[v] = dist[u] + 1
+ 
+Now let's prove this actually works- we want to prove:
+
+- If {u, v} is any edge, then |dist[u] - dist[v] <= 1
+- If uv is a tree edge, then dist[v] = dist[u] + 1.
+- dist[u] is the length of the shortest path from s to u - this is also called the distance from s to u
+
+
+The path of the proof
+
+- Lemma 1: if u is discovered before v, then dist[u] <= dist[v]
+- Lemma 2: If uv is any edge, then |dist[u] - dist[v] <= 1
+- Theorem: For any vertex v, dist[v] = length of the shortest path from s to v
+- the proof is actually quite long and complicated, but we'll go over it to give you the idea
+
+define layers:
+
+- L_i = {v : dist[v] = i}
+- properties of L_i : v is in L_i iff 
+  - uv is an edge
+  - u is in L_{i-1}
+  - there is no vertex u' in L_j where j < i-1 and u'v is an edge
+
+ Lemma 1 can be proven using the characterization of the Li's
+
+ Lemma 2: proof by contradiction
+
+ - suppose uv is an edge, but dist[v] >= dist[u] + 2
+ - let dist[u] = d, say v is in adj[u]
+ - if v is white, then dist[v] = dist[u] + 1 (contradiction)
+ - if v is not white, then it was already been discovered 
+ - say v was discovered from u'
+ - u' was discovered before u, so dist[v] <= dist[u] by lemma 1 (contradiction)
+
+ Theorem: let delta(v) be the distance from s to v. Then delta(v) = dist[v]
+ 
+ Proof
+
+ - delta(v) <= dist[v]
+ - there is a path of length dist[v] from s to v
+ - show delta(v) >= dist[v] by induction on delta(v)

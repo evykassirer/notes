@@ -266,3 +266,44 @@ potential problem with spinlocks:
 ###BIG HINT: review your assignments
 
 ###virtual memory will be a big part of the midterm
+
+
+
+## Nov 3
+
+[Assignment tips](https://d1b10bmlvqabco.cloudfront.net/attach/idj4uqwlfyu2uf/hbqmn85hst0c8/igiawxcpjsan/assignment_2b.pdf)
+
+- this assignment lets us run multiple programs at the same time
+- in the menu we use to run programs, we can't pass parameters, execv lets us pass paramters
+- taking a look at runprogram:
+ - it replaces data/memory/code/stack with a new program specified in first parameter
+ - array is terminated by a null pointer so we can tell where it ends (b/c we don't pass length and this is C)
+ - the menu has to do a lot of this work already, so a lot of this code already exists - check out runprogram
+ - file systems - there are no file systems assignments in this course, so don't worry too much about how that works for now
+ - as_create instead of as_copy (as_copy copies from parent, but there's no previous adress space to copy from)
+ - program starts off with empty stack, pointer points to top of stack
+
+
+![diagram on board](elf_a2b.jpg)
+What load elf does (don't need to know for a2 but we do for a3)
+
+
+so what do we have to do?
+
+- in the slide for execv the grey points are the ones we mostly just copy 
+- parameters: path to program name, array of strings
+- these parameters are pointers to somewhere in user space
+ - pointer in user space could be null (don't dereference)
+ - TLB still has the right address space, so that's good
+ - problem: the user could send pointers to stuff in kernel space - the user can't access it, but now the kernel can access sensitive date for the user (bad!) --- use copyin/copyout to avoid this
+- so count how many addresses there are, copy program path into the kernel
+- when we make function calls, we pass arguments on the stack - similarily here we want to put the arguments on the stack
+
+tips
+
+- use USERSTACK instead of 0x8....
+- check out common mistakes on the slides - and don't make them! :p
+- we can't put two 4 byte things back to back in the stack, it won't recognize it as 2 different things, so we have to round up
+- allocate enough space you need (backward), then write forwards (e.g. allocate 6 characters from top of stack then put h e l l o \0, ending at the top of the stack)
+- TIP: get it working without argument passing first, argument passing is tricky so make sure the rest works first (pointer stuff is tricky)
+
