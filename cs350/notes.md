@@ -307,3 +307,32 @@ tips
 - allocate enough space you need (backward), then write forwards (e.g. allocate 6 characters from top of stack then put h e l l o \0, ending at the top of the stack)
 - TIP: get it working without argument passing first, argument passing is tricky so make sure the rest works first (pointer stuff is tricky)
 
+
+###Virtual Memory: slides 47-50
+
+##Nov 5
+
+examples to show why secondary storage is important
+
+- 147 tabs would probably use more storage than you have in primary storage
+- latency in accessing main DRAM memory - 30-100 nanoseconds
+- disk memory (looks like a record player) takes 10-15 milliseconds
+- SSD is 100 microseconds (much slower than memory)
+- CPU is so much faster than memory, so L1 and L2 cache are super important
+
+###Virtual memory: slides 52-61
+
+##Nov 10
+
+Review:
+
+- swapping/paging - why?
+ - advantages: more processes running at same time, don't allocate things we don't need
+ - disadvantages: can be slow
+- some processes will require more memory than others - not how much it allocates but how much it *needs* (transition into this class' slides)
+
+###Virtual memory: slides 62-68
+
+###we're skipping I/O and will hopefully come back later
+
+###Scheduling: slides 1-11

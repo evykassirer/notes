@@ -1,4 +1,4 @@
-#CS 341
+ #CS 341
 
 ##Sept 14
 
@@ -1496,3 +1496,164 @@ define layers:
  - delta(v) <= dist[v]
  - there is a path of length dist[v] from s to v
  - show delta(v) >= dist[v] by induction on delta(v)
+
+ --- we ran out of time, but the complete proofs are on Learn ---
+
+ ##Nov 4
+
+ Bipartite graphs
+
+ - a graph if bipartite if we can separate vertices into two groups X and Y, and all edges have one endpoint in X and one endpoint in Y (we can think about giving the vertices different colours)
+
+###Theorem: a graph is bipartite iff it doesn't contain an odd cycle (an odd # of vertices connected in a polygon)
+ 
+proof => 
+
+	prove the contrapositive - if G has an odd length cycle, it's not bipartite
+
+ 	let's say it is bipartite
+ 	let v1 v2 ... v2k+1 v1 be the vertices in an odd length cycle
+ 	WLOG let's say v1 is red, then v2 is blue, v3 is red ... v2k+1 is R ... but v1 is also a red and connected to v2k+1 so contradiction
+
+proof <= 
+
+	prove the contrapositive: assume G is bipartite, show it contains an odd length cycle
+ 	
+ 	WLOG assume G is connected. Let s be any vertex
+ 	
+ 	Define X = {v: dist[v] is even}
+ 		   Y = {v: dist[v] is odd}
+
+ 	G is not bipartite, so there is an edge uv with u,v in X or u,v in Y
+
+ 	so dist[u] and dist[v] are both even or both odd, so by Lemma 2 dist[u] = dist[v] , let's call this distance d
+
+ 	two paths of length d:
+ 	u, u1 (π[u]), u2 (π[u1]), ..., s=ud (π[u_d-1])
+ 	v, v1 ..... similarily ... s=vd
+
+ 	so we have u and v different, and at some point befoe or at s we hit a common vertex and that makes a cycle of odd length
+
+ 	more specifically - let j = min{i: ui = vi}
+ 	u u1 ... uj = vj vj-1 .... v1 v u is a cycle of length 2j+1 (odd)
+
+ 	we can find this cycle efficiently using our BFS algorithm
+
+###Depth-first search of a directed graph
+
+- A depth-first search uses a stack (or recursion) instead of a queue
+-  predecessors and colour vertices are defined the same as in BFS
+- It is also useful to specify a discovery time d[v] and a finishing time f[v] for every vertex v - we increment a time counter every time a value d[v] or f[v] is assigned
+- We eventually visit all the vertices, and the algorithm constructs a depth-first forest
+- we have an adjacency list, same as before (this time for directed graph)
+
+-- code is on the slides --
+
+we did an example, but again it's hard to show because colours keep getting changed - but go through it on your own and make sure you know how to do this algorithm
+
+we find a tree, and might not hit all vertices because it's a directed graph, and then look from remaining vertices which might make more trees - this makes a forest
+
+four kinds of edges:
+
+- uv is tree edge if u = pi(v)
+- forward edge if not tree edge and v is a descendant of u in a tree in depth-first forest 
+- backwards edge if u is descendent of v in a tree in the depth first forst
+- any other edge is a cross edge - an edge joining vertices in two different trees in the forest is a cross edge, but we can also have cross edges joining two vertices in the same tree
+
+there was a pic on the board I don't want to copy but [this picture shows how it works](https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Tree_edges.svg/2000px-Tree_edges.svg.png)
+
+![picture](https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Tree_edges.svg/2000px-Tree_edges.svg.png)
+
+
+tree edge colouring:
+
+- d[u] < d[v] < f[v] < f[u]
+ - we discover u before we discover v, and finish u after finishing v
+- v is white when the edge uv is processed, so u is the predecessor of v
+
+forward edge colouring:
+
+- we have u goes to v1 and v, but v1 also has a path to v
+- start by processing u-v1
+- visit v1, v2, v ...
+- .. then back up through recursive calls
+- process uv, v is black
+- d[u] < d[v] < f[v] < f[u]
+- same sequence of discovery times as tree edge, but v is black
+
+##Nov 9
+
+continuing describing edges....
+
+back edge
+
+- v->v1->v2->u->v
+- d[v] < d[u] < f[u] < f[v]
+- when we process uv, v is grey because we processed it first
+
+cross edge
+
+- 1->2->v and 1->3->u with the 1->2->v processed first
+- d[v] < f[v] < d[u] < f[u]
+ - note these intervals are disjoint
+- u->v is then a cross edge, v is black when we process u->v
+
+### Topological Orderings and DAGs
+
+- directed acyclic graph (DAG) contains no directed cycle
+- a directed cycle is when we have x1->x2->...->xn->x1
+ - x1->x2<-x3->x1 is not directed because the direction of x3->x2 is the opposite eway
+- a direted graph has topological ordering, or topological sort, if there is a linear ordering < of all the vertices such that u <v whenever uv is an edge
+
+** exmaple on the board, I took a picture, TODO(add to notes)**
+
+Lemma: Every DAG has a vertex of indegree (edges coming in) 0
+
+- Proof: assume there is no vertex of indegree 0 (prove the graph has a directed cycle)
+- let v1 be any vertex - there is an arc v2v1, there is an arc v3v2, there is an arc v4v3 ... etc
+- eventually vi = vj for some j > i
+- consider the first repetition of this type - then vj -> vj-1 -> vj-2 -> ... ... -> vi = vj is a directed cycle
+
+Theorem: D has a topological ordering iff D is a dAG
+
+- Proof: => by contradiction
+ - suppose D has a directed cycle v1v2...vkv1
+ - start at v1 without loss of generality, continue to vk, vk then goes to v1 which does not respect the ordering
+- Proof: <= Assume D is DAG (find a top ordering)
+ - let v1 be a vertex of indegree 0 (exists by lemma)
+ - take v1 to be the first vertex in the ordering
+ - remove v1 and all incident edges
+ - let v2 be a vertex of indegree 0 in this smaller graph - this won't create a directed cycle so it's still a DAG so lemma still holds
+ - repeat this process -> gives a topological ordering
+
+We will find a more efficinet algorithm to construct top orderings based on DFS
+
+Lemma: D is a DAG iff a DFS of D has no back edges
+
+- Proof: => by contradiction
+ - assume D has a back edge 
+ - the back edge by definition makes a directed cyclde
+- Proof: <= by contradiction
+ - let C = v1v2...vlv1 be a directed cycle
+ - WLOG, assume v1 is the first discovered vertex in C
+ - v1 is discovered before vi for i = 2...l
+ - claim: vlv1 is a backedge
+  - rememember that v1 is discovered before vl -  so vlv1 is a backedge or a cross edge (from chart on slide 142)
+ - what colour is v1 when we discovered the edge vlv1?
+  - it's not finished yet, since we're still coming around the cycle
+  - so it's grey and f[vl] < f[v1]
+ - so it's a back edge
+
+using DFS
+
+ - we did an example on the board
+ - do DFS -> if there is any back edge, quit and say it's not a DAG
+ - if no back edge, reverse order of finishing times yields the top ordering
+ - how do we recognize when we encouner a back edge vw? answ: w is gray
+ - we could run DFS then sort the array f in reverse order theta(nlogn)
+ - more efficient: when we finish an item, put it on stack, then pop stack n times to reverse order at the end - this is theta(n)
+ - DFS algorithm is theta(n+m) - recall m is #edges and m <= n^2
+
+ *** see code on slides ***
+
+ 
