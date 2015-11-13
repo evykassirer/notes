@@ -336,3 +336,21 @@ Review:
 ###we're skipping I/O and will hopefully come back later
 
 ###Scheduling: slides 1-11
+
+##Nov 12
+
+Remember you only have 2 slip days for A3 - it's about as time consuming as A2a, maybe even more (more code, but you're more familiar with things now) - so get started!
+
+Review
+
+- round robining - context switch even if not done, first come first served
+- shortest job first - ordered in queue based on runtime - good because a really long this first in line will increase average turnaround time buy a lot
+- shortest remaining time first is even more vicious
+- we also talked last time about this multi level feedback queue that infers if the proccess is an interactive process or batch process - give interactive ones more priority for faster response
+- we talked about priority - some jobs are more important than others
+
+###Scheduling: slides 12-15
+
+back to I/O!
+
+###I/O: slides 1

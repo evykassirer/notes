@@ -1656,4 +1656,89 @@ using DFS
 
  *** see code on slides ***
 
- 
+ ##Nov 11
+
+ graph terminology
+
+ - connected graph: any two vertices are joined by a path
+ - disconnected graph: connected components which are maximal connected subgraph
+ - a digraph is strongly connected iff for any vertices u, v there is a directed path from u to v and a directed path from v to u
+- strongly connected components: maximal strongly connected subgraphs
+
+example on the board
+
+TODO(insert pic)
+
+- c3 is the 9 vertex
+- c4 is the 10 vertex
+
+component graph: 
+
+	c1  <- c2   c3 <- c4
+	  ^----------
+
+The componenent graph is a DAG
+
+- proof: assume there is a direced cycle in the component graph
+- then some vertex in c1 goes to some vertex in c2 and similarily for c2 to c3 .... cn to c1
+- but then c1 and c2 and c3 ... cn make a strongly connected component - this contradicts the maximality of c1, c2, c3, c4
+
+When we do depth first search:
+
+- For a strongly connected component C, define f[C] = max{f[v] : v in C} and d[C] = min{d[v] : v in C}
+- interestingly enough, if Ci, Cj are strongly connected components, and there is an arc from Ci to Cj in the component graph, then f[Ci] > f[Cj]
+
+Proof of above theorem (f[Ci] > f[Cj])
+
+- two cases, depending on order of where we start depth first search
+ - case 1: d[Ci] < d[Cj]
+ - case 2: d[Ci] > d[Cj] 
+- case 1: let u be the first discovered vertex in Ci
+ - all vertices in ci and cj are visited in recursive calls made from DFSvisit(u)
+ - for any v in ci and cj (that isn't u), we have d[u] < d[v] < f[v] < f[u]
+ - so f[Ci] > f[Cj]
+- case 2: suppose we visit cj fist
+ - we know ci has an arc to cj, but because the component graph is a DAG we can never get from fj to ci
+ - the recursive calls from cj will never include any vertex in ci
+ - so d(cj) < f(cj) < d(ci) < f(ci)
+ - so f[Ci] > f[Cj]
+
+Lemma: Let S be any fixed vertex. Then G is strongly connected iff there are directed paths from s to v and from v to s, for all other vertices v
+
+- => is trivial by definition of strongly connected, so we'll just show <=
+- <= let u and v be any two vertices
+ - there's a directed path from s to u (path1) and u to s (path2)
+ - there's a directed path from s to v (path3) and v to s (path4)
+ - so path2 and path3 maek a path from u to v, and path 4 and 1 make a path from v to u
+
+ Algorithm to determine if G is strongly connected:
+
+ 1. pick a vertex S
+ 2. run DFSvisit(S)
+ 3. if there is a white vertex QUIT (G is not strongly connected)
+ 4. otherwise, reverse the direction of every edge of G, forming a new graph H
+ 5. run DFSvisit(S) in H
+ 6. if there is a white vertex QUIT (G is not strongly connected)
+ if all verteices are black (guarenteed if no white vertices) then G is strongly connected
+
+An Algorithm to Find the Strongly Connected Components
+
+1. Perform a depth-first search of G, recording the finishing times f[v] for all vertices v
+2. Construct a directed graph H from G by reversing the direction of all edges in G.
+3. Perform a depth-first search of H, considering the vertices in decreasing order of the values f[v] computed in step 1.
+4. The strongly connected components of G are the trees in the depth-first forest constructed in step 3
+
+TODO(example of DFS on board, I actually took a pic this time)
+
+order of reverse finishing times: 1, 2, 4, 3, 5, 7, 6
+
+TOOD(pic of H)
+
+Correctness that we find the strongly connected components
+
+- G and H have the same strongly connected components (SCC)
+- let us be the first vertex visited in step 3 (u has thehighest finishing time in DFS of G)
+- let C be the SCC containing u, lte C' be any other SCC
+- in G, f[c] > f[c'],so there is an edge from C' to C in the component graph of G (contrapositive from last bullet on slide 146, proved earlier this class)
+- therefore there is no edge from C to C' in H
+- this continues to apply to other components
