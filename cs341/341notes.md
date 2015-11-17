@@ -1742,3 +1742,80 @@ Correctness that we find the strongly connected components
 - in G, f[c] > f[c'],so there is an edge from C' to C in the component graph of G (contrapositive from last bullet on slide 146, proved earlier this class)
 - therefore there is no edge from C to C' in H
 - this continues to apply to other components
+
+
+##Nov 16
+
+terminology:
+
+- a tree on n vertices is a connected (undirected) graph containi no cycles - it has n-1 edges
+- spanning trees is a subgraph that is a tree, "spanning" means it contains all the vertices in G
+- there is a unique path between any two vertices in a tree
+- Minimum Spanning Tree: if edges have weights, a minimum spanning tree is a spanning tree that minimizes the total weight of the edges in the spanning tree
+
+Kruskal’s Algorithm to find min spanning tree
+
+- algorithm
+ - sort edges by increasing weight
+ - keep a set of edges
+ - for each edge (from least to most weight) see if we can add it to our set without making a cycle, add if we can
+- so at any point, we have a forest of vertex-disjoint trees
+- initially we have n trees, one vertex per tree
+- whenever we choose an edge to add to the forest, we are merging two trees - so #trees is reduced by one
+ - proof - in the case where we join two different trees there's no cycle, if both end points of the edge are in the same tree adding the edge will create a cycle (you can draw this to see)
+- at the end of the algorithm we'll have chosen n-1 edges, and have a single tree
+
+at any point in time, each tree has a unique 'leader' vertex
+
+- define a function find where find(v) is the leader vertex for a tree that contains v
+- to implement find, we use an auxilary array L
+ - for any v, L[v] = some vertex v (not just any vertex, we'll explain more in a sec) in the tree that contains v
+ - L[v] = v iff v is leader vertex for that tree
+- conceptually we have a tree defined by L, where every edge is directed towards the leader (not necessarily edges in the graph)
+ - he drew a picture of directed branches all leading up to the same vertex, so at the bottom there's w, and L[w] is a vertex it directs towards, and L[L[w]] is one higher, and L[L[L[w]]] is at the top (we call it u)
+ - and v is the bottom of another branch, and L[v] is it's 'parent' and L[L[v]] is also u, and doesn't direct to anything
+ - for any v - v, L[v], L[L[v]], ... eventually ends at leader vertex
+ - find(v) connects the sequence v, L[v], L[L[v]].... until the leader vertex, say u, is reached. Not that L[u] = u
+
+How do we do the cycle test efficiently?
+
+- given an edge uv, check if find(u) is not equal to find(v) -- then we can add the edge to the tree
+
+Making L:
+
+- initialize L[v] = v for all v
+- every time we merge two trees by adding an edge, say uv
+ - we had find(u) = u' and find(v) = v'
+ - we can make L[u'] = v' or L[v'] = u'
+
+TODO(insert pic of graph)
+
+looking at edges in order of weight:
+
+		x   :  a  b  c  d  e  f  g  h  i
+		L[x]:  a  b  c  d  e  f  g  h  i     look at gh, can add, share find(h)
+		       a  b  c  d  e  f  h  h  i     look at fg, can add, share find(g) 
+		       a  b  c  d  e  h  h  h  i 	 look at ci, can add, share find(i)
+		       a  b  i  d  e  h  h  h  i     look at ab, can add, share find(b)
+		       b  b  i  d  e  h  h  h  i     look at cf, can add, share find(h)
+		       b  b  i  d  e  h  h  h  h     look at gi, find(g) == find(i) == h, so discard
+		       etc.
+
+notes:
+- note that we can't just do table lookup because we only update one find value on each join
+- the idea isi that we keep track of the depths of the trees and direce the leader of the tree with lower depth to the leader of the tree of higher depth (when they're the same the choice is arbitrary)
+- this is so our resulting tree has the least possible depth - and the depth will be the complexity of find()
+- find is a logn operation
+- presort is theta(mlogm) where m is number of edges
+- O(m) iterations - O(logn) per iteration
+so total runtime is O(mlogn)
+
+Prim’s Algorithm (idea)
+
+- We initially choose an arbitrary vertex u_0 and define A = {e}, where e is the minimum weight edge incident with u_0
+- A is always a single tree, and at each step we select the minimum weight edge that joins a vertex in V_A to a vertex not in VA
+ - Remark: V_A denotes the set of vertices in the tree A
+- for any vertex v not in V_A
+ - N[v] = u, where {u,v} is a min weight edge such that u is in V_A
+ - W[v] = weight of the edge N[v] v
+ - assume the weight of uv is infinity is uv is not an edge (so we never pick that)

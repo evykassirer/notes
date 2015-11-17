@@ -353,4 +353,87 @@ Review
 
 back to I/O!
 
-###I/O: slides 1
+###I/O: slides 1-13
+
+
+##Nov 17
+
+We talk about A3
+
+([notes here](https://d1b10bmlvqabco.cloudfront.net/attach/idj4uqwlfyu2uf/hbqmn85hst0c8/ih2fyhknqxz0/assignment_3.pdf) but I'm writing stuff here too so I pay attention)
+
+"I would argue that after assignment3, os161 would be almost useful!"
+
+- e.g. for a microwave or mars rover where you want something really lightweight (we're not talking about phones or laptops)
+
+why not put windows or something on the mars rover?
+
+- don't need a GUI
+- don't know minesweeper, don't need app store
+- easier to audit 1000 lines of code than 10000 lines of code
+
+A3 adds stability
+
+- we can keep running without having to restart (before running out of TLB entries made it crash - and we can reuse physical memory!)
+- making sure text segments are read only by using segments
+- replace fixed segmentation with page table - segmentation with paging
+
+FIRST do TLB replacement
+
+- TLB miss -> exception -> common exception handler and mips trap -> vm_fault
+- vm_fault iterates to find unused/invalid entry and overwrites
+- WE IMPLEMENT: what to do when TLB is full - replace a random entry
+ - this is on the same level as A0
+ - make sure page fields are all unique
+
+THEN read-only text segment
+
+- in os161 dirty bit on means **a TLB entry is writeable** and if it's 0 it's read only
+- text segments should be read-only
+- each entry in TLB is 64 bit wide - holds page# and frame# and some protection bits
+ - ehi and elo are provided for us - ehi is highest 32 bits, helo is lowest 32 bits
+ - ehi: first 20 of those bits is page#, next 12 bits is unused
+ - elo: first 20 bits is frame number, then nocache bit (don't worry about this), then dirty bit, then valid bit, then rest unused
+- to make text segments read only do elo &= ~TLBLO_DIRTY (turns off dirty bit in elo)
+- vbase is base virtual address, vtop is the highest possible address for that segment - we se if our address is between the readonly segments vbase and vtop
+- except... load_elf needs to be able to write to this read-only space and will fail, so add a flag to addrspace to indicate whether or not load_elf has completed, and when it completes **flush the TLB** and ensure all TLB entries for the text segment has TLBLO_DIRTY off
+- as_activate flushes the TLB
+
+THEN handle the readonly exception
+
+- instead of panicing, kill the thread and the current process (like sys__exit with a different exit code)
+- we have a different encoding of the exit to show it died in a not so graceful way
+- up to here, this is about A1 worth of work
+
+THEN: managing memory
+
+- ram_stealmem allocates a certain number of pages but doesn't provide any way to free them
+- when it allocates the max number of pages and runs out, it panics
+- we still use ram_stealmem for the beginning of bootstrap before virtual memory kicks in, but we want to stop using it eleswhere
+- once we finish with ram_stealmem in beginning of bootstrap, see what memory is left, partition it, and keep track of the frame's status (with a core-map)
+- the core-map can be a linked-list, doesn't have to be super efficient in lookup
+- kfree doesn't know how much to delete, so keep track of how many frames you want to delete (we don't pass it to free_kpages, it's stored in the table)
+- we store the map before the segments we allocate
+
+**go back and add kfree to anywhere you forgot**
+
+page table
+
+- secret: you can pass all the tests without implementing the page table
+- so why do it? TAs will manually inspect to see if you did it (if you didn't, 5 marks deduction)
+- we change pbase to point to a page table
+- the hard part is going through and changing all the address space functions to work with page tables
+
+ascopy - copying one from to another
+
+- physical address -> kernel virtual address in both frames
+- then the MMU will handle that
+- kernel virtual addresses do NOT go through TLB, the MMU converts it, we just add 0x8 - there's macro somewhere that does kernel virtual address->physical address and vice versa
+- never do anything with a physical address except in the TLB
+- you always make it virtual when dealing with it elsewhere
+
+
+"I'm going to talk to you about hard drives for 5 minutes"
+
+###I/O slides 14-15
+
