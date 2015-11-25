@@ -437,3 +437,14 @@ ascopy - copying one from to another
 
 ###I/O slides 14-15
 
+##Nov 19
+
+###I/O slides 16-25
+
+###Chat about SSDs - I wrote about it on the blank slide after I/O
+
+###Files and File Systems slides 1-20
+
+##Nov 24
+
+###Files and File Systems slides 21-

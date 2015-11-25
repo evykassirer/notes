@@ -1819,3 +1819,259 @@ Prim’s Algorithm (idea)
  - N[v] = u, where {u,v} is a min weight edge such that u is in V_A
  - W[v] = weight of the edge N[v] v
  - assume the weight of uv is infinity is uv is not an edge (so we never pick that)
+
+see code on the slides
+
+Andy's notes from when I left for an interview
+
+- we want to find minimum weighted edge from V_A to V\V_A
+- example: consider the graph is Kurstal's algorithm
+ - let u_0 = a, V_A = {a}
+ - choose edge ab, V_A = {a,b}
+ - choose edge bc, V_A = {a,b,c}
+ - choose edge ci, V_A = {a, b, c, i}
+- initialization:
+ - N[V] = u_0
+ - w[v] = w(u_0,v)
+- update:
+ - we have a previous best edge from any vertex v' to V_A, compare that to the weight of the v' to the vertex we just added (v) - pick the lesser of w[v] and w[v']
+- complexity
+ - initialization: theta(n)
+ - while loop - O(n) iterations, finding v is linear search, for loop is O(n)
+ - so total O(n^2)
+- improvements:
+ - use a priority queue (minheap) to store w values
+ - this can reduce complexity to O(mlogn), which is better only when m is small compared to n^2, or sparse graphs
+
+##Nov 18
+
+we can prove the correctness of Krustal's and Prim's algorithm by proving the general version of the algorithm
+
+definitions:
+
+- cut: a paritition of the vertices so that we have (S, V\S) and neither set is empty
+- Let (S, V \S) be a cut in a graph. An edge e is a **crossing edge** with respect to the cut (S, V \S) if e has one endpoint in S and one endpoint in V \S - also known as a bridge
+- A cut (S, V \S) **respects** the set of a set of edges A provided that no edge in A is a crossing edge
+
+A General Greedy Algorithm to Find an MST
+
+	A is empty set
+	while A's size is < n-1:
+		let (S, V \S) be a cut that respects A
+		let e be a min weight crossing edge
+		A <- A U {e}
+	return A
+
+Krushal and Prim are both special cases of the general algorithm
+
+- for Kushal
+ - e is a min weight edge joining two trees T1 and T2
+ - so S = T1 and V\S is everything else (T2 and potentially other trees)
+- for Prim, S is the tree we have so far, V\S is has the rest of the vertices including the one we pick to add the next edge
+
+Correctness Proof:
+
+- let A = {e_1, e_2, ..., e_n-1} wher the edges are chosen in that order
+- assume all edge weights are distinct
+- we will prove by induction that {e1, ..., ej} is a subset of edges of a MST for j=0, 1, ..., n-1 
+- where j=n-1 this says that A is a MST
+
+induction:
+
+	base case: j=0 is trivial
+
+	IH: {e_1, ..., e_{j-1} is contained in a MST. 
+
+	Prove that {e1, ..., ej} is contained in a MST
+
+	Assume that the MST T does not contain e_j. Note that e1, ... e_{j-1} are in T
+
+	There is a cut (S,V\S) such that ej is the min crossing edge.
+	T is connected, so it contains a crossing edge for this cut. If it's not ej, let's call it e'.
+	But, w(ej) < w(e') since ej is the min weight crossing edge
+
+	Define T' = T\{e'} U {ej}
+	T' is a spanning tree with smaller weight - contradiction!
+
+### Shortest Path Problems
+
+1. Given u, v find the shortest path from u to v (and by shortest we actually mean min weight)
+
+2. 'Single Source' - Given a source u_0, find the shortest paths from u_0 to v for all v (n-1 paths) - we use this to solve 1
+
+3. 'all pairs' - find shortest path from u to v for all pairs of u to v (extension of 2)
+
+
+Dijkstra’s Algorithm (Main Ideas)
+
+- single source
+- requires that all edge weights are non negative
+- S is a subset of vertices such that the shortest paths from u_0 to all vertices in S are known; initially, S = {u0}
+- For all vertices v in S, D[v] is the weight of the shortest path Pv from u0 to v, and all vertices on Pv are in the set S
+- For all vertices v not in S, D[v] is the weight of the shortest path Pv from u0 to v in which all interior (not endpoint) vertices are in S
+- For v != u0, π[v] is the predecessor of v on the path Pv.
+- At each stage of the algorithm, we choose v in V \S so that D[v] is
+minimized, and then we add v to S
+- Then the arrays D and π are updated appropriately
+
+pseudo code on slides
+
+initialization: 
+ - S = {u_0}
+ - D[v] = w(u_0, v)
+ - T[v] = u_0
+ - if uv is not an edge then w(u, v) is infinity
+
+say we have the set S, and path P from u_0 to v has weight D[v]
+
+ - supose there is a path P' from u_0 to v such that wt(P') < wt(P)
+ - decompose P' into two parts: P1 from u_0 to v' and P2 from v' to v (v != v')
+ - wt(P') = wt(P1) + wt(P2)
+ - >= D[v'] + wt(P2)
+ - >= D[v] + wt(P2) -- since v has the min D-value
+ - = wt(P) + wt(P2)
+ - >= wt(P) but since all edge weights are >=0 --> contradiction
+
+Updating step
+
+- preview best previoius path wt =  D[v']
+- compare with v where we have weight w(v,v') + D[v]
+
+comparing updating step to Prim's algorithm
+
+- Prim: if w(v, v') < W[v'] then W[v'] <- w(v, v')
+- Dijkstra: if D[v] + w(u, v') < D[v'] then D[v'] <- D[v] + w(v,v')
+
+complexity
+
+- O(n^2) "straightforward"
+- O(mlogn) for priority queue
+
+Bellman-ford algorithm solves single-source shortest path problem allowing negative weight edges
+ - but there cannot be negative weight directed cycles 
+ - a negative weight cycle is where the total weight of a cycle is negative --> so we could loop around this infinitely and get an infinitely low path - trying to force us not to cycle like this becomes pretty difficult
+ - compelxity O(mn)
+
+shortest paths in DAGs single source shortest path problem can be solved in time O(m+n) based on topological sort
+
+All pairs shortest path (negative weight edges are okay, negative weight cycles aren't)
+
+0) run Bellmanford with every possible sort O(mn^2) ---- slowest
+1) slide 162 O(n^4)
+2) side 163 O(n^3logn)
+3) slide 164 O(n^3) <- Floyd-Warshall ---- fastest
+
+FloydWarshall:
+
+- define D_m[i,j] to denote the weight of the min weight path from i to j in which all interior vertices are in {1...m}
+- previous best path was 1 ... interior ... j with weighgt D_{m-1}[i, j]
+- now considering m as a new interior vertex, the candidate path is i ... m ... j
+- break it into two disjoint (since there are no negative weight cycles) pieces
+ - 1 to m (weight D_{m-1}[1,m])
+ - m to j (weight D_{m-1}[m,j])
+- see pseudo code on slides
+
+##Nov 23
+
+Decision problems
+- Decision Problem: Given a problem instance I, answer a certain question “yes” or “no”
+- Problem Solution: Correct answer (“yes” or “no”) for the specified problem instance. I is a yes-instance if the correct answer for the instance I is “yes”. I is a no-instance if the correct answer for the instance I is “no”
+- Algorithm Solving a Decision Problem: An algorithm A is said to solve a decision problem  Π provided that A finds the correct answer (“yes” or “no”) for every instance I of  Π in finite time
+- Polynomial-time Algorithm: An algorithm A for a decision problem  Π is said to be a polynomial-time algorithm provided that the complexity of A is O(nk), where k is a positive integer and n = Size(Π)
+- The Complexity Class P denotes the set of all decision problems that have polynomial-time algorithms solving them. We write  Π is in P if the decision problem  Π is in the complexity class P.
+
+Let's look at some algorithms:
+
+- cycle problem: does G contain a cycle? (decisionp problem)
+ - use DFS, only tree edges -> no, if any back/forward/cross edges -> yes
+ - complexity is n+m, size(I) is theta(n+m)
+ - polytime
+- hamiltonian cycle (passes through every vertex exactly once) - does one exist in G?
+ - unknown if ham cycle is in P - "probably not" -> NP-complete
+- rational knapsack
+ - we change the problem from before to "is there an ntuple" -> now it's a decision problem
+ - recall we can use a greedy algorithm to solve rational knapsack optimization in poly time
+ - so we can solve rational knapsack in poly time, get optimatl profit and answer yes or no
+- 01 knapsack
+ - NP complete
+
+Intuition:
+
+- proving a theorem might be very difficult. On the hother hand, verifying whether a purported proof is valid can often be easier than finding the proof in the first place
+- We're going to look at finding a proof vs verifying a proof
+
+
+Polynomial-time Turing Reductions
+
+- Suppose Π1 and Π2 are problems (not necessarily decision problems). A (hypothetical) algorithm A2 to solve Π2 is called an *oracle* for Π2
+- Suppose that A is an algorithm that solves Π1, assuming the existence of an oracle A2 for Π2. (A2 is used as a subroutine within the algorithm A)
+- Then we say that A is a Turing reduction from Π1 to Π2, denoted Π1 <=^T Π2
+- A Turing reduction A is a polynomial-time Turing reduction if the running time of A is polynomial, under the assumption that the oracle A2 has unit cost running time
+
+Travelling Salesperson as an example (see slides)
+
+Certificates:
+
+- Certificate: Informally, a certificate for a yes-instance I is some “extra information” C which makes it easy to verify that I is a yes-instance (like if we ask if it's possible to make ____, the certiticate would be ___)
+- Certificate Verification Algorithm: Suppose that Ver is an algorithm that verifies certificates for yes-instances. Then Ver(I,C) outputs “yes” if I is a yes-instance and C is a valid certificate for I. If Ver(I,C) outputs “no”, then either I is a no-instance, or I is a yes-instance and C is an invalid certificate.
+- Polynomial-time Certificate Verification Algorithm: A certificate verification algorithm Ver is a polynomial-time certificate verification algorithm if the complexity of Ver is O(n^k), where k is a positive integer and n = Size(I).
+
+
+Certificate Verification Algorithm for a Decision Problem
+
+- A certificate verification algorithm Ver is said to solve a decision problem Π provided that 
+ - for every yes-instance I, there exists a certificate C such that Ver(I,C) outputs “yes”.
+ - for every no-instance I, for every certificate C, Ver(I,C) outputs “no”.
+
+e.g. for Hamiltonian Cycle
+
+- a certifcate for a yes-instance is a ham cycle of the graph
+- to vertify the correctness of a certificate X=[x1...xn] we need to check 
+ - X contains n entries
+ - all entries are distinct
+ - consecutive entries in X are always edges in the graph
+ - XnXn is also an edge
+ - this can be done in polytime O(n)
+
+The Complexity Class NP
+
+- the set of all decision problems that have polynomial-time certificate verification algorithms solving them )like ham cycle)
+- We write Π is in NP if the decision problem Π is in the complexity class NP
+- Finding Certificates vs Verifying Certificates: It is not required to be able to find a certificate C for a yes-instance in polynomial time in order to say that a decision problem Π is NP
+
+P is in NP
+
+- proof: 
+ - suppose Π is P
+ - let A be a poly-time algorithm that solves Π
+ - then there is a poly-time verification algorithm for Π
+ - in Ver(I,C) 
+ 	- run A(I)
+ 	- ignore C, output the answer yes or no
+ - Ver is poly time - so for every C Ver(I,C) outputs yes if I is a yes instance and 'no' if I is a no instance
+
+so P is in NP - is P equal to NP? this is an unsolved problem. people lean towards the idea that they are not equal
+
+can we use a certificate verification algorithm for Π to solve Π?
+
+- given an instance I for Π, suppose we generate all the possible certificates for I (of a certain length) and test them using the certificate verfication algorithm
+- if at least one certificate is verified, we havea  yes-instance. if no certs are verified, then we have a no instance
+- this is a valid algorithm, but it's not polynomial (exponential # of possible certificates)
+
+Polynomial-time Reductions
+
+- For a decision problem Π, let I(Π) denote the set of all instances of Π
+- Let Iyes(Π) and Ino(Π) denote the set of all yes-instances and no-instances (respectively) of Π
+- Suppose that Π1 and Π2 are decision problems
+- We say that there is a polynomial-time reduction (AKA polynomial transformation) from Π1 to Π2 (denoted Π1 <=^P Π2) if there exists a function f : I(Π1) --> I(Π2) such that the following properties are satisfied:
+ - f(I) is computable in polynomial time
+ - if I is in Iyes(Π1) then f(I) is in Iyes(Π2)
+ - if I is in Ino(Π1) then f(I) is in Ino(Π2)
+
+e.g. clique -> vertex cover
+
+- a clique is a subset of vertices W such that all pairs of vertices from W are edges
+- a cover is a subset of vertices that involve every edge
+- we want a reduction from clique to vertex cover
+ - we have the instance I = (G, k) where k is the size of the clique we're looking for
+ - change to instance H, l where H is complement of G (all edges not in G) and l = n-k (l is the cover size we're looking for)
