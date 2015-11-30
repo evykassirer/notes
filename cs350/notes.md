@@ -447,4 +447,8 @@ ascopy - copying one from to another
 
 ##Nov 24
 
-###Files and File Systems slides 21-
+###Files and File Systems slides 21-32
+
+##Nov 26
+
+###Files and File Systems slides 33

@@ -2001,14 +2001,7 @@ Intuition:
 - We're going to look at finding a proof vs verifying a proof
 
 
-Polynomial-time Turing Reductions
-
-- Suppose Π1 and Π2 are problems (not necessarily decision problems). A (hypothetical) algorithm A2 to solve Π2 is called an *oracle* for Π2
-- Suppose that A is an algorithm that solves Π1, assuming the existence of an oracle A2 for Π2. (A2 is used as a subroutine within the algorithm A)
-- Then we say that A is a Turing reduction from Π1 to Π2, denoted Π1 <=^T Π2
-- A Turing reduction A is a polynomial-time Turing reduction if the running time of A is polynomial, under the assumption that the oracle A2 has unit cost running time
-
-Travelling Salesperson as an example (see slides)
+Polynomial-time Turing Reductions (skipped for now)
 
 Certificates:
 
@@ -2075,3 +2068,203 @@ e.g. clique -> vertex cover
 - we want a reduction from clique to vertex cover
  - we have the instance I = (G, k) where k is the size of the clique we're looking for
  - change to instance H, l where H is complement of G (all edges not in G) and l = n-k (l is the cover size we're looking for)
+- definition of complement: H is called the complement of G, because every edge of G is a non-edge of H and every non-edge of G is an edge of H.
+
+ ##Nov 25
+
+ clique to cover ct'd
+
+ 1. so f needs to be computable in poly time
+ 2. if I is a yes instance of clique, f(I) should be a yes instance of vertex cover
+ 3. if I is a no instance of Clique, then f(I) should be a no instance of vertex cover
+
+example of how f works:
+
+TODO(picture)
+
+- here the clique is {2,3,6} and the vertex cover is {1,4,5}
+- cover is all vertices not in the clique
+
+Proof of point 2 above (yes -> yes)
+
+- supopse G has a clique W of size k
+- Claim: V\W is a vertex cover in H
+- let uv be an edge in H
+- we will show u is in V\W or v is in V\W
+- suppose this was not the case. Then u is in W and v is in W - then uv is no an edge in G, but since u and v are both in W this contradicts that W is a clique in G
+
+Proof of point 3 (no -> no) 
+
+- prove the contrapositive
+- assume H has a vertex cover of size n-k. Prove that G has a clique of size k
+- the details of this argument is pretty much the same as previous proof
+
+Properties of Polynomial-time Reductions
+
+- Suppose that Π1, Π2, . . . are decision problems
+- thm: If Π1 <=_P Π2 and Π2 is in P,then Π1 is in P
+
+Proof:
+
+- we hae f, a poly trans from Π1 to Π2 and A, a polytime algorithm to solve Π2
+- how to solve Π1 in poly time? 
+ - step 1: compute f(I)
+ - step 2: run A(f(I))
+- clearly this yeilds the corret answer (yes/no) for I
+- does this run in poly time?
+ - let size(I) = n
+ - step 1 takes O(n^k) where k is a positive integer -- this constructs f(I)
+ - step 2 - suppose A has complexity O(n^l) where l is a positive integer
+ - what can we say about size(f(I)) as a function of n?
+ - size(f(I)) is in O(n^k) because the amount of output you have is bounded by the time the algorithm takes -- we'd need a unit of time to output each bit
+ - complexity of running A on F(I) is O(n^kl)
+
+Another theorem
+
+- If Π1 <=_P Π2 and Π2 <=_P Π3, then Π1 <=_P Π3
+
+###The complexity class NPC
+
+- "NP-complete"
+- theorem: if any NP-complete problem is solvable in polynomial time, then P=NP
+- equivalently, if P is no NP then P union NPC is not empty (this is contrapositive)
+- if P is not NP, then we have two sets (P and NPC) disjoint within NP
+
+NPC 
+
+- NPC is the set of all decision problems Π that satisfy two properties:
+ - Π is NP
+ - for all Π' in NP, Π' <=_P Π
+
+Proof of above theorem (if P union NPC isn't empty, then P=NP)
+
+- we've proved P is a subset of NP, so it suffices to prove that NP is a subset of P (then P=NP)
+- we have Π is in P union NPC
+- let Π' be in NP -- prove Π' is in P
+- Π is in NPC and Π' is in NP, so Π' <=_P Π (defn)
+- Π' <=_P Π and Π is in P, so Π' is in P (theorem from previous slides)
+
+Note
+
+- you can go from a harder problem to an easier problem, but not an easier to a harder problem
+- if Π is in P and Π' is in NPC, Π <=_P Π', but it is unlikely that Π' <=_P Π (unless P=NP)
+
+
+###Satisfiability and the Cook-Levin Theorem
+
+Proving Problems NP-complete
+
+- suppose Π1 is NPC and Π1 <=_P Π2 and Π2 is in NP
+- then Π2 is NP
+
+Proof
+
+- we assume Π1 is NPC, Π2 is NP, Π1 <=_P Π2
+- to show Π2 is NPC weneed to show:
+ - Π2 is in NP (true by assumption)
+ - for any Π' in NP, Π' <=_P Π2
+- Π' <=_P Π1 since Π1 is NPC and Π' is NP (defn)
+- also Π1 <=_P Π2 (assumption) 
+- so by transitivity Π' <=_P Π2 -- done!
+
+CNF-Satisfiability
+
+- Instance: A boolean formula F in n boolean variables x1, ... , xn, such that F is the conjunction (logical “and”) of m clauses, where each clause is the disjunction (logical “or”) of literals. (A literal is a boolean variable or its negation.)
+- Question: Is there a truth assignment such that F evaluates to true?
+- we're given a bunch of variables and clauses - we want to assign the variables true of false to try to have every clause include at least one true variable
+
+Theorem
+
+- CNF-Satisfiability is NPC
+- we show this using 3-CNF-SAT (also NPC) and 2-CNF-SAT (is P) using the above technique 
+
+##Nov 30
+
+(insert slide of 4 cases of instance translation)
+
+examples of CNF instance -> 3CNF instance
+
+- {x1, NOTx2} --> {x1, NOTx2, c}, {x1, NOTx2, NOTc}
+- {x1, NOTx3, x4} -->  {x1, NOTx3, x4}
+- {NOTx1, x2, x3, NOTx5} --> {NOTx1, x2, d1}, {NOTd1, x3, NOTx5}
+
+proving case 4 -- if I is yes -> f(I) is yes
+
+- if it's a yes instance, at least one var is true -> WLOG suppose z1 is T
+- we can assign values (T or F) to the new variables d1 ... dk-3 so that each of the k-2 constructed caluses contain at least one true literal 
+ - we can make all the d_i false so that in each clause we have NOTd_i which makes it true, except the first but we know z1 is true so we're fine
+
+proving if I is no -> f(I) is no
+
+- contrapositive
+ - assume the k-2 constructed clauses each contain a true literal
+ - prove original clause contains the true literal (i.e. at least one z_i is T)
+- prove contrapositive by contradiction: assume all z_i are false
+ - show that at least one of the k-2 constructed clauses contains no true literal
+ - this follows easily - d1 must be T for the first to be true, but then d2 must be true, ... but then NOTdk-3 is false which makes the last clause false
+
+complexity of computing f(I) 
+
+- I is n clauses, each m variables
+- m might be exponential large compared to n
+- size(I) = theta(mn) if we encode I using an mxn matrix (index rows by m clauses, index columns by the n variables) and the entries in the matrix are 0, 1, -1 (where -1 means it's not in that clause)
+- polynomial means a polynomial function of size(I), which means polynomial in m and n
+
+returning to turing reductions, which we skipped earlier
+
+Polynomial-time Turing Reductions
+
+- Suppose Π1 and Π2 are problems (not necessarily decision problems). A (hypothetical) algorithm A2 to solve Π2 is called an *oracle* for Π2
+- Suppose that A is an algorithm that solves Π1, assuming the existence of an oracle A2 for Π2. (A2 is used as a subroutine within the algorithm A)
+- Then we say that A is a Turing reduction from Π1 to Π2, denoted Π1 <=^T Π2
+- A Turing reduction A is a polynomial-time Turing reduction if the running time of A is polynomial, under the assumption that the oracle A2 has unit cost running time
+
+Travelling Salesperson as an example
+
+- TSP-optimization
+ - Input: graph, weights
+ - Output: hamiltonian cycle (visits each node exactly once) that minimizes sum of weights
+- TSP-optimal-value
+ - same input
+ - output: T - minimum value of w(H) where H is a ham cycle
+- TSP-decision
+ - given graph, weights, target t
+ - does there exist ham cycle with w(H) <= T?
+
+"Trivial" turing reductions 
+
+- (if you have algorithm for problem on the right, you can solve the one of the left) 
+- TSP-decision <=^T_P TSP-opt-value  - just compare the target to the weight of optimal cycle
+- TSP-decision <=^T_P TSP-optimization - just compare the target to the optimal weight
+- TSP-opt-value <=^T_P TSP-optimization - find the weight of the optimal cycle
+
+"non-trivial" turing deductions
+
+- TSP-optvalue <=^T_P TSP-decision
+- TSP-optimization <=^T_P TSP-decision
+
+TSP-optvalue <=^T_P TSP-decision
+
+- binary search technique
+- interval [lo, hi]
+- we can use lo as the lower bound - our upper bound will be the sum of all edge weights
+- initial call to decision solver with 'hi' - tells us if there is any ham cycle in G - if not, quit
+- size of I = 
+ - graph G - theta(n+m) for vertices and edges
+ - weight function with size sum of log of weights - because w(e) takes log(w(e)) bits to write down in binary
+- so size(I) is theta(m+n+sum(log weights))
+- complexity of the reduction is theta(log(hi-lo)) which is theta(log sum of weights)
+- log (sum of weights) is less than or equal to sum (log of weights) which is less than size(I) -- so it's polynomial
+- Q: what if we instead did a linear search? would it be poly time?
+ - complexity would be theta(hi-lo) = theta(sum of weights)
+ - sum of weights is exponential large compared to size(I)
+ - turing reduction, but not poly time
+
+TSP-optimization <=^T_P TSP-decision
+
+- step 1: compute the value T* of the optimal ham cycle -> use the previous reduction
+- step 2: find a ham cycle with the weight T* 
+ - idea: throw away edges one at a time if they're not part of the optimal ham cycle
+ - see code on slides
+- complexity: theta(m) iterations of the for loop
+- size(I) is theta(m+n+sum log of weights) so it's poly time
