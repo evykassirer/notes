@@ -451,4 +451,17 @@ ascopy - copying one from to another
 
 ##Nov 26
 
-###Files and File Systems slides 33
+###Files and File Systems slides 33-42
+
+##Dec 1 (when did it become December...? :o)
+
+Review of read
+
+- inode tells you which data block has the information - then you read the data which tells the inumber of the next directory (and find out if it even exists)
+- we read the final file (bar) inode to check permissions before we even start the read (we actually have to check permissions for every directory too)
+- first you read inode to find out where data blocks are
+- then read the data
+- write to inode to update last access time
+- note there are two reads in a row between teh open(bar) function and read() funciton - this isn't really inefficient because the memory is most likley cached
+
+###Files and File Systems slides 39-48
