@@ -1,4 +1,6 @@
- #CS 341
+#CS 341
+
+[Course summary chart on Google Drive](https://docs.google.com/document/d/1DycNQ2iYa0_BgTZpA3YKKwLG28L35k3Fz6TjlbiWxHI/edit) 
 
 ##Sept 14
 
