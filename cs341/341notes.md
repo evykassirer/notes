@@ -85,9 +85,9 @@ THIRD EXAMPLE: 3SUM (insert inappropriate giggles)
 
 - the trivial brute force way is O(n^3), WLOG we can assume i<j<k to make it a little more efficient
 - we can show the lower bound is also OMEGA(n^3) so the algorithm is theta(n^3)
- - we can find the lower bound efficiency by thinking about how many times is the 'if' statement executed? 
- - we remember that i<j<k (all unique groups of 3 indices between 1 and n) 
- - so the answer is n choose 3
+ - we can find the lower bound efficiency by thinking about how many times the 'if' statement is executed
+ - we remember that we're looking at all combos of i, j, k and i<j<k (all unique groups of 3 indices between 1 and n) 
+ - this is n choose 3
 - on the slides we show two improvements we can make to optimize the algorithm 
 - first improvement is to sort first, find i and then j, and then use binary search to find k  - this is O(logn\*n^2)
  - note we can search just from j+1 to n since i<j<k 
@@ -127,10 +127,10 @@ e.g.
 Analysis:
 
 - formal proof of correctness is kinda annoying and left as an exercise
-- complexity: for loop with n-2 iterations, while loop has O(n) iterations with each iteration takin O(1) time
+- complexity: for loop with n-2 iterations, while loop has O(n) iterations with each iteration taking O(1) time
 - showing that the while loop has O(n) iterations:
  - consider the value k-j
- - initially, k=n, j= i+1 >=2, k-j <= n-2
+ - initially, k=n --- j = i+1 >= 2 --- k-j <= n-2
  - in each iteration, j<-j+1 or k<-k-1 or both
  - so, k-j decreases by at least 1 each iteration
  - since the loop terminates when k-j = 0 or -1, there are at most n-1 iterations
@@ -150,6 +150,7 @@ Problems
 - Problem Instance: Input for the specified problem
 - Problem Solution: Output (correct answer) for the specified problem
 - Size of a problem instance: Size(I) is a positive integer which is a measure of the size of the instance I
+ - note for an integer k, Size(k) is log(k) since it takes that many bits to encode
 
 Algorithms and Programs
 
@@ -178,7 +179,7 @@ Running Time vs Complexity:
  - can be analyzed by high-level mathematical analysis
  - is independent of the above-mentioned factors affecting running time.
  - is a less precise measure than running time since it is asymptotic and it incorporates unspecified constant factors and unspecified lower order terms
- - If algorithm A has lower complexity than algorithm B, then a program implementing algorithm A will be faster than a program implementing algorithm B for sufficiently large inputs
+ - If algorithm A has lower complexity than algorithm B, then a program implementing algorithm A will be faster than a program implementing algorithm B for sufficiently large inputs (though not necessarily for small inputs)
 
 
 ORDER NOTATION
