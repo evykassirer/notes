@@ -2912,6 +2912,7 @@ code(factor):
 	push($29)
 	push($31)
 	code(expr1)
+	push($3)
 	...
 	code(exprn)
 	push($3)
