@@ -443,7 +443,11 @@ ascopy - copying one from to another
 
 ###Chat about SSDs - I wrote about it on the blank slide after I/O
 
-###Files and File Systems slides 1-20
+###Files and File Systems slides 1-10
+
+-- skipped some slides
+
+###Files and File Systems slides 19-20
 
 ##Nov 24
 
@@ -465,3 +469,13 @@ Review of read
 - note there are two reads in a row between teh open(bar) function and read() funciton - this isn't really inefficient because the memory is most likley cached
 
 ###Files and File Systems slides 39-48
+
+##Dec 3
+
+Note: we are not doing the last section (interproccess communication) at all - will not be tested
+
+back to skipped slides
+
+###Files and File Systems slides 9-18
+
+###Files and File Systems slides 49-

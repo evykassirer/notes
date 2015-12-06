@@ -1964,7 +1964,7 @@ All pairs shortest path (negative weight edges are okay, negative weight cycles 
 FloydWarshall:
 
 - define D_m[i,j] to denote the weight of the min weight path from i to j in which all interior vertices are in {1...m}
-- previous best path was 1 ... interior ... j with weighgt D_{m-1}[i, j]
+- previous best path was 1 ... interior ... j with weight D_{m-1}[i, j]
 - now considering m as a new interior vertex, the candidate path is i ... m ... j
 - break it into two disjoint (since there are no negative weight cycles) pieces
  - 1 to m (weight D_{m-1}[1,m])
@@ -2268,3 +2268,58 @@ TSP-optimization <=^T_P TSP-decision
  - see code on slides
 - complexity: theta(m) iterations of the for loop
 - size(I) is theta(m+n+sum log of weights) so it's poly time
+
+##Dec 2
+
+###More Satisfiability Transformations
+
+3-CNF-SAT <=_P Clique (every vertex is connected to every other)
+
+- instance of 3CNF - I - is array of n x's, array of m clauses (each with 3 items)
+- instance of clique - f(I) - is a graph with vertices and edges, and k
+- our vertices will be v^i_j where is is the clause number and j is between 1 and 3
+- two vertices make an edge if they are not in the same clause (different i values), and if the vertices are not the complement of each other (like they refer to x1 and NOTx1)
+- we let k = m
+
+TOOD(picture on the board of example)
+
+prove transformation (3 steps: show it's poly time, show yes -> yes, and show no->no)
+
+- it is poly time
+- I yes -> f(I) yes
+ - suppose I is a yes instance of 3-CNF-SAT. There exists a truth assignment to the boolean variables x1..xn such that every clause contains at least one true literal.
+ - pick a true literal from each clause, consider the corresponding vertices in G
+ - claim: this set of vertices is a clique of size m
+ - size is m yup
+ - is it a clique? any two of these vertices are on different levels, so not same i value, and they bot correspond to true literals so the two literals are not negations of each other so yup
+- I no -> f(I) no --- aka F(I) yes --> I yes
+ - supopse we have a clique of size k
+ - the clique must contain one vertex from each level
+ - assign the corresponding literals the value true
+ - since any two of these values are joined by an edge, we are not making any bad assignments (like x1 = T and x1 = F)
+
+subset sum
+
+- we have n objects, each has a size, we want to find if there's a subset so that their sum is equal to a target sum
+- vertex cover instance I is graph of vertices and edges, and value k
+- subset sum instance f(I) is a set of n+m sizes, and a target sum W
+- construct an nxm matrix C where cij is 1 if ej is incident with vi, 0 otherwise
+
+TODO(insert pics)
+
+for our example
+
+- a2 + a3 = 211211, add b0 and b1 and b3 and b4 -> get 22222 = W
+- what will happen in general? 
+ - start with an edge in the vertex cover
+ - choose the corresponding ai's -> compute their sum
+ - then include the right bj's to meet the target (anywhere with a 1, add the corresponding power of 10)
+ - the halfway value is all 1s and 2s because all edges contains 1 or 2 vertices in the cover - edge with one endpoint in cover will make a 1 digit, with two endpoints in the coer will make a 2 digit
+- we're not gonna show the other side of the proof (no->no)
+
+Undecidable Problems
+
+- A decision problem is undecidable if there does not exist an algorithm that solves it
+- If a problem is undecidable, then for every algorithm A, there exists at least one instance I such that A(I) does not find the correct answer (“yes” or “no”) in finite time
+- remember we proved the halting problem is undecidable this in at least one other course - we finished this course with the proof too
+- if halting <=^T problem, then the problem is also undecidable
