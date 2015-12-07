@@ -188,7 +188,7 @@ O-notation (<=)
 
 - f(n) ∈ O(g(n)) if there exist constants c > 0 and n\_0 > 0 such that 0 ≤ f(n) ≤ c\*g(n) for all n ≥ n\_0
 - g(n)is worst case time of f(n)
-- to figure out what n\_0 is, find an intersection point --- n\_0 has to be a natural number
+- to figure out what n\_0 is, find an intersection point --- remember n\_0 has to be a natural number
 - note that this means if something is O(n) it's also O(n^2)
 
 Ω-notation (>=)
@@ -350,7 +350,7 @@ Example of computing Arithmetic-Geometric sequence:
 	  1x2 + 3x2^2 + 5x2^3 + ... + (2n-1)*2^n
 	= 1x2 + 1x2^2 + 1x2^3 + ... + 1x2^n
 	   +    2x2^2 + 2x2^3 + ... + 2x2^n
-	          +     2x2^3 + ... + 2x2^m
+	          +     2x2^3 + ... + 2x2^n
 	          ............
 	              ............. + 2x2^n 
 
@@ -360,7 +360,9 @@ Example of computing Arithmetic-Geometric sequence:
 	+ 2(2^(n+1) - 8)
 	...
 	+ 2(2^(n+1) - 2^n)
-	= (2n-1)*2^(n+1) - (the first 2 b/c that line isn't x2) - another geometric sequence
+	=    [sum of the 2*2^n+1] 
+           - [the 2 in the first line] 
+           - [all the other values subtracted * 2 - note this is another geometric sequence]
 	= (2n-1)*2^(n+1) - 2 - 2(2^(n+1) - 4)
 
 ####There's a slide with misc. formulae
@@ -386,8 +388,9 @@ why is this formula useful?
 Note that n! is theta(n^(n+1/2)\*e^-n)
 
 - this is theta((n/3)^n\*sqrt(n)) which is quite bad
-- derviced from sterling's formula
-- ln(n^(n+1/2)\*e^-n) = (n+1/2)lnn - n  which is nlogn
+- derived from sterling's formula
+- ln(n^(n+1/2)\*e^-n) = (n+1/2)ln(n) - n  which is nlogn
+- all we need to know is ln(n!) is theta(nlogn)
 
 ###Complexities sorted by increasing growth rate
 
@@ -543,7 +546,7 @@ Example: n = 2^j
 
 using this:
 
-- values at each level is c\*2^j for every level except d\*2^j on the last level
+- #nodes \* node value (total value) at each level is c\*2^j for every level except d\*2^j on the last level
 - therefore, T(2^j) = j\*c\*2^j + d\*2^j
 - ^ this is an exact formula and it is a mathematical proof!
 - if n = 2^j, j = log\_2(n)
@@ -619,16 +622,16 @@ Modified genereal version of Master Theorem
 
 Example: T(n) = 3T(n/4) + nlogn
 
-- a = 3, b = 4, sp x = log\_4(3) approx= 0.793
+- a = 3, b = 4, so x = log\_4(3) approx= 0.793
 - we will apply case 3 of the modified general version of the MT because:
-- fn)/n^(x+epsilon) = nlogn / n^(0.793-epsilon) = n^(0.207-eps) \* logn
+- f(n)/n^(x+epsilon) = nlogn / n^(0.793-epsilon) = n^(0.207-eps) \* logn
 - let epsilon = 0.1
 - then f(n) / n^(x-eps) = n^1.07logn which is clearly an increasing function of n
 - so T(n) is theta(nlogn)
 
 Example: T(n) = 2T(n/2) + nlogn
 
-- we can't use MT to oslve this recurrence
+- we can't use MT to solve this recurrence
 - since a=2, b=2, x = log2(2) = 1, cases 1 and 2 don't apply
 - case 3? 
  - f(n)/n^(x-epsiolon) = nlogn/n^(1+eps) = logn/n^eps 
@@ -661,7 +664,7 @@ Example: T(n) = T(floor(n/2)) + T(floor(n/3)) + n
 
 we will prove this by induction on n
 
-	base case: T(1) = 1 <= c\*1 and T(2) = 2 <= c\*2
+	base case: T(1) = 1 <= c*1 and T(2) = 2 <= c*2
 	
 	Induction assumption: T(n) <= cn for all n < m
 
@@ -715,7 +718,7 @@ Sloppy and Exact Recurrence Relations
 
 - It is simpler to replace the theta(n) term by cn, where c is an unspecified constant. The resulting recurrence relation is called the exact recurrence
  - The Master Theorem provides the exact solution of the recurrence when n = 2^j (it is in fact a proof for these values of n).
- - We can express this solution (for powers of 2) as a function of n, using ⇥-notation.
+ - We can express this solution (for powers of 2) as a function of n, using theta-notation.
 - If we then remove the floors and ceilings, we obtain the so-called
 ￼￼sloppy recurrence
 - The exact and sloppy recurrences are identical when n is a power of two. Further, the sloppy recurrence makes sense only when n is a power of two.
@@ -739,7 +742,7 @@ The Max-Min Problem
 
 - Given two points (x1, y1), (x2, y2) in the Euclidean plane, we say that (x1, y1) dominates (x2, y2) if x1 
 - Problem Instance: a set of n points in a plane
-- Problem Question: find all non dominated points in the se (all the points that are not dominated by any other point)
+- Problem Question: find all non dominated points in the set (all the points that are not dominated by any other point)
 - this has a trivial theta(n^2) algorithm to solve it, based on comparing all pairs of points in S. Can we do better? (of course we can)
 - thing of this visually - the non dominated points will form a staircase -- (think of a staircase from top left to bottom right, each point is the edge of a stair) -- all non dominated points are lower or left of the points of the staircase, so they're under the staircase
 
