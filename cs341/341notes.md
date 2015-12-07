@@ -1025,8 +1025,6 @@ Claim 2: T(n) <= T(n/5) + T(7n/10) + theta(n)
 ------
 missed two days of class for a conference - [see another student's notes](http://anthony-zhang.me/University-Notes/CS341/CS341.html#section-8)
 
-- the knapsack proof doesn't convince me (doesn't seem very rigorous), I'll look at it more later to see
-
 ##Oct 21
 
 ###Stable Marriage problem ct'd
@@ -1052,7 +1050,7 @@ complexity
 - there are O(n^2) iterations, O(1) time per iteration --> O(n^2)
 - so total time O(n^2)
 
-fibinacci numbers
+###fibinacci numbers
 
 - f0, f1, f2, f3 ...
 - 0, 1, 1, 2, 3, 5, 8, 13, 21 ...
@@ -1129,14 +1127,14 @@ Compute Optimal Solutions
 
 thinking about the problem:
 
-- consider xn which = 0 or 1
+- consider what it means if xn is 0 or 1
 - case xn = 0
  - let X' be the solution to the subproblem consisting of the first n-1 items
- - then X = [X], 0]
+ - then X = [X, 0]
 - case xn = 1
- - subproblem: first n-1 objects with capacity M' <- M-w\_n
+ - subproblem: first n-1 objects with capacity M' = M - w\_n
  - optimal solution X = [X', 1]
-- the subproblem profit(x) = profit(x') + p\_n
+- the subproblem profit(x) = profit(X') + p\_n
 
 ##Oct 26
 
@@ -1148,10 +1146,10 @@ reviewing from last time:
  - if x_n=0, then X' = [x_2, ...., x_{n-1}] is an optimal solution to the instance consisting of the first n-1 items with capacity M
  - profit(X) = profit(X')
 - case 2:
- - if x_n = 1, then X' is an optimal solution to the instance consisting of the first n-1 items with capacity M-W_n
+ - if x_n = 1, then X' is an optimal solution to the instance consisting of the first n-1 items with capacity M - W\_n
  - profit(X) = profit(X') + p_n
 - we pick whichever case gives us the better answer
-- subproblems: define P[i,m] 1<=1<=n, 1<=m<=M
+- subproblems: define P[i,m] 1 <= i <= n, 1 <= m <=M
  - the first i items, with some capacity between 1 and M
 
 recurrence relation: 
@@ -1166,7 +1164,7 @@ recurrence relation:
 computing:
 
 - compute all the optimal solutions P[i,m]
-- table of values P[i, m] 1<=i<=n, -<=m<=M
+- table of values P[i, m] 1 <= i <=n, 1 <= m <=M
 - fill in the table one row at a time (i=1,2,...,n)
  - note the first row is all the base cases
 - fill in each row from left to right
@@ -1226,7 +1224,7 @@ backtracking solution (recursive)
 
 ###Coin Changing
 
-- Instance: a list of coin demonimations d1...dn and a positive integer T (target sum)
+- Instance: a list of coin denominations d1...dn and a positive integer T (target sum)
 - Find: a tuple of non-negative integers a1...an such that T = sum ai*di and N= sum ai is minimized
 - 0 <= a_n <= floor(T/dn)
 - optimal solution consists of j coins of denomination dn along with an optimal solution using the first n-1 denominations for target T - jdn
@@ -1240,14 +1238,14 @@ subproblems:
 
 recurrence:
 
-- N[i,t] = min{N[i-1], t-jdi]+j : 0 <= j <= floor(t/di)}
+- N[i,t] = min{N[i-1, t-j*di] + j : 0 <= j <= floor(t/di)}
  - j is the #coins of denomination di, 0 <= j <= floor(t/di)
  - this is if i<=2
 - N[i,t] = t if i=1 (because we've decided d1 = 1)
 
 traceback to compute the # coins of each denomination in the optimal solution:
 
-- A[i,t]'s (# coins in denomination di in the optimal soluiton) makes the trace back more efficient 
+- A[i,t]'s (# coins in denomination di in the optimal soluiton) makes the trace back more efficient - we can fill it out as we go
 
 note: this is not polytime for the same reason as knapsack
 
@@ -1278,7 +1276,7 @@ optimal structure:
  - case 1: suppose x_m is the last element in the LCS (so y_n is not the last element) - then LCS(X,Y) = LCS(X,Y')
  - case 2: suppose y_n is the last element in the LCS (so x_m is not the last element) - then LCS(X,Y) = LCS(X',Y)
  - case 3: suppose neither xm nor yn is the last element in the LCS -- then LCS(X,Y) = LCS(X', Y')
-- so LCS(X,Y) = max{LCS(X,Y'), LCS(X', Y), LCS(X, Y')}
+- so LCS(X,Y) = max{LCS(X,Y'), LCS(X', Y), LCS(X', Y')}
 - note that LCS(X', Y') <= LCS(X, Y') and is also <= LCS(X', Y), so the third case is redundant and LCS(X, Y) = max{LCS(X,Y'), LCS(X', Y)}
 
 define subproblems:
@@ -1366,6 +1364,8 @@ recurrence relation
 
 - see slides, this was kinda rushed at the end
 
+TODO(put screenshot)
+
 ## Nov 2
 
 ###Graphs
@@ -1378,7 +1378,7 @@ A graph is a pair G = (V, E)
 - An edge can be represented as a set of two vertices, e.g., {u, v}, where u != v. We may also write this edge as uv or vu
 - often we say n = # vertices and m = # edges, and clearly m <= (n choose 2)
 
-directed graph or dirgraph 
+directed graph or digraph or dag
 
 - directed edges or arcs
 - an arc is an ordered pair (u,v) from u (the tail) to v (the head)
@@ -1432,7 +1432,7 @@ def BFS(G,s):
 	InitializeQueue(Q)
 	Enqueue(Q, s)
 
-	while Q is empty:
+	while Q is not empty:
 		u = Dequeue(Q)
 		for each v in adj[u]:
 			if colour[v] = white
@@ -1446,7 +1446,7 @@ we did an example but it's hard to draw out, since the colour states keep changi
 observation - when we explore an edge {u, v} starting from u
 
 - if v is white, then uv is a tree edge (hangs down) and π[v] = u is the predecessor of v in the BFS tree
-- otherwise, uv is a cross edge (goes across the 'tree' of the graph - think of it hanging)
+- otherwise, uv is a cross edge (goes across the 'tree' of the graph - pictures showing this to come later)
 - The BFS tree consists of all the tree edges.
 - Every vertex v != s has a unique predecessor π[v] in the BFS tree.
 
@@ -1505,11 +1505,11 @@ define layers:
  - there is a path of length dist[v] from s to v
  - show delta(v) >= dist[v] by induction on delta(v)
 
- --- we ran out of time, but the complete proofs are on Learn ---
+--- we ran out of time, but the complete proofs are on Learn ---
 
- ##Nov 4
+##Nov 4
 
- Bipartite graphs
+Bipartite graphs
 
  - a graph if bipartite if we can separate vertices into two groups X and Y, and all edges have one endpoint in X and one endpoint in Y (we can think about giving the vertices different colours)
 
