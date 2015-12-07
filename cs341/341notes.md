@@ -843,7 +843,7 @@ Divide and Conquer
 
 Finding the algorithm
 
-- x = x\_l x\_r (divide digits in half with left and right parts) = 2^(k/2)x\_l + x\_r (to shift the first half)
+- x = x\_l x\_r (divide digits in half with left and right parts) = 2^(k/2)x\_l + x\_r (the 2^(k/2) is to shift the first half)
 - y = y\_l y\_R (divide digits in half) = 2^(k/2)y\_l + y\_r
 - e.g. in base 10:
  - x = 4655 = 10^2\*46 + 55
@@ -858,7 +858,7 @@ Run time
 
 - assume k is a power of 2, we use a recurrence relation
 - T(k) = 4T(k/2) + theta(k)
-- the theta(k) is from the additons of k (maybe shifted up to k more) digit numbers
+- the theta(k) is from the additons of k digit numbers (maybe shifted up to k more) 
 - MT: a=4, b=2, y=1, x = log\_b(a) = log\_2(4) = 2
 - x > y so T(k) is theta(k^x) = theta(k^2)
 - no improvement over gradeschool algorithm!
@@ -896,7 +896,7 @@ Matrix multipliation
 Problem Decomposition
 
 - remember math 136? great, neither do I
-- there's a property that's hard to type out, but see slide 82, where you can divide the matrices into four sections of n/2 by n/2 matrices, and do some multiplication and addition, and then put them back together to get the same thing as if you did the multiplication all together -- so pretty much a divide and conquer thing
+- there's a property that's hard to type out, but see slide 82, where you can divide the matrices into four sections of n/2 by n/2 matrices, and do some multiplication and addition, and then put them back together to get the same thing as if you did the multiplication all together - so pretty much a divide and conquer thing
 - T(n) = 8T(n/2) + theta(n^2)
  - n^2 comes from four additions of n/2 by n/2 matrices
 - MT: a=8, b=2, y=2, x = log\_2(8) = 3
@@ -929,7 +929,7 @@ Simple algorithms
  - build a heap - O(n) if we do heapify all at once
  - do k deletemin operations - O(klogn)
  - total is O(n + klogn)
- - for small k this is linear for k=n/2 it's O(logn) (a good balance between the pros/cons of the last two algorithms and their complexities)
+ - for small k this is linear for k=n/2 it's O(nlogn) (a good balance between the pros/cons of the last two algorithms and their complexities)
 
 Our goal is a linear algorithm for any k
 
@@ -990,23 +990,25 @@ Claim 1: the number of elements of A that are > y is at most 7n/10, and the numb
  - the r+1 is the top half of the rows including y, and the 3 is the left half of the 5 elements, including the column with y
 - the proportion of elements <=y is at least 3(r+1)/(10r+5) which is about 3/10
 - therefore the proportion of elements >y is at most 7/10
+- we can make the same argument for elements <y
 
 Claim 2: T(n) <= T(n/5) + T(7n/10) + theta(n)
 
 - the n/5 is from step 6 
-- the 7n/10 is stop 9 or 10 (the recursion of subset of elements)
+- the 7n/10 is step 9 or 10 (the recursion of subset of elements)
 - finding the medians and the rest takes theta(n)
 - this is a sloppy recurrence
 - we can do a recurrence tree
  - n with children T(n/5) and T(7n/10)
  - the n/5 node has (n/5)(1/5) and (n/5)(7/10) children 
- - similariy, we keep multiplying left by 1/5 and right by 7/10
+ - similarily, we keep multiplying left by 1/5 and right by 7/10
  - so the first level sums to n(1/5 + 7/10) = 9n/10
  - second level sums to (9/10)^2 n
  - so we have a geometric sum of n(1 + 9/10 + (9/10)^2 + ... )
  - r = 9/10 < 1 so we have sum equalling 10n so it's theta(n)
 - note that we're not being precise here - to be mathematically precise, T(n) <= T(floor(n/5)) + T(floor(7n+12/10)) + theta(n)
- - the +12 comes from n = 10r + 5 + theta where 0<=theta<=9 (I asked why it's 12, it's a messy thing about where those extra elements could lie)
+ - (I asked why it's 12, it's a messy thing about where those extra elements could lie)
+ - something like the +12 comes from n = 10r + 5 + theta where 0<=theta<=9 
 
 ##Part 4 of the course: Greedy Algorithms
 
