@@ -740,11 +740,11 @@ The Max-Min Problem
 
 ###Non-dominated points problem
 
-- Given two points (x1, y1), (x2, y2) in the Euclidean plane, we say that (x1, y1) dominates (x2, y2) if x1 
+- Given two points (x1, y1), (x2, y2) in the Euclidean plane, we say that (x1, y1) dominates (x2, y2) if x1 > x2 and y1 > y2
 - Problem Instance: a set of n points in a plane
 - Problem Question: find all non dominated points in the set (all the points that are not dominated by any other point)
 - this has a trivial theta(n^2) algorithm to solve it, based on comparing all pairs of points in S. Can we do better? (of course we can)
-- thing of this visually - the non dominated points will form a staircase -- (think of a staircase from top left to bottom right, each point is the edge of a stair) -- all non dominated points are lower or left of the points of the staircase, so they're under the staircase
+- think of this visually - the non dominated points will form a staircase -- (think of a staircase from top left to bottom right, each point is the edge of a stair) -- all dominated points are lower or left of the points of the staircase, so they're under the staircase
 
 Using divide and conquer:
 
@@ -764,7 +764,7 @@ Complexity:
 - T(n) = 2T(n/2) + O(n) 
  - the while loop to merge is the O(n), also note this is a sloppy relation
  - we recognize this as O(nlogn) from the Master Theorem
-- so overall is O(nlogn) + O(nlogn) = O(nlogn)
+- so overall is O(nlogn) to sort + O(nlogn) for D+C = O(nlogn)
 
 ###Closest Pair problem
 
@@ -773,21 +773,21 @@ Complexity:
 - brute force is quadratic (compare points to all others), let's do better
 - we divide and find the closest pair on the left and closest on the right (deltaL, deltaR)
 - when we combine, we determine if there is a pair of points (one on the left, one on the right) that are closer than either of our closest pairs so far). There are potentially n/2 \* n/2 = n^2/4 such pairs to check, which takes quadratic time which we're trying to avoid
-- let delta be the min of deltaL and deltaR - we only wish to consider points where x coord is within delta of he vertical splitting line - the 'critical strip' of width 2delta
-- if there is a pair of points whose distance is less than delta, then both points will be in this critical strip
-- so we discard al points that are not in the critical stripo. the points that remain are 'candidate points'. how many points are there? there could be all n points!
+- let delta be the min of deltaL and deltaR - we only wish to consider points where x coord is within delta of the vertical splitting line - the 'critical strip' of width 2delta
+- if there is a pair of points, one from each subproblem, whose distance is less than delta, then both points will be in this critical strip
+- so we discard all points that are not in the critical strip. the points that remain are 'candidate points'. how many points are there? there could be all n points!
 - next step is to sort candidate points on the y axis
 
-Lemma: suppose candidate points are sorted with respect to y coordinates. Suppose that R[j] and R[k] have distance less than delta, where j < k. Then k <= j+7
+Lemma: suppose the list of candidate points R are sorted with respect to y coordinates. Suppose that R[j] and R[k] have distance less than delta, where j < k. Then k <= j+7
 
 - rectangle R that is width of strip and height delta, divided into 8 squares of side delta/2
 
 ![rectangle](rectangleR.jpg)
 
 - two points in the same square can be at most the distance of the diagonal apart - that value is delta/2 * root2 < delta - but this is impossible because we're on one side of the middle line of the critical section where the smallest distance was delta
-- so only one point max per rectangle
+- so only one point max per square
 - so R[j+8] is above the rectangle (because there are at most one point per square) so its distance from R[j] is more than delta
-- so now we can say checking the trip is O(n) because each iteration of the inner loop is constant (only 8 times)
+- so now we can say checking the strip is O(n) because each iteration of the inner loop (finding the pair for a point) is constant (only 8 times)
 
 Complexity:
 
@@ -819,7 +819,7 @@ We are interested in the bit complexity
 
 - determining the complexity as a function of k, the number of bits in the binary representation
 - size(X) = k = # bits (not the value of X)
-- X approx= 2^k, k = log\_2(x)
+- in binary k = log\_2(X), and X approx= 2^k
 
 Multiprecision Multiplication
 
@@ -843,7 +843,7 @@ Divide and Conquer
 
 Finding the algorithm
 
-- x = x\_l x\_r (divide digits in half) = 2^(k/2)x\_l + x\_r
+- x = x\_l x\_r (divide digits in half with left and right parts) = 2^(k/2)x\_l + x\_r (to shift the first half)
 - y = y\_l y\_R (divide digits in half) = 2^(k/2)y\_l + y\_r
 - e.g. in base 10:
  - x = 4655 = 10^2\*46 + 55
