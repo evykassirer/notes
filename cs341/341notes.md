@@ -1689,8 +1689,8 @@ TODO(insert pic)
 
 component graph: 
 
-	c1  <- c2   c3 <- c4
-	  ^----------
+	c1  <- c2    c3 <- c4
+	  ^----------|
 
 The componenent graph is a DAG
 
@@ -1701,6 +1701,7 @@ The componenent graph is a DAG
 When we do depth first search:
 
 - For a strongly connected component C, define f[C] = max{f[v] : v in C} and d[C] = min{d[v] : v in C}
+ - f/d are finish/discover times
 - interestingly enough, if Ci, Cj are strongly connected components, and there is an arc from Ci to Cj in the component graph, then f[Ci] > f[Cj]
 
 Proof of above theorem (f[Ci] > f[Cj])
@@ -1726,15 +1727,16 @@ Lemma: Let S be any fixed vertex. Then G is strongly connected iff there are dir
  - there's a directed path from s to v (path3) and v to s (path4)
  - so path2 and path3 maek a path from u to v, and path 4 and 1 make a path from v to u
 
- Algorithm to determine if G is strongly connected:
+Algorithm to determine if G is strongly connected:
 
- 1. pick a vertex S
- 2. run DFSvisit(S)
- 3. if there is a white vertex QUIT (G is not strongly connected)
- 4. otherwise, reverse the direction of every edge of G, forming a new graph H
- 5. run DFSvisit(S) in H
- 6. if there is a white vertex QUIT (G is not strongly connected)
- if all verteices are black (guarenteed if no white vertices) then G is strongly connected
+1. pick a vertex S
+2. run DFSvisit(S)
+3. if there is a white vertex QUIT (G is not strongly connected)
+4. otherwise, reverse the direction of every edge of G, forming a new graph H
+5. run DFSvisit(S) in H
+6. if there is a white vertex QUIT (G is not strongly connected)
+
+if all verteices are black (guarenteed if no white vertices) then G is strongly connected
 
 An Algorithm to Find the Strongly Connected Components
 
