@@ -1736,7 +1736,7 @@ Algorithm to determine if G is strongly connected:
 5. run DFSvisit(S) in H
 6. if there is a white vertex QUIT (G is not strongly connected)
 
-if all verteices are black (guarenteed if no white vertices) then G is strongly connected
+if all vertices are black (guarenteed if no white vertices) then G is strongly connected
 
 An Algorithm to Find the Strongly Connected Components
 
@@ -1765,7 +1765,7 @@ Correctness that we find the strongly connected components
 
 terminology:
 
-- a tree on n vertices is a connected (undirected) graph containi no cycles - it has n-1 edges
+- a tree on n vertices is a connected (undirected) graph containing no cycles - it has n-1 edges
 - spanning trees is a subgraph that is a tree, "spanning" means it contains all the vertices in G
 - there is a unique path between any two vertices in a tree
 - Minimum Spanning Tree: if edges have weights, a minimum spanning tree is a spanning tree that minimizes the total weight of the edges in the spanning tree
