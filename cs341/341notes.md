@@ -1378,7 +1378,7 @@ A graph is a pair G = (V, E)
 - An edge can be represented as a set of two vertices, e.g., {u, v}, where u != v. We may also write this edge as uv or vu
 - often we say n = # vertices and m = # edges, and clearly m <= (n choose 2)
 
-directed graph or digraph or dag
+directed graph or digraph
 
 - directed edges or arcs
 - an arc is an ordered pair (u,v) from u (the tail) to v (the head)
@@ -1505,13 +1505,13 @@ define layers:
  - there is a path of length dist[v] from s to v
  - show delta(v) >= dist[v] by induction on delta(v)
 
---- we ran out of time, but the complete proofs are on Learn ---
+--- we ran out of time, but the complete proofs are in this repo (BFS-shortest-distances.pdf) ---
 
 ##Nov 4
 
 Bipartite graphs
 
- - a graph if bipartite if we can separate vertices into two groups X and Y, and all edges have one endpoint in X and one endpoint in Y (we can think about giving the vertices different colours)
+ - a graph is bipartite if we can separate vertices into two groups X and Y, and all edges have one endpoint in X and one endpoint in Y (we can think about giving the vertices different colours)
 
 ###Theorem: a graph is bipartite iff it doesn't contain an odd cycle (an odd # of vertices connected in a polygon)
  
@@ -1521,11 +1521,12 @@ proof =>
 
  	let's say it is bipartite
  	let v1 v2 ... v2k+1 v1 be the vertices in an odd length cycle
- 	WLOG let's say v1 is red, then v2 is blue, v3 is red ... v2k+1 is R ... but v1 is also a red and connected to v2k+1 so contradiction
+ 	WLOG let's say v1 is red, then v2 is blue, v3 is red ... v2k+1 is red 
+ 	... but v1 is also a red and connected to v2k+1 so contradiction
 
 proof <= 
 
-	prove the contrapositive: assume G is bipartite, show it contains an odd length cycle
+	prove the contrapositive: assume G is not bipartite, show it contains an odd length cycle
  	
  	WLOG assume G is connected. Let s be any vertex
  	
@@ -1534,13 +1535,16 @@ proof <=
 
  	G is not bipartite, so there is an edge uv with u,v in X or u,v in Y
 
- 	so dist[u] and dist[v] are both even or both odd, so by Lemma 2 dist[u] = dist[v] , let's call this distance d
+ 	so dist[u] and dist[v] are both even or both odd, 
+ 	so by Lemma 2 (from the last proof) dist[u] = dist[v]
+ 	let's call this distance d
 
  	two paths of length d:
- 	u, u1 (π[u]), u2 (π[u1]), ..., s=ud (π[u_d-1])
- 	v, v1 ..... similarily ... s=vd
+ 	u, u1 (π[u]), u2 (π[u1]), ..., s=u\_d (π[u\_d-1])
+ 	v, v1 ..... similarily ... s=v\_d
 
- 	so we have u and v different, and at some point befoe or at s we hit a common vertex and that makes a cycle of odd length
+ 	so we have u and v different, 
+ 	and at some point before or at s we hit a common vertex and that makes a cycle of odd length
 
  	more specifically - let j = min{i: ui = vi}
  	u u1 ... uj = vj vj-1 .... v1 v u is a cycle of length 2j+1 (odd)
@@ -1555,7 +1559,7 @@ proof <=
 - We eventually visit all the vertices, and the algorithm constructs a depth-first forest
 - we have an adjacency list, same as before (this time for directed graph)
 
--- code is on the slides --
+TODO(screenshot of code on the slides)
 
 we did an example, but again it's hard to show because colours keep getting changed - but go through it on your own and make sure you know how to do this algorithm
 
@@ -1610,10 +1614,10 @@ cross edge
 
 - directed acyclic graph (DAG) contains no directed cycle
 - a directed cycle is when we have x1->x2->...->xn->x1
- - x1->x2<-x3->x1 is not directed because the direction of x3->x2 is the opposite eway
-- a direted graph has topological ordering, or topological sort, if there is a linear ordering < of all the vertices such that u <v whenever uv is an edge
+ - x1->x2<-x3->x1 is not directed because the direction of x3->x2 is the opposite way
+- a directed graph has topological ordering, or topological sort, if there is a linear ordering of all the vertices such that u < v whenever uv is an edge
 
-** exmaple on the board, I took a picture, TODO(add to notes)**
+** example on the board, I took a picture, TODO(add to notes)**
 
 Lemma: Every DAG has a vertex of indegree (edges coming in) 0
 
@@ -1622,9 +1626,9 @@ Lemma: Every DAG has a vertex of indegree (edges coming in) 0
 - eventually vi = vj for some j > i
 - consider the first repetition of this type - then vj -> vj-1 -> vj-2 -> ... ... -> vi = vj is a directed cycle
 
-Theorem: D has a topological ordering iff D is a dAG
+Theorem: D has a topological ordering iff D is a DAG
 
-- Proof: => by contradiction
+- Proof: => by contrapositive
  - suppose D has a directed cycle v1v2...vkv1
  - start at v1 without loss of generality, continue to vk, vk then goes to v1 which does not respect the ordering
 - Proof: <= Assume D is DAG (find a top ordering)
@@ -1634,14 +1638,14 @@ Theorem: D has a topological ordering iff D is a dAG
  - let v2 be a vertex of indegree 0 in this smaller graph - this won't create a directed cycle so it's still a DAG so lemma still holds
  - repeat this process -> gives a topological ordering
 
-We will find a more efficinet algorithm to construct top orderings based on DFS
+We will find a more efficient algorithm to construct top orderings based on DFS
 
 Lemma: D is a DAG iff a DFS of D has no back edges
 
-- Proof: => by contradiction
+- Proof: => by contrapositive
  - assume D has a back edge 
- - the back edge by definition makes a directed cyclde
-- Proof: <= by contradiction
+ - the back edge by definition makes a directed cycle
+- Proof: <= by contrapositive
  - let C = v1v2...vlv1 be a directed cycle
  - WLOG, assume v1 is the first discovered vertex in C
  - v1 is discovered before vi for i = 2...l
@@ -1654,23 +1658,26 @@ Lemma: D is a DAG iff a DFS of D has no back edges
 
 using DFS
 
- - we did an example on the board
- - do DFS -> if there is any back edge, quit and say it's not a DAG
- - if no back edge, reverse order of finishing times yields the top ordering
- - how do we recognize when we encouner a back edge vw? answ: w is gray
- - we could run DFS then sort the array f in reverse order theta(nlogn)
- - more efficient: when we finish an item, put it on stack, then pop stack n times to reverse order at the end - this is theta(n)
- - DFS algorithm is theta(n+m) - recall m is #edges and m <= n^2
+- we did an example on the board
+- do DFS -> if there is any back edge, quit and say it's not a DAG
+- if no back edge, reverse order of finishing times yields the top ordering
+- how do we recognize when we encounter a back edge vw? 
+ -answ: w is gray
+- we could run DFS then sort the array f in reverse order theta(nlogn)
+- more efficient: when we finish an item, put it on stack, then pop stack n times to reverse order at the end - this is theta(n)
+- DFS algorithm is theta(n+m) - recall m is #edges and m <= n^2
+ - n for stack
+ - m for DFS
 
- *** see code on slides ***
+ *** TODO (code on slides) ***
 
- ##Nov 11
+##Nov 11
 
- graph terminology
+graph terminology
 
- - connected graph: any two vertices are joined by a path
- - disconnected graph: connected components which are maximal connected subgraph
- - a digraph is strongly connected iff for any vertices u, v there is a directed path from u to v and a directed path from v to u
+- connected graph: any two vertices are joined by a path
+- disconnected graph: connected components which are maximal connected subgraph
+- a digraph is strongly connected iff for any vertices u, v there is a directed path from u to v and a directed path from v to u
 - strongly connected components: maximal strongly connected subgraphs
 
 example on the board
