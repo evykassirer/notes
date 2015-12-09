@@ -727,7 +727,7 @@ Sloppy and Exact Recurrence Relations
 
 The Max-Min Problem
 
-- Let’s design a divide-and-conquer algorithm for the Max-Min problem. 
+- Let's design a divide-and-conquer algorithm for the Max-Min problem. 
 - Divide: Suppose we split A into two equal-sized subarrays, AL and AR.
 - Conquer: We find the maximum and minimum elements in each subarray recursively, obtaining maxL, minL, maxR and minR.
 - Combine: Then we can easily “combine” the solutions to the two subproblems to solve the original problem instance: max = max{maxL,maxR} and min = min{minL, minR}
@@ -1362,9 +1362,11 @@ subproblems:
 
 recurrence relation
 
-- see slides, this was kinda rushed at the end
-
-TODO(put screenshot)
+- this was kinda rushed at the end, this was copied after class from slides 
+- For 1 <= i < j <= n, let S[i, j] denote the optimal solution to the subproblem consisting of the polygon having vertices qi, ... , qj .
+- Let D(qi, qk, qj) denote the perimeter of the triangle having vertices qi,qk,qj.
+- recurrence relation: S[i,j] = min{D(qi, qk, qj) + S[i,k] + S[k,j] : i < k < j}
+- base cases: for all i, S[i, i + 1] = 0
 
 ## Nov 2
 
@@ -1559,7 +1561,8 @@ proof <=
 - We eventually visit all the vertices, and the algorithm constructs a depth-first forest
 - we have an adjacency list, same as before (this time for directed graph)
 
-TODO(screenshot of code on the slides)
+![code](DFScode1.png)
+![code](DFScode2.png)
 
 we did an example, but again it's hard to show because colours keep getting changed - but go through it on your own and make sure you know how to do this algorithm
 
@@ -1617,7 +1620,7 @@ cross edge
  - x1->x2<-x3->x1 is not directed because the direction of x3->x2 is the opposite way
 - a directed graph has topological ordering, or topological sort, if there is a linear ordering of all the vertices such that u < v whenever uv is an edge
 
-** example on the board, I took a picture, TODO(add to notes)**
+![example](topordering.jpg)
 
 Lemma: Every DAG has a vertex of indegree (edges coming in) 0
 
@@ -1669,7 +1672,8 @@ using DFS
  - n for stack
  - m for DFS
 
- *** TODO (code on slides) ***
+![code](DFScomponentcode1.png)
+![code](DFScomponentcode2.png)
 
 ##Nov 11
 
@@ -1682,7 +1686,7 @@ graph terminology
 
 example on the board
 
-TODO(insert pic)
+![example](SCCexample.jpg)
 
 - c3 is the 9 vertex
 - c4 is the 10 vertex
@@ -1745,17 +1749,17 @@ An Algorithm to Find the Strongly Connected Components
 3. Perform a depth-first search of H, considering the vertices in decreasing order of the values f[v] computed in step 1.
 4. The strongly connected components of G are the trees in the depth-first forest constructed in step 3
 
-TODO(example of DFS on board, I actually took a pic this time)
+![example](DFSforSCC.jpg)
 
 order of reverse finishing times: 1, 2, 4, 3, 5, 7, 6
 
-TOOD(pic of H)
+![example](DFSforSCC2.jpg)
 
 Correctness that we find the strongly connected components
 
 - G and H have the same strongly connected components (SCC)
-- let us be the first vertex visited in step 3 (u has thehighest finishing time in DFS of G)
-- let C be the SCC containing u, lte C' be any other SCC
+- let u be the first vertex visited in step 3 (u has the highest finishing time in DFS of G)
+- let C be the SCC containing u, let C' be any other SCC
 - in G, f[c] > f[c'],so there is an edge from C' to C in the component graph of G (contrapositive from last bullet on slide 146, proved earlier this class)
 - therefore there is no edge from C to C' in H
 - this continues to apply to other components
@@ -1766,11 +1770,13 @@ Correctness that we find the strongly connected components
 terminology:
 
 - a tree on n vertices is a connected (undirected) graph containing no cycles - it has n-1 edges
-- spanning trees is a subgraph that is a tree, "spanning" means it contains all the vertices in G
+- spanning tree is a subgraph that is a tree, "spanning" means it contains all the vertices in G
 - there is a unique path between any two vertices in a tree
 - Minimum Spanning Tree: if edges have weights, a minimum spanning tree is a spanning tree that minimizes the total weight of the edges in the spanning tree
 
-Kruskal’s Algorithm to find min spanning tree
+###Finding min spanning tree
+
+Kruskal's Algorithm to find min spanning tree
 
 - algorithm
  - sort edges by increasing weight
@@ -1792,7 +1798,9 @@ at any point in time, each tree has a unique 'leader' vertex
  - he drew a picture of directed branches all leading up to the same vertex, so at the bottom there's w, and L[w] is a vertex it directs towards, and L[L[w]] is one higher, and L[L[L[w]]] is at the top (we call it u)
  - and v is the bottom of another branch, and L[v] is it's 'parent' and L[L[v]] is also u, and doesn't direct to anything
  - for any v - v, L[v], L[L[v]], ... eventually ends at leader vertex
- - find(v) connects the sequence v, L[v], L[L[v]].... until the leader vertex, say u, is reached. Not that L[u] = u
+ - find(v) connects the sequence v, L[v], L[L[v]].... until the leader vertex, say u, is reached. Note that L[u] = u
+
+honestly this whole 'leader vertex' thing is kinda confusing, it's pretty much just the root of a tree with directed edges up to it
 
 How do we do the cycle test efficiently?
 
@@ -1805,7 +1813,7 @@ Making L:
  - we had find(u) = u' and find(v) = v'
  - we can make L[u'] = v' or L[v'] = u'
 
-TODO(insert pic of graph)
+![example](makingL.jpg)
 
 looking at edges in order of weight:
 
@@ -1819,39 +1827,43 @@ looking at edges in order of weight:
 		       etc.
 
 notes:
-- note that we can't just do table lookup because we only update one find value on each join
-- the idea isi that we keep track of the depths of the trees and direce the leader of the tree with lower depth to the leader of the tree of higher depth (when they're the same the choice is arbitrary)
+
+- note that we can't just do table lookup for find[x] because we only update one find value on each join
+- the idea is that we keep track of the depths of the trees and direct the leader of the tree with lower depth to the leader of the tree of higher depth (when they're the same the choice is arbitrary)
 - this is so our resulting tree has the least possible depth - and the depth will be the complexity of find()
 - find is a logn operation
 - presort is theta(mlogm) where m is number of edges
 - O(m) iterations - O(logn) per iteration
+
 so total runtime is O(mlogn)
 
-Prim’s Algorithm (idea)
+Prim's Algorithm (idea)
 
-- We initially choose an arbitrary vertex u_0 and define A = {e}, where e is the minimum weight edge incident with u_0
-- A is always a single tree, and at each step we select the minimum weight edge that joins a vertex in V_A to a vertex not in VA
- - Remark: V_A denotes the set of vertices in the tree A
-- for any vertex v not in V_A
- - N[v] = u, where {u,v} is a min weight edge such that u is in V_A
+- We initially choose an arbitrary vertex u\_0 and define A = {e}, where e is the minimum weight edge incident with u\_0
+- A is always a single tree, and at each step we select the minimum weight edge that joins a vertex in V\_A to a vertex not in V\_A
+ - Remark: V\_A denotes the set of vertices in the tree A
+- for any vertex v not in V\_A
+ - N[v] = u, where {u,v} is a min weight edge such that u is in V\_A
  - W[v] = weight of the edge N[v] v
  - assume the weight of uv is infinity is uv is not an edge (so we never pick that)
 
-see code on the slides
+![example](prim.png)
 
-Andy's notes from when I left for an interview
+rest of this class's notes are Andy's notes from when I left for an interview (I got the job so worth :D)
 
 - we want to find minimum weighted edge from V_A to V\V_A
-- example: consider the graph is Kurstal's algorithm
+- example: consider the graph from the example for Kurstal's algorithm
  - let u_0 = a, V_A = {a}
  - choose edge ab, V_A = {a,b}
  - choose edge bc, V_A = {a,b,c}
  - choose edge ci, V_A = {a, b, c, i}
-- initialization:
- - N[V] = u_0
+- initialization for all v not in V_A 
+ - N[v] = u_0
  - w[v] = w(u_0,v)
 - update:
- - we have a previous best edge from any vertex v' to V_A, compare that to the weight of the v' to the vertex we just added (v) - pick the lesser of w[v] and w[v']
+ - there was a previous best edge from to a vertex v' in V_A
+ - we just added vertex v to V_A
+ - compare that to the weight of v' to v - pick the lesser of w[v] and w[v']
 - complexity
  - initialization: theta(n)
  - while loop - O(n) iterations, finding v is linear search, for loop is O(n)
@@ -1866,11 +1878,11 @@ we can prove the correctness of Krustal's and Prim's algorithm by proving the ge
 
 definitions:
 
-- cut: a paritition of the vertices so that we have (S, V\S) and neither set is empty
+- cut: a partition of the vertices so that we have (S, V\S) and neither set is empty
 - Let (S, V \S) be a cut in a graph. An edge e is a **crossing edge** with respect to the cut (S, V \S) if e has one endpoint in S and one endpoint in V \S - also known as a bridge
-- A cut (S, V \S) **respects** the set of a set of edges A provided that no edge in A is a crossing edge
+- A cut (S, V \S) **respects** the set of edges A provided that no edge in A is a crossing edge
 
-A General Greedy Algorithm to Find an MST
+A General Greedy Algorithm to Find an MST (min spanning tree)
 
 	A is empty set
 	while A's size is < n-1:
@@ -1888,7 +1900,7 @@ Krushal and Prim are both special cases of the general algorithm
 
 Correctness Proof:
 
-- let A = {e_1, e_2, ..., e_n-1} wher the edges are chosen in that order
+- let A = {e_1, e_2, ..., e_n-1} where the edges are chosen in that order
 - assume all edge weights are distinct
 - we will prove by induction that {e1, ..., ej} is a subset of edges of a MST for j=0, 1, ..., n-1 
 - where j=n-1 this says that A is a MST
@@ -1919,7 +1931,7 @@ induction:
 3. 'all pairs' - find shortest path from u to v for all pairs of u to v (extension of 2)
 
 
-Dijkstra’s Algorithm (Main Ideas)
+Dijkstra's Algorithm (Main Ideas)
 
 - single source
 - requires that all edge weights are non negative
@@ -1927,11 +1939,11 @@ Dijkstra’s Algorithm (Main Ideas)
 - For all vertices v in S, D[v] is the weight of the shortest path Pv from u0 to v, and all vertices on Pv are in the set S
 - For all vertices v not in S, D[v] is the weight of the shortest path Pv from u0 to v in which all interior (not endpoint) vertices are in S
 - For v != u0, π[v] is the predecessor of v on the path Pv.
-- At each stage of the algorithm, we choose v in V \S so that D[v] is
-minimized, and then we add v to S
+- At each stage of the algorithm, we choose v in V \S so that D[v] is minimized, and then we add v to S
 - Then the arrays D and π are updated appropriately
 
-pseudo code on slides
+![code](Dijkstra1.png)
+![code](Dijkstra2.png)
 
 initialization: 
  - S = {u_0}
@@ -1949,9 +1961,9 @@ say we have the set S, and path P from u_0 to v has weight D[v]
  - = wt(P) + wt(P2)
  - >= wt(P) but since all edge weights are >=0 --> contradiction
 
-Updating step
+Updating step for each v'
 
-- preview best previoius path wt =  D[v']
+- preview best previous path wt =  D[v']
 - compare with v where we have weight w(v,v') + D[v]
 
 comparing updating step to Prim's algorithm
@@ -1967,7 +1979,7 @@ complexity
 Bellman-ford algorithm solves single-source shortest path problem allowing negative weight edges
  - but there cannot be negative weight directed cycles 
  - a negative weight cycle is where the total weight of a cycle is negative --> so we could loop around this infinitely and get an infinitely low path - trying to force us not to cycle like this becomes pretty difficult
- - compelxity O(mn)
+ - complexity O(mn)
 
 shortest paths in DAGs single source shortest path problem can be solved in time O(m+n) based on topological sort
 
@@ -1999,7 +2011,7 @@ Decision problems
 
 Let's look at some algorithms:
 
-- cycle problem: does G contain a cycle? (decisionp problem)
+- cycle problem: does G contain a cycle? (decision problem)
  - use DFS, only tree edges -> no, if any back/forward/cross edges -> yes
  - complexity is n+m, size(I) is theta(n+m)
  - polytime
@@ -2014,11 +2026,10 @@ Let's look at some algorithms:
 
 Intuition:
 
-- proving a theorem might be very difficult. On the hother hand, verifying whether a purported proof is valid can often be easier than finding the proof in the first place
+- proving a theorem might be very difficult. On the other hand, verifying whether a purported proof is valid can often be easier than finding the proof in the first place
 - We're going to look at finding a proof vs verifying a proof
 
-
-Polynomial-time Turing Reductions (skipped for now)
+_Polynomial-time Turing Reductions (skipped for now)_
 
 Certificates:
 
@@ -2045,7 +2056,7 @@ e.g. for Hamiltonian Cycle
 
 The Complexity Class NP
 
-- the set of all decision problems that have polynomial-time certificate verification algorithms solving them )like ham cycle)
+- the set of all decision problems that have polynomial-time certificate verification algorithms solving them (like ham cycle)
 - We write Π is in NP if the decision problem Π is in the complexity class NP
 - Finding Certificates vs Verifying Certificates: It is not required to be able to find a certificate C for a yes-instance in polynomial time in order to say that a decision problem Π is NP
 
@@ -2087,17 +2098,17 @@ e.g. clique -> vertex cover
  - change to instance H, l where H is complement of G (all edges not in G) and l = n-k (l is the cover size we're looking for)
 - definition of complement: H is called the complement of G, because every edge of G is a non-edge of H and every non-edge of G is an edge of H.
 
- ##Nov 25
+##Nov 25
 
- clique to cover ct'd
+clique to cover ct'd
 
- 1. so f needs to be computable in poly time
- 2. if I is a yes instance of clique, f(I) should be a yes instance of vertex cover
- 3. if I is a no instance of Clique, then f(I) should be a no instance of vertex cover
+1. so f needs to be computable in poly time
+2. if I is a yes instance of clique, f(I) should be a yes instance of vertex cover
+3. if I is a no instance of Clique, then f(I) should be a no instance of vertex cover
 
 example of how f works:
 
-TODO(picture)
+![example](cliquetocover.jpg)
 
 - here the clique is {2,3,6} and the vertex cover is {1,4,5}
 - cover is all vertices not in the clique
@@ -2123,11 +2134,11 @@ Properties of Polynomial-time Reductions
 
 Proof:
 
-- we hae f, a poly trans from Π1 to Π2 and A, a polytime algorithm to solve Π2
+- we have f, a poly trans from Π1 to Π2 and A, a polytime algorithm to solve Π2
 - how to solve Π1 in poly time? 
  - step 1: compute f(I)
  - step 2: run A(f(I))
-- clearly this yeilds the corret answer (yes/no) for I
+- clearly this yields the corret answer (yes/no) for I
 - does this run in poly time?
  - let size(I) = n
  - step 1 takes O(n^k) where k is a positive integer -- this constructs f(I)
@@ -2172,12 +2183,12 @@ Note
 Proving Problems NP-complete
 
 - suppose Π1 is NPC and Π1 <=_P Π2 and Π2 is in NP
-- then Π2 is NP
+- then Π2 is NPC
 
 Proof
 
 - we assume Π1 is NPC, Π2 is NP, Π1 <=_P Π2
-- to show Π2 is NPC weneed to show:
+- to show Π2 is NPC we need to show:
  - Π2 is in NP (true by assumption)
  - for any Π' in NP, Π' <=_P Π2
 - Π' <=_P Π1 since Π1 is NPC and Π' is NP (defn)
@@ -2197,7 +2208,7 @@ Theorem
 
 ##Nov 30
 
-(insert slide of 4 cases of instance translation)
+![example](CNFto3CNFcases.png)
 
 examples of CNF instance -> 3CNF instance
 
@@ -2231,8 +2242,8 @@ returning to turing reductions, which we skipped earlier
 
 Polynomial-time Turing Reductions
 
-- Suppose Π1 and Π2 are problems (not necessarily decision problems). A (hypothetical) algorithm A2 to solve Π2 is called an *oracle* for Π2
-- Suppose that A is an algorithm that solves Π1, assuming the existence of an oracle A2 for Π2. (A2 is used as a subroutine within the algorithm A)
+- Suppose Π1 and Π2 are problems (not necessarily decision problems). A (hypothetical) algorithm A2 to solve Π2 is called an *oracle* for Π2 
+- Suppose that A is an algorithm that solves Π1, assuming the existence of an oracle A2 for Π2. (A2 is used as a subroutine within the algorithm A - helper function)
 - Then we say that A is a Turing reduction from Π1 to Π2, denoted Π1 <=^T Π2
 - A Turing reduction A is a polynomial-time Turing reduction if the running time of A is polynomial, under the assumption that the oracle A2 has unit cost running time
 
@@ -2308,21 +2319,21 @@ prove transformation (3 steps: show it's poly time, show yes -> yes, and show no
  - pick a true literal from each clause, consider the corresponding vertices in G
  - claim: this set of vertices is a clique of size m
  - size is m yup
- - is it a clique? any two of these vertices are on different levels, so not same i value, and they bot correspond to true literals so the two literals are not negations of each other so yup
+ - is it a clique? any two of these vertices are on different levels, so not same i value, and they both correspond to true literals so the two literals are not negations of each other so yup
 - I no -> f(I) no --- aka F(I) yes --> I yes
  - supopse we have a clique of size k
  - the clique must contain one vertex from each level
  - assign the corresponding literals the value true
  - since any two of these values are joined by an edge, we are not making any bad assignments (like x1 = T and x1 = F)
 
-subset sum
+vertex cover <=_P subset sum 
 
-- we have n objects, each has a size, we want to find if there's a subset so that their sum is equal to a target sum
+- subset sum: we have n objects, each has a size, we want to find if there's a subset so that their sum is equal to a target sum
 - vertex cover instance I is graph of vertices and edges, and value k
 - subset sum instance f(I) is a set of n+m sizes, and a target sum W
 - construct an nxm matrix C where cij is 1 if ej is incident with vi, 0 otherwise
 
-TODO(insert pics)
+![example](covertosubset.jpg)
 
 for our example
 
@@ -2332,7 +2343,7 @@ for our example
  - choose the corresponding ai's -> compute their sum
  - then include the right bj's to meet the target (anywhere with a 1, add the corresponding power of 10)
  - the halfway value is all 1s and 2s because all edges contains 1 or 2 vertices in the cover - edge with one endpoint in cover will make a 1 digit, with two endpoints in the coer will make a 2 digit
-- we're not gonna show the other side of the proof (no->no)
+- we're not gonna show the other side of the proof (no->no) because we're running out of time (maybe try it to study?)
 
 Undecidable Problems
 
