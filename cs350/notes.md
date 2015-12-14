@@ -478,4 +478,184 @@ back to skipped slides
 
 ###Files and File Systems slides 9-18
 
-###Files and File Systems slides 49-
+###Files and File Systems slides 49-50
+
+#Dec 11 review session
+
+[sample question slides](https://d1b10bmlvqabco.cloudfront.net/attach/idj4uqwlfyu2uf/gwxqjaai36m598/ihz5x1z8xm43/CS350F15FinalReview.pdf)
+
+###Virtual Memory
+
+dynamic relocation - map chunk of virtual to chunk of physical - offset from base address
+
+paging - break up chunk of memory into fixed size pieces and have a physical address for each page of physical memory
+
+multi level paging
+
+note we might have a 64 bit number and then probably a whole lot more bits than usual for the frame number - but it's still the same process
+
+
+Q1
+
+- note only some of the page tables are helpful at all
+- dirty bit isn't needed for this question
+- we're using 32 bits
+- page size 64 KB = 2^16 B -- so the bottom 16 bits are for the page offset (4 hex digits)
+- note if the number of bits for offset is not divisible by 4, you're probably wrong
+- we're told top 4 bits are for segment (first hex digit)
+- remaining middle 12 bits are for the offset (middle 3)
+
+a) 16 (see above)
+b) first four bytes are used for identifying segment, last 28 bits for indexing into a segment, so a segment can be 2^28
+c) cannot be translated because 3 is the max page number and we had page number 4
+d) segment 3, page number 2, it is valid (don't forget this check), so do 753 2267 --> 0x07532267
+e) note that 706... and 704... are irrelevant page tables (not in our segment mapping) - 705 is valid so we have segment 2, page 3, same offset --> 0x20033721
+
+Q2 Block replacement
+
+- we went over slide 61
+- we keep track if it has been used, and also have a 'victim' pointer (next victim to kick out)
+- when we add 'a' to frame 1, we say a has been used and frame 2 is the next victim
+- when we add 'b' to frame 2 (victim frame), we mark b as used as well, and set frame 3 to victim
+- same for c
+- when we add d, turn a's use bit off, go to b and turn its use bit off, go to c and turn its use bit off - back to a and its use bit is off so we replace it and move victim down to frame 2
+- when we add a, we go to victim frame (2) and see its use bit is off so we replace it with a (and give a use bit on)
+- same process for b and e
+- when we get to the next a (third one), we currently have e (on), a (off, victim), b (off) --- we get a from frame2 and turn its use bit back on (no fault) -- don't move victim because we didn't replace anything
+- suppose the next column (9) is c (we changed it) -- a is the victim still but its use bit is on, so we turn it off and go to the next, which is b with use bit off, and then we replace that
+
+
+###Scheduling
+
+Q1
+
+a
+
+- 1: T1 runs for 1 unit, then blocks for 4 units (queue: T2, T3)
+- 2-4: T2 runs, T1 is blocking (queue at end: T3, T2)
+- 5-6: T3 runs, T1 unblocks at time 5 and goes to end of queue (at the end the queue is T2, T1, T3)
+- 7-10: T2 runs again and then is done (queue at end: T1, T3)
+- 11: T1 runs again then blocks (queue at end: T3)
+- 12-14: T3 runs the second time and then is done 
+- 15: T1 becomes unblocked and runs then blocks
+- 16-19 blocking
+- 20: T1 runs again for the last time
+
+b
+
+- might come back later if we have time
+
+
+Q2
+
+- CFS completely fair scheduling
+- whoever's been running the least, schedule next, but we measure how long running with a weight
+- T1 - c (real time) = 3, p = 1
+- T2 - c=7, p=2
+- T3 - c=6, p=3
+- sum of p = 6
+- T1 virtual time unit is 3*6/1 = 18
+- T2 is 21
+- T3 is 12
+- we pick T3 to run because 12 is the lowest 
+
+###I/O
+
+- we will probably just talk about one cylinder, too complicated to bring in multiple
+- how many sectors per cylinder --> means how many sectors per track
+
+Q1
+
+a
+
+- we want to think about this in terms of t_seek + t_rot + t_serv
+- it takes 1/omega seconds for a full rotation
+- to read a sector it takes 1/S of a full rotation
+- so t_serv = 1/(S*omega)
+- t_seek is 0 because s1 and s2 are on the same track
+- so what's t_rot? because d>0, we'll a full rotation from where s1 ended to get back there - but we already did d of it -- so t_rot = 1/omega - d
+- so the answer is 1/omega - d + 1/(S*omega)
+
+b
+
+- need to move K/S fraction of 1/omega full rotation time
+- d = K/(S*omega) -- we know we've gone d distance already, so where would we be?
+- K = d*s*omega minimizes service time
+
+2
+
+a)
+
+- we can't know the exact amount of time, we're looking for expected amount of time
+- t_serv = 1/(S*omega)
+- we were given that t_seek = 5 + 0.05*d and here d is 10 (went from 10 in to the edge where S is) so t_seek = 5.5
+- t_rot -- we can't know exact because we don't know where it is --> average is half a rotation = 1/2 * 1/omega
+- total time is 1/(S*omega) + 5.5 + 1/(2*omega)
+
+b)
+
+- t_serv is 1/(S*omega) as before
+- t_seek is 5 + 0.05*1 = 5.05
+- t_rot is 1/omega - time_already_spent since we read S
+- the time so far was d+5.05 - which might be more than a rull rotation time
+- so t_rot = 1/omega + (d+5.05)%(1/omega)
+
+
+###File Systems
+
+a) 200 000 / 1000 = 200 data blocks (this doesn't include other blocks that keep meta data)
+
+b) 
+
+- we need 200 blocks 
+- we have 10 direct, 1 single direct, and 1 double indirect pointer
+- the first 10 go in the direct
+- a block is 1000 and a pointer is 10, so a block can reference 100 pointers
+- so our single indirect pointer can cover another 100
+- the double indirect block can point to one block that points to the last 90
+- the 10 indiret pointers are in the inode, so we need one more for indirect and two for the double indrect 
+- answer is 3+200 = 203
+
+c) 
+
+- we work with blocks, not bytes
+- 9500 --> which block? 
+ - the direct pointers do blocks 0-9
+ - the single direct pointers cover blocks 10-109
+ - the rest (from double indirect) covers blocks 110-end
+ - remember each block is 1000 bytes
+ - so 9500 is block 9, offset 500
+ - 10300 is block 10, offset 300
+ - we don't count inode where pointer to 9 is, but we need the block that points to 10 
+ - so total 3 blocks (block 9, block 10, pointer to 10)
+
+d)
+
+- block 10, and block 11
+- and the pointer to blocks 10 and 11 (in the single indrect)
+- 3 total
+
+2
+
+- 12 direct, 1 single indirect, 1 double indirect
+- block size 4KB
+- size of block pointer 32 bits
+
+a
+
+- 4 KB is 2^12 bytes -- 32 bits/pointer is 4 (or 2^2) bytes
+- so we can have 12^10 pointers in a block
+
+b
+
+- block size is 2^10 bytes
+- total #blocks: 12 (direct) + 12^10 (indirect) + 12^10 * 12^10 (double indirect)
+- (aside: total file size in bytes is number of blocks times block size)
+
+c
+
+- if x < 12 it'd be the direct pointers
+- if 12 <= x < 2^10 + 12 it'd be single indirect
+- if x >= 2^10 + 12 it'd be double indirect
+- offset 2^23 / 2^12 (block size) = 2^11 (index of block)
+- we're in double indirect land - so the answer is 3 (including the two levels of indirection)
