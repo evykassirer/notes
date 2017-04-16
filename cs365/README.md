@@ -240,9 +240,8 @@ dfa so I cut them out lol)
 ![dfa-ii](/cs365/jan_5_dfa_ii.png)
 
 (iii) L = {w | w has same number of substrings 01 as 10}
- - 101 is in L, 1010 is not
-
-iii was left as an *EXERCISE*, someone did it in 5 states appparently
+ - e.g. 101 is in L, 1010 is not
+ - the DFA iii was left as an *EXERCISE*, someone did it in 5 states appparently
 
 Definition: A language L is **regular** iff it is recognized by some finite automaton
 
@@ -261,7 +260,7 @@ r\_0, r\_1, ..., r\_n in Q such that (for any n >= 0)
 - for all i in [n], r\_i **is in the set** δ(r\_{i-1}, w\_i)
 - ie "there is at least one path that accepts"
 
-Definition: NFA N recognizes L iff L = {w | N accepts w} (same as FA!)
+Definition: NFA N recognizes L iff L = {w | N accepts w} (same as DFA!)
 
 Theorem: Every language that can be recognized by an NFA is regular.
 
@@ -273,27 +272,32 @@ Proof sketch: Given an NFA N (Q, Σ, δ, q0, F), we can build a DFA M
 - F' = {subsets R in Q | R union F is not empty}
 - δ'(R in Q, σ in Σ) = union (over q in R) of δ(q, σ)
 
-Need to argue that L(M) == L(N) (convince yourself this is true)
+Need to argue that L(M) == L(N) (*EXERCISE*: convince yourself this is true)
 
 Definition: **ɛ-NFAs** can have transition functions on the character ɛ
 
 - the above theorem (regular) still holds with ɛ-NFAs
+- *EXERCISE* show that every language that can be recognized by NFAs with
+  ɛ-transitions is regular
 
 ## Lecture 3 (Jan 10)
 
 ### Establishing regularity
 
-L = {w\_1w\_2...w\_n: n>=2, w\_{n-1} =1}
+L = {w\_1 w\_2 ... w\_n: n>=2, w\_{n-1} = 1} (i.e. second last symbol is 1)
 
 Proposition: L is regular
 
 Proof:
 
-- took a picture of the DFA
+here's a DFA:
+
+![dfa-ii](/cs365/jan_10_dfa.jpg)
+
 - is this the end? no! we want to prove it's actually correct
 - rename q0 to be q00, others q01, q10, q11, etc (like I did in lecture 1)
-- if you name states like this, you should show which is the starting state
-  by adding an arrow to it
+- if you name states like this (with no q0 anymore), you should show which is
+  the starting state by adding an arrow pointing to it
 
 Aside:
 
@@ -342,12 +346,15 @@ Proof (sketches):
 
 - warning: explanations given out loud, proofs on the board are much sketchier
   than what's expected on assignments
-- NFAs on paper
 
-Definition: a string R over Σ U {ϵ', |, *, (, )} is a **regular expression** if:
+![dfa-ii](/cs365/jan_10_regular.jpg)
+
+
+Definition: a string R over Σ U {`ϵ'`, `|`, `*`, `(`, `)`} is a **regular
+expression** if:
 
  - (i) R = ε
- - (ii) R = ϵ'
+ - (ii) R = ϵ'  **INCOMPLETE/QUESTION: what's `ϵ'`?**
  - (iii) R = σ for any σ in Σ
  - (iv) R = R1|R2 for any r.e. R1, R2
  - (v) R = R1R2 for any r.e. R1, R2
@@ -356,16 +363,16 @@ Definition: a string R over Σ U {ϵ', |, *, (, )} is a **regular expression** i
 
 Order of operations: * then concatenation then |
 
-Definition: L(R) is the language represented by r.e. R
+Definition: L(R) is the language represented by regular expression R
 
-Exercise: Define "representation of languages by regular expressions"
+**EXERCISE**: Define "representation of languages by regular expressions"
 
-Exercise: Define a regular expression that represents the language
-(I guess I didn't write down the languages for ii and iii woops)
+**EXERCISE**: Define a regular expression that represents the language
+(**INCOMPLETE/QUESTION:I guess I didn't write down the languages for ii and iii woops)**
 
 - (i) all strings that end in 1: (0|1)\*1
 - (ii) 0\* (10\*10\*)\*
-- (iii) ((1 (00)\* 1)| (00\*) | (0 (11)\* 0) | (0101) )\* ?? -- left as exercise
+- (iii) ((1 (00)\* 1)| (00\*) | (0 (11)\* 0) | (0101) )\* maybe? -- left as exercise but what is it??
 
 Note: the language of regular expressions is not regular, because you can't
 match brackets with a DFA
@@ -377,9 +384,9 @@ Proof sketch (all the details are in the book)
 
 (1) regular expression -> NFA
 
-- we also saw earlier this lecture (Thompson's algorithm '68)
+- we did this earlier this lecture (and it's called Thompson's algorithm, '68)
 
-(2) DFA -> r.e. (via generalized NFAs)
+(2) DFA -> regular expression (via generalized NFAs)
 
 - add start and end states
 - for every transition that has more than one symbol (e.g. a, b) replace
@@ -392,27 +399,30 @@ Proof sketch (all the details are in the book)
 
 ### A non-regular language
 
-Thesis 1: Decision problems = languages (check ---- did we prove this***??)
+Thesis 1: Decision problems = languages
 
 Thesis 2: "Solving" = recognizable by FA
 
-L = {0^n 1^n : n >= 0}
+but...
 
-- Theorem: L is not regular
-- Tool for proof: pigeonhole principle
- - if I have n pigeons and I put them in m boxes for any m < n, at least one
-   box contains more than one pigeon
-- Proof:
- - by contradiction
- - assume there is a DFA M with m states that recognizes L. Consider the states
-   in M for r0, r1, ..., rm reached after reading epsilon, 0, 00, 000 ... 0^m
- - by the pigeonhole principle, there exist 0 <= k < l <=m such that rk = rl
- - so M is in the same state after reading O^k and 0^l. So it must also be in
-   the same state after reading 0^k w and 0^l w for any string w in {0,1}*.
- - but then consider w = 1^k. Then M either accepts or rejects both 0^k 1^k and
-   0^l 1^k. In either case, M does not recognize L.
- - =><= (contradiction)
- - done
+#### Theorem: L = {0^n 1^n : n >= 0} is not regular
+
+Tool for proof: pigeonhole principle
+
+- if I have n pigeons and I put them in m boxes for any m < n, at least one
+  box contains more than one pigeon
+
+Proof:
+- by contradiction
+- assume there is a DFA M with m states that recognizes L. Consider the states
+  in M for r0, r1, ..., rm reached after reading epsilon, 0, 00, 000 ... 0^m
+- by the pigeonhole principle, there exist 0 <= k < l <=m such that rk = rl
+- so M is in the same state after reading 0^k and 0^l. So it must also be in
+  the same state after reading `0^k w` and `0^l w` for any string w in {0,1}*.
+- but then consider w = 1^k. Then M either accepts or rejects both `0^k 1^k` and
+  `0^l 1^k`. In either case, M does not recognize L.
+- =><= (symbol Eric likes to use to say contradiction)
+- done
 
 ### Pumping lemma
 
@@ -449,15 +459,15 @@ Proof:
 Definition: L has the **pumping property** if it satisfies the condition of the
 lemma.
 
-Using P.L
+Using pumping lemma
 
 - to show L is not regular, it suffices to show that it does not have the
   pumping property.
 - <=> show that: **for any** p>=1, **there is** a string s in L of length
   |s| >= p such that **for any** decomposition s = xyz with |y| >=0 and
   |xy| <= p, **there exists** i>=0 such that x y^i z is not in L
-  - note that proving this is pretty tricky because of all the for any, there is
-    , etc and it's easy to mix them up
+  - note that it's easy to make a mistake in these proofsbecause of all the "for
+    any", "there is", etc and it's easy to mix them up
 - example: the 0^n 1^n language is not regular
  - for any p >= 1, we can choose s = 0^p 1^p in L
  - fix any decomposition s = xyz, such that |y| > 0 and |xy| <= p
@@ -482,7 +492,7 @@ more exercises:
 (iii) L = {c^n^2 : n>= 0, c in Sigma}
 
 - c^p^2
-- proof - exercise***
+- proof left as **EXERCISE**
 
 ### Glimpse beyond
 
@@ -496,12 +506,12 @@ more exercises:
 
 ### Pushdown automata
 
-Thesis 1: "solving" != recognizing a language with a FA
+Thesis 1 disproved: "solving" != recognizing a language with a FA
 
-e.g.
+e.g. these can't be solved by recognizing with a FA
 
 - L = {0^n 1^n : n >= 1}
-- L = {w in {(,)}* : w is a matching string of parenthesis}
+- L = {w in {`(`,`)`}* : w is a matching string of parenthesis}
 - L = {w in {0, 1}* : w = w^R}
 
 Definition: for any set of symbols S, the set S\_ε = S union ε
@@ -517,9 +527,10 @@ Definition: a (nondeterministic) **pushdown automata** (PDA) is a 6-tuple
 
 What about δ?
 
-- δ: Q x Σ\_ε x Γ? -> P(Q x Γ\_ε)
+- δ: Q x Σ\_ε x `Γ ?` -> P(Q x Γ\_ε)
 
-how to use Γ
+what should we do for Γ (as an exercise to think about how carefully we must
+define things)
 
 - Γ* is much to powerful - if we can see the whole stack, we can put the whole
   string there then accept if that string is in the language
@@ -536,7 +547,7 @@ w'1, ..., w'm in Σ\_ε and states r0,...,rm and strings s0,...,sm in Γ* such t
 1. r0 = q0, s0 = ε
 2. rm is in F
 3. w = w'1 w'2 ... w'm all concatented (some w'i might be epsilon)
-4. for every i in [m], there exists a, b in Γ\_ε, t in Γ* such that (ri, b) is
+4. for every i in [m], there exists a, b in Γ\_ε, t in Γ\_ε* such that (ri, b) is
    in δ(r\_{i-1}, w'i, a) and si = bt and s\_{i-1} = at --- (ie from state i-1
    to state i, you read the next character, take a off the stack, put b back on)
 
@@ -546,12 +557,12 @@ each be empty)
 
 e.g.
 
+- L = matching parentheses (didn't do this in class -- **EXERCISE**)
+- L = {w in {0,1}* : w = w^R} (didn't do this in class -- **EXERCISE**)
 - L = {0^n 1^n : n>=1}
   - nice trick where you put a special character at the bottom of the stack
     so that we can check if stack is empty
-  - took a pic
-- L = matching parentheses (didn't do this in class)
-- L = {w in {0,1}* : w = w^R} (didn't do this in class)
+  - ![PDA](/cs365/jan_17.jpg)
 
 ### Context-free grammars
 
