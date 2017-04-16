@@ -232,12 +232,12 @@ Example: (alphabet {1, 0})
 
 (i) L = {w | last character of w is 1}
 
-![dfa-i](/cs365/jan_5_i.jpg)
+![dfa-i](/cs365/jan_5_dfa_i.jpg)
 
 (ii) L = {w | next to last character of w is 1} (there were some mistakes in my
 dfa so I cut them out lol)
 
-![dfa-ii](/cs365/jan_5_ii.png)
+![dfa-ii](/cs365/jan_5_dfa_ii.png)
 
 (iii) L = {w | w has same number of substrings 01 as 10}
  - 101 is in L, 1010 is not
