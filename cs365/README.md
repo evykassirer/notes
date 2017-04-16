@@ -292,7 +292,7 @@ Proof:
 
 here's a DFA:
 
-![dfa-ii](/cs365/jan_10_dfa.jpg)
+![dfa-M](/cs365/jan_10_dfa_M.jpg)
 
 - is this the end? no! we want to prove it's actually correct
 - rename q0 to be q00, others q01, q10, q11, etc (like I did in lecture 1)
@@ -347,7 +347,7 @@ Proof (sketches):
 - warning: explanations given out loud, proofs on the board are much sketchier
   than what's expected on assignments
 
-![dfa-ii](/cs365/jan_10_regular.jpg)
+![dfa-ii](/cs365/jan_10_regular_proof.jpg)
 
 
 Definition: a string R over Σ U {`ϵ'`, `|`, `*`, `(`, `)`} is a **regular
@@ -562,7 +562,7 @@ e.g.
 - L = {0^n 1^n : n>=1}
   - nice trick where you put a special character at the bottom of the stack
     so that we can check if stack is empty
-  - ![PDA](/cs365/jan_17.jpg)
+  - ![PDA](/cs365/jan_17_pda.jpg)
 
 ### Context-free grammars
 
