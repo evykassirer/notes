@@ -127,14 +127,14 @@ Definitions:
  	- e.g. s = `hello_world`
  	- e.g. t = `01101`
  	- e.g. u = `_t__-1`
-- a character = a symbol
+- a **character** is **a symbol**
 
 Notation:
 
 - for  n >= 0, Σ^n is the set of all sequence of n symbols
-- Σ* = union n>=0 Σ^n
+- Σ* = union over n>=0 of Σ^n
 
-Definition: A **language** L over the alphabet Σ is a set of strings of Σ
+Definition: A **language** L over the alphabet Σ is a set of strings over Σ
 			(L is a subset of Σ*)
 
 Main observation: any decision problem (yes/no question) can be described as a language.
@@ -145,12 +145,18 @@ Main observation: any decision problem (yes/no question) can be described as a l
  	- so now the question is "is s ∈ Σ* in L\_prime?"
 - e.g. is the graph G connected
 	- Σ = {v\_1, v\_2, v\_3, ..., ;} --> doesn't work because infinite vertices
-	- can rewrite as v1 instead of v\_1 (because we have finite digits)
+    and alphabets must be finite
+	- can rewrite as the string v1 instead of a single symbol v\_1 (because now
+    we have finite characters v and 0-9)
 	- L\_conn = {v1v2;v2v3;v1v3; ...} (connected vertices)
-	- another solution: Σ = {0, 1}, L\_conn = {s in Σ* : s is matrix representation of a connected graph}
+	- another solution: Σ = {0, 1}, L\_conn = {s in Σ* : s is matrix
+    representation of a connected graph}
 - e.g. addition! (additive identities)
 	- Σ = {0, 1, ..., 0, +, =}
 	- L\_add = {0+0=0, 0+1=1, 1+1=2, ...}
+
+Note: even though this was stated as a fact, we never "proved" it and I'm pretty
+sure it's actually false.
 
 ## Lecture 2 (Jan 5)
 
@@ -169,19 +175,23 @@ News:
 
 ### Finite automata
 
-Recall: **goal**: determine which decision problems we can solve
+Recall:
+
+- **goal**: determine which decision problems we can solve
 
 Thesis 1: "decision problems" <=> languages
 
-- challenge: is a point on a line? -- real numbers are limitations, but
-  apparently there's a way to do this that's outside the scope of our course?
-- challenge: is this a language? -- languages can be infinite input, similar
+- any challenges to this thesis? (asked to the class)
+- challenge: "is a point on this given line?"" -- real numbers are limitations,
+  but apparently there's a way to do this that's outside the scope of our course?
+- challenge: "is this a language?"" -- languages can be infinite input, similar
   issue
 
 Algorithm solving a problem
 
 - black box that turns w -> w in L?
-- (w for string, think of it as standing for word)
+- (w for string, think of it as standing for word, so the black box turns a word
+   into another word)
 - the black box is a physical computer with a program that runs, you sit down
   at the keyboard and enter the input, and it responds yes or no
 	- this is too complicated, hard to deal with
@@ -192,7 +202,7 @@ Algorithm solving a problem
     - when you press enter, if you're in an accepting state it outputs yes,
       otherwise, no
 
-Thesis 2: "solving a language" <=> FA
+Thesis 2: "solving a language" <=> FA (finite automaton)
 
 Definition: A **(deterministic) finite automaton** is 5-tuple (Q, Σ, δ, q0, F)
 
@@ -204,9 +214,10 @@ Definition: A **(deterministic) finite automaton** is 5-tuple (Q, Σ, δ, q0, F)
 - F: subset of Q where you output yes (accepting states)
 
 Definition: A FA **accepts** w in Σ* iff there is a sequence of states
-r\_0, r\_1, ..., r\_n in Q such that (for any n >= 0)
+r\_0, r\_1, ..., r\_n (where n >= 0) in Q such that, these three conditions
+hold:
 
-- for all i in [n] := {1, 2, ..., n} r\_i = δ(r\_{i-1}, w\_i)
+- for all i in [n] := {1, 2, ..., n}, we have r\_i = δ(r\_{i-1}, w\_i)
 - r\_n is in F
 - r\_0 = q\_0
 
@@ -221,12 +232,16 @@ Example: (alphabet {1, 0})
 
 (i) L = {w | last character of w is 1}
 
+![dfa-i](/cs365/jan_5_i.jpg)
+
 (ii) L = {w | next to last character of w is 1}
+
+![dfa-ii](/cs365/jan_5_ii.png)
 
 (iii) L = {w | w has same number of substrings 01 as 10}
  - 101 is in L, 1010 is not
 
-(I took pictures of my solutions to i and ii, someone did iii in 5 states)
+iii was left as an *EXERCISE*, someone did it in 5 states appparently
 
 Definition: A language L is **regular** iff it is recognized by some finite automaton
 
@@ -1219,7 +1234,7 @@ examples:
 - S = composite numbers (non prime)
  - P(a, x, y) = a - (x + 1)*(y + 1)
 
-Defn: the langauge corresponding to the set of natural numbers S is
+Defn: the language corresponding to the set of natural numbers S is
 `L_s = {<x> : x in S}` (where `<x>` means an encoding of x)
 
 Theorem: If there is a Diophantine set S such that L_S is undecidable, then
@@ -1384,7 +1399,7 @@ Proof: you write 1s for each 0 you see, then erase them for each 1 you see. If
 
 Corollary: TIME(t(n)) is NOT equal to TIME^multi(t(n))
 
-Theorem: for every langauge L that can be decided by a k-tape TM with running
+Theorem: for every language L that can be decided by a k-tape TM with running
 time t(n), there is a 2-tape Tm with running time O(t(n) log(t(n)))
 
 Thoerem: the language PAL = {x x^R : x in {0,1}*} can be decided by a 2-tape TM
@@ -1494,7 +1509,7 @@ running time O(t(n))
 
 Def'n: NP = union k>=1 NTIME(n^k)
 
-Def'n: The langauge L is **efficiently verifiable** if there is a
+Def'n: The language L is **efficiently verifiable** if there is a
 polynomial-time deterministic TM M that satisfies:
 
 - (i) for all c in {0,1}* of length |c| = poly(|x|) such that m accepts <x, c>
