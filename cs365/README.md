@@ -234,7 +234,8 @@ Example: (alphabet {1, 0})
 
 ![dfa-i](/cs365/jan_5_i.jpg)
 
-(ii) L = {w | next to last character of w is 1}
+(ii) L = {w | next to last character of w is 1} (there were some mistakes in my
+dfa so I cut them out lol)
 
 ![dfa-ii](/cs365/jan_5_ii.png)
 
