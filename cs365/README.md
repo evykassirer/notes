@@ -241,7 +241,7 @@ dfa so I cut them out lol)
 
 (iii) L = {w | w has same number of substrings 01 as 10}
  - e.g. 101 is in L, 1010 is not
- - the DFA iii was left as an *EXERCISE*, someone did it in 5 states appparently
+ - the DFA iii was left as an *EXERCISE\**, someone did it in 5 states appparently
 
 Definition: A language L is **regular** iff it is recognized by some finite automaton
 
@@ -272,12 +272,12 @@ Proof sketch: Given an NFA N (Q, Σ, δ, q0, F), we can build a DFA M
 - F' = {subsets R in Q | R union F is not empty}
 - δ'(R in Q, σ in Σ) = union (over q in R) of δ(q, σ)
 
-Need to argue that L(M) == L(N) (*EXERCISE*: convince yourself this is true)
+Need to argue that L(M) == L(N) (*EXERCISE\**: convince yourself this is true)
 
 Definition: **ɛ-NFAs** can have transition functions on the character ɛ
 
 - the above theorem (regular) still holds with ɛ-NFAs
-- *EXERCISE* show that every language that can be recognized by NFAs with
+- *EXERCISE\** show that every language that can be recognized by NFAs with
   ɛ-transitions is regular
 
 ## Lecture 3 (Jan 10)
@@ -365,14 +365,13 @@ Order of operations: * then concatenation then |
 
 Definition: L(R) is the language represented by regular expression R
 
-**EXERCISE**: Define "representation of languages by regular expressions"
+*EXERCISE\**: Define "representation of languages by regular expressions"
 
-**EXERCISE**: Define a regular expression that represents the language
-(**INCOMPLETE/QUESTION:I guess I didn't write down the languages for ii and iii woops)**
+*EXERCISE\**: Define a regular expression that represents the language
 
 - (i) all strings that end in 1: (0|1)\*1
-- (ii) 0\* (10\*10\*)\*
-- (iii) ((1 (00)\* 1)| (00\*) | (0 (11)\* 0) | (0101) )\* maybe? -- left as exercise but what is it??
+- (ii) even #1s: 0\* (10\*10\*)\*
+- (iii) even number of 1s and even number of 0s: ((1 (00)\* 1)| (00\*) | (0 (11)\* 0) | (0101) )\* maybe? -- left as exercise
 
 Note: the language of regular expressions is not regular, because you can't
 match brackets with a DFA
@@ -415,7 +414,7 @@ Tool for proof: pigeonhole principle
 Proof:
 - by contradiction
 - assume there is a DFA M with m states that recognizes L. Consider the states
-  in M for r0, r1, ..., rm reached after reading epsilon, 0, 00, 000 ... 0^m
+  in M for r0, r1, ..., rm reached after reading ε, 0, 00, 000 ... 0^m
 - by the pigeonhole principle, there exist 0 <= k < l <=m such that rk = rl
 - so M is in the same state after reading 0^k and 0^l. So it must also be in
   the same state after reading `0^k w` and `0^l w` for any string w in {0,1}*.
@@ -489,16 +488,16 @@ more exercises:
 - y will be 0s from the first block of 0s
 - choose i = 2, now there's more 0s in the left w
 
-(iii) L = {c^n^2 : n>= 0, c in Sigma}
+(iii) L = {c^n^2 : n>= 0, c in Σ}
 
 - c^p^2
-- proof left as **EXERCISE**
+- proof left as *EXERCISE\**
 
 ### Glimpse beyond
 
 - CS 462 covers more stuff with FAs
   - Myrill-Nehode Thoerem
-  - Theorem: if L is a language over sigma = {1} that is recognized by an NFA
+  - Theorem: if L is a language over σ = {1} that is recognized by an NFA
     with n states, it can be recognized by a DFA with e^(sqrt(n)*logn) states
 
 
@@ -546,7 +545,7 @@ w'1, ..., w'm in Σ\_ε and states r0,...,rm and strings s0,...,sm in Γ* such t
 
 1. r0 = q0, s0 = ε
 2. rm is in F
-3. w = w'1 w'2 ... w'm all concatented (some w'i might be epsilon)
+3. w = w'1 w'2 ... w'm all concatented (some w'i might be ε)
 4. for every i in [m], there exists a, b in Γ\_ε, t in Γ\_ε* such that (ri, b) is
    in δ(r\_{i-1}, w'i, a) and si = bt and s\_{i-1} = at --- (ie from state i-1
    to state i, you read the next character, take a off the stack, put b back on)
@@ -557,8 +556,8 @@ each be empty)
 
 e.g.
 
-- L = matching parentheses (didn't do this in class -- **EXERCISE**)
-- L = {w in {0,1}* : w = w^R} (didn't do this in class -- **EXERCISE**)
+- L = matching parentheses (didn't do this in class -- *EXERCISE\**)
+- L = {w in {0,1}* : w = w^R} (didn't do this in class -- *EXERCISE\**)
 - L = {0^n 1^n : n>=1}
   - nice trick where you put a special character at the bottom of the stack
     so that we can check if stack is empty
@@ -580,11 +579,11 @@ Definition: A **context-free grammar** is a 4-tuple (V, Σ, R, S) where
   - must be finite, or else we can have rules for each word in the language
 - S = start variable
 
-Definition: uAv **yields** uwv in G for some u, v, w in (V union Σ)*, A in V
-if the rule A -> w is in R (uAv => uwv)
+Definition: uAv **yields** uwv in a grammar G for some u, v, w ∈ (V union Σ)*,
+A ∈ V if the rule (A -> w) ∈ R (uAv => uwv)
 
-Definition: u =>* v (u derives v) in G for u, v in (V union Σ)* if there is a
-sequence u0, ..., um in (V union Σ)* such that
+Definition: u =>* v (u derives v) in G for u, v ∈ (V union Σ)* if there is a
+sequence u0, ..., um ∈ (V union Σ)* such that
 
 - u = u0,
 - for all i in [m] u\_{i-1} yields u in G, and
@@ -605,11 +604,11 @@ e.g. 0^n 1^n
 
 e.g. parens
 
-- S  = () | SS | epsilon
+- S  = () | SS | ε
 
 e.g. palindrome
 
-- S = 0S0 | 1S1 | epsilon | 0 | 1
+- S = 0S0 | 1S1 | ε | 0 | 1
 
 ## Lecture 6 (Jan 19)
 
@@ -617,49 +616,59 @@ e.g. palindrome
 
 Theorem: A language is context-free iff it is generated by a CFG.
 
-Proof sketch: CFG -> PDA
+#### Proof sketch: CFG -> PDA
+
+(note: this proof sketch is pretty sketchy so you might want to read the text
+to get a clear idea of how it works)
 
 what about q0 -> qloop -> qacc
 
 - apply all the rules until we get the input string we're testing for
 - e.g. S -> AB -> 0AB -> ... -> 00000B -> ... -> 001
- - this doesn't work because the stack - need to only check first character first (??)
+ - this doesn't work because the stack - when we use the stack we can only read
+   the top character
 
 q0, qloop, qacc transitions
 
-- qo-> qloop on (epsilon, epsilon->$S)
- - (you can't actually push both $ and S, you'd have a middle state and do
-   q0 -> (epsilon, epsilon -> $) -> middle -> (epsilon, epsilon -> S) -> qloop
-- qloop to self with (epsilon,A->w) for all rules A->w in the grammar, w in (Sigma union V)*
-- qloop to self with (a,a -> epsilon) for every a in the alphabet
-- qloop to qacc with (epsilon, $ -> epsilon)
-- took a pic
+- qo-> qloop on (ε, ε->$S)
+ - (note you can't actually push both $ and S at once, you'd have a middle state
+   and do q0 -> (ε, ε -> $) -> middle state -> (ε, ε -> S) -> qloop
+- qloop to self with (ε,A->w) for all rules A->w in the grammar, w in
+  (Σ union V)*
+- qloop to self with (a,a -> ε) for every a in the alphabet
+- qloop to qacc with (ε, $ -> ε)
 
-PDA -> CFG
+![CFG_to_PDA](jan_19_CFG_to_PDA.jpg)
+
+#### PDA -> CFG
+
+first make the PDA to be of this form:
 
 1. One accept state
 2. Every transition either pushes a symbol on the stack or pops one off (but not both)
 3. Only accept when stack is empty
- - claim: you can always do this for any PDA. have qacc loop to itself with (epsilon, sigma -> epsilon), then have qacc -> qacc' with (epsilon, & -> epsilon) where if you're using $, & has to be different and you'd put it on the stack before $
+ - claim: you can always do this for any PDA. have qacc loop to itself with (ε, σ -> ε), then have qacc -> qacc' with (ε, & -> ε) where if you're using $, & has to be different and you'd put it on the stack before $
 
 How this works:
 
 
 - V = {A\_pq} p,q in Q
 - S = A_q0,qacc
-- A\_pp -> epsilon for all p in Q
-- p --(a, epsilon -> sigma)--> r --> ... --> s --(b, sigma -> epsilon)--> q
- - (took a pic)
+- A\_pp -> ε for all p in Q
+- p --(a, ε -> σ)--> r --> ... --> s --(b, σ -> ε)--> q
  - case 1: everything from states r to s that ends with the same stack as it
    started --- then if we can read a before that (from state p) and b after it
    (going to state q), then it's the rule (A\_pq -> a Ars b)
  - case 2: the stack *does* change between r and s --- can use rule
    (A\_pq -> A\_pr A\_rq) for all r in Q
 
+![PDA_to_CG](jan_19_PDA_to_CFG.jpg)
+
+
 Showing that a string is in the grammar
 
 - algorithm idea: try all combinations of rules, until you maybe make the string
-- because some symbols can go to epsilon (if you have a __ -> epislon rule), you
+- because some symbols can go to ε (if you have a __ -> epislon rule), you
   can keep trying to make your string by trying more rules and making it
   longer -- so it might not terminate!
 
@@ -669,7 +678,7 @@ Definition: the CFG G is in Chomsky Normal Form if all its rules are of the form
 
 - A -> BC, for any A in V, and B, C in V \ {S}
 - A -> a, for any A in V, a in alphabet
-- S -> epsilon (you can only get epsilon at the very start)
+- S -> ε (you can only get ε at the very start)
 
 Theorem: For every CFG G, there is a CFG G' in Chromsky Normal Form that
 generates the same language.
@@ -677,14 +686,14 @@ generates the same language.
 
 Hm, but we can still do A -> AA infinitely... we fix this by stopping the
 algorithm when we're made something longer than the string we're checking
-(because there's no A -> epsilon, we can't make the string shorter again)
+(because there's no A -> ε, we can't make the string shorter again)
 
 #### Proof:
 
 update A -> a1 ... ak
 
 - Add variables  c\_a for every a in the alphabet
-- to G', conert the rule to A -> c\_a1 c\_a2 ... c\_ak
+- to G', convert the rule to A -> c\_a1 c\_a2 ... c\_ak
 - add rules for c\_a -> a
 - so we get
  - A -> c\_a1 A(1)
@@ -692,7 +701,7 @@ update A -> a1 ... ak
  - ...
  - A(k-2) -> c\_ak-1 c\_ak
 
-update A -> epsilon
+update A -> ε
 
 - "propogate"
 - B -> ABC | BC
@@ -705,15 +714,15 @@ update A -> B
 A -> S
 
 - add S -> S'
-- and do S -> S'
+- and do A -> S'
 
 ## Regular grammars
 
 Definition: The CFG G is **regular** if the rules are of the form
 
 - A -> bC (C != S, do we need this if we change the last rule?)
-- A-> a
-- S -> A | epsilon (the typical deifnition is A -> epsilon, are these equiv?)
+- A -> a
+- S -> A | ε (the typical definition is A -> ε, are these equiv? left as an open question)
 
 Theorem: The language L is regular iff it is generated by a regular grammar
 
@@ -739,10 +748,10 @@ Proof:
 - let G be a grammar that generates L and that is Chomsky Normal Form.
 - let m be the # of variables in G
 - Aside:
- - any string you can make with a grammar, you can draw a tree that shows how
-   you get from S to the string (parse tree)
- - prop: if G is in CNF, any parse tree that generates a string of
-   length >= 2^d + 1 must have depth > d
+  - any string you can make with a grammar, you can draw a tree that shows how
+    you get from S to the string (parse tree)
+  - prop: if G is in CNF, any parse tree that generates a string of
+    length >= 2^d + 1 must have depth > d
 - let p = 2^(m + 1)
 - so we know |s| >= 2^(m + 1)
 - so for any s in L of length |s| >= p, the parse tree that generates s has
@@ -751,43 +760,49 @@ Proof:
   m+1 in the parse tree. by pigeonhole, one varible appears at least twice in
   this path.
 - Some exploration
- - I took a picture of a diagram showing the breakdown from the parse tree to
-   get uvxyz
- - I also took a picture of a diagram showing how to get uvvxyyz (by repeating
-   the top derivation in the bottom derivation of the repeated variable)
+
+![pumping lemma proof pic 1](jan_24_PL_proof1.jpg)
+
+![pumping lemma proof pic 2](jan_24_PL_proof2.jpg)
+
 - The parse tree tells that there is a derivation
- - (a) S -> uRz
- - (b) R -> vRy, and
- - (c) R -> x
+  - (a) S -> uRz
+  - (b) R -> vRy, and
+  - (c) R -> x
 - Following the derivation (a), then the derivation (b) i times, and derivation
   (c), we obtain the string u v^i x y^i z
 - The rule applied at the top (blue) R must be R -> AB for some variables A, B.
   the var that does not generate the lower R must generate a string of length >=
   1 as v or y
 - note that we can similarly prove that |x| > 0 and |u| + |z| > 0, but these
-  don't seem like we'd need them to prove stuff
+  don't seem like we'd need them to prove this pumping lemma
 - by pigeonhole, we can find a repeated variable in the a path where the subtree
   from the top variable has depth at most 2^(m+1)
- - therefore the string vxy generated by this subtree has length <= p
+  - therefore the string vxy generated by this subtree has length <= p
 
 ### Using the pumping lemma
 
-- e.g.  show that L = {0^n 1^n 2^n : n >= 0} is not context free
+e.g.  show that L = {0^n 1^n 2^n : n >= 0} is not context free
+
  - fix any p > 0, choose s = 0^p 1^p 2^p
  - if L is CF, there exists u, v, x, y, z such that s=uvxyz and |vxy| <= p
  - the string vxy cannot contain all three characters 0, 1, 2 and vy must
    contain some characters, so u v^2 x y^2 z cannot have same number of 0s, 1s,
    and 2s, so u v^2 x y^2 z is not in L (contradiction)
-- e.g.  show that L = {ww : w in {0,1}*} is not context free
+
+e.g.  show that L = {ww : w in {0,1}*} is not context free
+
  - 0^p 1 0^p 1, and 0^p 1^p 0^p 1^p look like they'd both work, but only one
-   does. left as an exercise - answer is in the book
+   does. left as an *EXERCISE\** - answer is in the book
 
 ### Language Hierarchy Theorem 1 (more of them to come later in the course)
 
 - we have finite languages, then regular languages which contain finite languages
   and goes beyond, then CFLs which contain regular languges and goes beyond,
   and there's more beyond
-- I took a picture of the diagram
+
+![language hierarchy thm 1](jan_24_language_heirarchy.jpg)
+
 - It's actually pretty remarkable that each new class of language totally covers
   the one we saw before
 
@@ -803,30 +818,30 @@ Proof:
 ### Turing machines
 
 Definition: A **Turing machine** is a 7-tuple
-(Q, Sigma, Gamma, delta, q\_0, q\_acc, q\_rej)
+(Q, Σ, Γ, δ, q\_0, q\_acc, q\_rej)
 
 where:
 
 - Q is a finite set of states
-- Sigma is the input alphabet which does not contain |_| (I'm gonna use ▄ and we're calling it the "blank character")
+- Σ is the input alphabet which does not contain |_| (I'm gonna use ▄ and we're calling it the "blank character")
  - ▄ fills up the tape where your input isn't
-- Gamma is the tape alphabet: can have Sigma, ▄, and anything else (ie it's the superset of Sigma union {▄})
-- delta is Q x Gamma -> Q x Gamma x {L, R}
+- Γ is the tape alphabet: can have Σ, ▄, and anything else (ie it's the superset of Σ union {▄})
+- δ is Q x Γ -> Q x Γ x {L, R}
 - q0 is in the initial state
 - q\_acc and q\_rej are halting states, accepting and rejecting states
 
 Definition: a **configuration** of a TM (turing machine) is a pair (q, w) where
 
 - q in Q is the current state
-- w in (Gamma union Gamma-bar)* such that
- - (Gamma-bar is Gamma with a bar over it)
- - Gamma-bar = {alpha-bar : alpha in Gamma} (a copied alphabet)
- - w contains exactly 1 character from Gamma-bar (shows the current position)
+- w in (Γ union Γ-bar)* such that
+ - (Γ-bar is Γ with a bar over it)
+ - Γ-bar = {alpha-bar : alpha in Γ} (a copied alphabet)
+ - w contains exactly 1 character from Γ-bar (shows the current position)
 
 Definition2: A **configuration** is a triple (q, w, m) where
 
 - q is in Q
-- w is in Gamma*
+- w is in Γ*
 - m is an integer (marking our place)
 
 Definition3: A **configuration** is a string w in (Delta union Q)* that contains
@@ -837,11 +852,11 @@ exactly one value from Q
 Definition: The **configuration** (q, w) **yields** the configuration (q', w')
 in the Turing Machine M if
 
-- w = x a b-bar c y for some strings x, y in Gamma* and characters a,b,c in Gamma
+- w = x a b-bar c y for some strings x, y in Γ* and characters a,b,c in Γ
 - one of these two cases applies:
- - w' = x a-bar d c y where delta(q, b) = (q', d, L)
- - w' = x a d c-bar y where delta(q, b) = (q', d, R)
-- and q is not q\_acc or q\_rej (we could do this cleaner if we defined delta as a
+ - w' = x a-bar d c y where δ(q, b) = (q', d, L)
+ - w' = x a d c-bar y where δ(q, b) u= (q', d, R)
+- and q is not q\_acc or q\_rej (we could do this cleaner if we defined δ as a
   function that only takes q that aren't accepting or rejecting states)
 - there's a symbol for 'yields in one step' that looks kinda like `|-` (though
   maybe the book actually uses =>, Eric forgets)
@@ -852,21 +867,21 @@ Definition: The configuration (q, w) **derives** (q', w') if there is a sequence
 of configurations c1,...,ck for k>=0 such that
 (q, w) => c1 => c2 => ... => ck => (q', w')
 
-Definition: The TM M **accepts** x in Sigma* if (q0, x-bar) derives (q_acc, y)
-for some y in (Gamma union Gamma-bar)* with just one character in y that's in
-Gamma-bar, and where x-bar = a-bar x' if x = ax'
+Definition: The TM M **accepts** x in Σ* if (q0, x-bar) derives (q_acc, y)
+for some y in (Γ union Γ-bar)* with just one character in y that's in
+Γ-bar, and where x-bar = a-bar x' if x = ax'
 
-Definition: The TM M **rejects** x in Sigma* if (q0, x-bar) derives (q_rej, y)
-for some y in (Gamma union Gamma-bar)* with just one character in y that's in
-Gamma-bar, and where x-bar = a-bar x' if x = ax'
+Definition: The TM M **rejects** x in Σ* if (q0, x-bar) derives (q_rej, y)
+for some y in (Γ union Γ-bar)* with just one character in y that's in
+Γ-bar, and where x-bar = a-bar x' if x = ax'
 
-Definition: The TM M **halts** on x in Sigma* if it accepts or rejects x
+Definition: The TM M **halts** on x in Σ* if it accepts or rejects x
 
-Definition: The TM **decides** the language L in Sigma* if it accepts every x in
-L and rejects every x in Sigma* \ L
+Definition: The TM **decides** the language L in Σ* if it accepts every x in
+L and rejects every x in Σ* \ L
 
-Definition: The TM M **recognizes** L that's a subset of Sigma* if
-{x in Sigma* : M accepts x} = L
+Definition: The TM M **recognizes** L that's a subset of Σ* if
+{x in Σ* : M accepts x} = L
 
 (if a TM recognizes L, it doesn't necessarily decide it -
 but if it decides it, it recognizes it)
@@ -908,18 +923,18 @@ Recall definitions of a turing machine deciding and recognizing a language
 
 Theorem: Every regular language is decidable
 
-Proof: Let M = (Q, Sigma, delta, q0, F) be a DFA that recognizes the regular
-languages L. Let T = (Q', Sigma', Gamma', delta', q0', q\_acc, q\_rej) be the TM
+Proof: Let M = (Q, Σ, δ, q0, F) be a DFA that recognizes the regular
+languages L. Let T = (Q', Σ', Γ', δ', q0', q\_acc, q\_rej) be the TM
 defined by
 
 - Q' = Q union (q\_acc, q\_rej)
 - q0' = q0
-- Sigma' = Sigma
-- Gamma' = Sigma union { _ } (where _ is the blank character)
-- delta'(q,a) = (delta(q, a), a, R) for every a in Sigma
-- delta'(q, _) =
-  - (q\_rej, _, R)   if q is not in F
-  - (q\_acc, _, R)   if q is in F
+- Σ' = Σ
+- Γ' = Σ union { ▄ } (where ▄ is the blank character)
+- δ'(q,a) = (δ(q, a), a, R) for every a in Σ
+- δ'(q, ▄) =
+  - (q\_rej, ▄, R)   if q is not in F
+  - (q\_acc, ▄, R)   if q is in F
 
 Theorem: Every context-free language is decidable
 
@@ -927,8 +942,8 @@ Proof sketch:
 
 - Wrong approach: simulate a PDA
  - you could have a PDA with the start state transitioning to itself with
-   (epsilon, epsilon -> 1) and to something else with (0, 1 -> epsilon)
- - if you always pick one to try first, and always try the epsilon transition,
+   (ε, ε -> 1) and to something else with (0, 1 -> ε)
+ - if you always pick one to try first, and always try the ε transition,
    you loop forever and never decide the language
 - Right way: simulate/implement the CFG hat generates the CFL L
  - key idea: implement a CFG in Chomsky normal form for L
@@ -939,10 +954,10 @@ Proof sketch:
 ### Variants of TMs
 
 Defn: let VarTM be the extension of TM model where we have a finite # of
-variables that take values in Gamma.
+variables that take values in Γ.
 
 - Theorem: Every language decidable by VarTMs is also decidable by TMs
-- Proof: Let Q' = Q x Gamma^m where m is the number of variables in the VarTM
+- Proof: Let Q' = Q x Γ^m where m is the number of variables in the VarTM
 (ie we just fold in all finite combinations of values for variables into the
 states)
 
@@ -974,24 +989,24 @@ tapes
 ### Nondeterministic TMs
 
 Defn: a **nondeterministic** TM is a 7-tuple
-(Q, Sigma, Gamma, delta, q0, q\_acc, q\_rej) where:
+(Q, Σ, Γ, δ, q0, q\_acc, q\_rej) where:
 
-  - delta: Q x Gamma -> P(Q x Gamma x {L, R})
+  - δ: Q x Γ -> P(Q x Γ x {L, R})
   - this is new because of it's a set and not just one transition (like DFA/NFA)
 
 Defn: the nondeterministic TM **decides** L if
 
 - for every x in L, at least one path leads to the accept state
 - for every x not in L, no path leads to the accept state
-- for every x in Sigma*, all possible paths terminate (at q\_acc, q\_rej, or in
+- for every x in Σ*, all possible paths terminate (at q\_acc, q\_rej, or in
   a dead end)
 
 Defn: The NTM M recognizes L if (i) and (ii) are satisfied
 
-Theorem: if L is decidable (recognizable) by a NTM, then it is also decidable
-(reocgnizable) by a TM
+Theorem: if L is decidable (or recognizable) by a NTM, then it is also decidable
+(or recognizable) by a TM
 
-Proof: exercise! there's also a right and a wrong way to do it
+Proof: *EXERCISE\**! there's also a right and a wrong way to do it
 
 ## Lecture 10 (Feb 2)
 
@@ -1013,31 +1028,40 @@ Def'n: |S| = |T| if |S| <= |T| and |T| <= |S|
 
 Def'n: The set S is **countable** iff |S| <= |N| where N = {1, 2, 3...}
 
-Exercises:
+#### Exercises:
 
-- even natural numbers
+even natural numbers
+
  - map to dividing by 2
-- integers
+
+integers
+
  - count as 0, 1, -1, 2, -2
  - explicitly, map a to (-2a + 1) if a <= 0, and (2a) if a is a > 0
-- Q+ = {m/n : m, n are natural numbers}
+
+Q+ = {m/n : m, n are natural numbers}
+
  - make a 2D grid mxn, start in the top left corner, and go back and forth
    diagonally (TODO: add a pic from the internetz)
  - a nice alternative is f(m, n) = 2^m 3^n
-- T = {M : M is a TM}
+
+T = {M : M is a TM}
+
  - we only care about the funtionality, if two turing machines behave the same
    but have different state names or alphabets, then we consider them the same
- - can encode M as |Q|#|Sigma|#|Gamma|#|...|#q0#qrej
+ - can encode M as |Q|#|Σ|#|Γ|#|...|#q0#qrej
  - where q0, qrej, 1acc are numbers between 1 and |Q|
- - for delta (where the ... is) we encode every (q,a) in QxGamma as their index
-   in our ordering of Q and Gamma with with its output triple in QxGammax{L,R}
-   we can add all of them because Q and Gamma are finite size
+ - for δ (where the ... is) we encode every (q,a) in QxΓ as their index
+   in our ordering of Q and Γ with with its output triple in QxΓx{L,R}
+   we can add all of them because Q and Γ are finite size
  - now that M is encoded into an ascii string, we can encode it into binary
 
-Thm: The Set of all Turing machines is countable
+#### Thm: The Set of all Turing machines is countable
 
-- proof idea:  we can encode each TM into an asciii string, write it in binary.
-  take the mapping that associates M with the natural number whose binary
+proof idea:
+
+- we can encode each TM into an asciii string, write it in binary.
+- take the mapping that associates M with the natural number whose binary
   representation is the same
 
 ### Uncountable sets
@@ -1047,7 +1071,7 @@ Defn: the set S is uncountable if it is *not* countable
 S is uncountable iff it is impossible to map N to S in a way that covers each
 element of S
 
-Thm: The set L of all language over Sigma = {a,b} is uncountable.
+Thm: The set L of all language over Σ = {a,b} is uncountable.
 
 Proof: by **diagonalization**
 
@@ -1125,7 +1149,7 @@ Proof by contradiction:
 
 Defn: EMPTY_TM = {<M> : L(M) = emptyset}
 
-Defn: L(M) = {w in Sigma* : M accepts w} (ie the language recognized by M)
+Defn: L(M) = {w in Σ* : M accepts w} (ie the language recognized by M)
 
 Theorem: EMPTY_TM is undecidable
 
@@ -1134,7 +1158,7 @@ Proof: by contradiction
 - assume E is a TM that decides EMPTY_TM
 - let T be a TM that takes in <M, w> as input
 - T does:
-  - (i) builds M' that on input x in Sigma*
+  - (i) builds M' that on input x in Σ*
      - checks that x = w. if not, it rejects
      - if x = w, M' simulates M on x
      - observation: L(M') = {w} if M accepts w, emptyset otherwise
@@ -1437,7 +1461,7 @@ time t(n), there is a 2-tape TM M' that decides L in time 1/2 t(n) + 2n
 
 proof:
 
-- we can choose a new tape language Gamma' = Gamma^3
+- we can choose a new tape language Γ' = Γ^3
 - so if the old string was x1 x2 x3 x4 ....
 - then the new first character is "x1 x2 x3" amd the next is "x3 x4 x5" then
  "x5 x6 x7" etc
@@ -1575,7 +1599,7 @@ Exercises:
   - f(G) = G with new vertex that's connected to all the vertices in G
 - cheat for all 3: they're all decidible in poly-time, so we can decide it first
   then reduce it to something in or not the other language, e.g. for (ii):
-  f(x) = epsilon if x is in the language, 10 otherwise
+  f(x) = ε if x is in the language, 10 otherwise
 
 
 ### NP-hardness and NP-completeness
@@ -1676,8 +1700,8 @@ Theorem: There is a language L in NP for which any algorithm runs in time c*n
 Conjecture: P != NP. For any NP-complete L and any c > 0, there is no algorithm
 that computes L in time O(n^c)
 
-Conjecture (Strong Exponential-Time Hypothesis): There is a constant delta > 0
-such that every algorithm that computes SAT has time complexity Omega(2^(delta*n))
+Conjecture (Strong Exponential-Time Hypothesis): There is a constant δ > 0
+such that every algorithm that computes SAT has time complexity Omega(2^(δ*n))
 
 Theorem 1: There exists a language L in NP such that any algorithm in the RAM
 model that computes L has running time Omega(n)
@@ -1866,11 +1890,11 @@ Proof: NP ⊆ PSAPCE
 Proof: L ⊆ P
 
 - if M uses s cells in the work tape on input x in {0,1}^n, it can be in at most
-  (|Gamma|^s times s) times |Q| times n
+  (|Γ|^s times s) times |Q| times n
 - (all combinations of configurations of the work tape, state, input tape)
 - if M is halting, it can never be in the same config twice, so if its space
   complexity is O(log n), then time complexity is
-  O(|Gamma|^(O(log n)) \* |Q| \* log n \* n) = O(n^c) for some c = poly(n)
+  O(|Γ|^(O(log n)) \* |Q| \* log n \* n) = O(n^c) for some c = poly(n)
 
 "NL ⊆ P would be a fantastic exam question" -- nevermind, the proof he thought
 of was wrong, "so it's an exercise!
