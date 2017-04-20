@@ -2000,18 +2000,24 @@ Hierarchy:
 
 ![language-hierarchy](march-23-language-heirarchy.png)
 
-proof for ZPP in RP is like ZPP in BPP, but when terminating, always be sure to reject (since we can’t wrongly accept)
+proof for ZPP in RP is like ZPP in BPP, but when terminating, always be sure to
+reject (since we can’t wrongly accept)
 
-Claim: BPP is a subset of NP because for L in BPP and input x, we have a verifier that takes a sequence of coin flips that leads to accept state as the certificate.
+Claim: BPP is a subset of NP because for L in BPP and input x, we have a
+verifier that takes a sequence of coin flips that leads to accept state as the
+certificate.
 
 FALSE (strong hint for the exam - understand why this is false)
 
 - if x is in L, there's a valid certificate to the accept state
-- if x is not in L, up to a third of the paths lead to the accept state wrongly (because we allow error), so there also exists a valid certificate!
+- if x is not in L, up to a third of the paths lead to the accept state wrongly
+  (because we allow error), so there also exists a valid certificate!
 
 Theorem: RP is in NP
 
-- the above attempt at a proof now works for RP, because if x is in L at least half the paths lead to accept state, and if it's not then there's no valid certificate
+- the above attempt at a proof now works for RP, because if x is in L at least
+  half the paths lead to accept state, and if it's not then there's no valid
+  certificate
 
 Question1: is BPP in NP?
 
@@ -2019,9 +2025,12 @@ Question1: is BPP in NP?
 
 THeorem: BPP is in EXP?
 
-- proof: brute force simulation, count paths. try all the possible coin flips - there's an exponential number of paths. count the probability of ending in an accept state. It'll only be >= 2/3 if we should accept
+- proof: brute force simulation, count paths. try all the possible coin flips -
+  there's an exponential number of paths. count the probability of ending in an
+  accept state. It'll only be >= 2/3 if we should accept
 
-Question 2: are there BPP-complete languages? (same as NP-complete definition, but replace NP with BPP)
+Question 2: are there BPP-complete languages? (same as NP-complete definition,
+but replace NP with BPP)
 
 - unknown
 
@@ -2034,12 +2043,16 @@ Question 3: is BPTIME(n^2) not equal to BPTIME(n)?
 ![IP-diagram](march-23-interactive-proofs.png)
 
 - based off of communication complexity
-- the ‘prover’ gets x and as much time and space as it wants to come up with a certificate
+- the ‘prover’ gets x and as much time and space as it wants to come up with a
+  certificate
 - then the verifier can verify it in poly time
 - this is an 'interactive' view of NP
-- this is 'one way' communication, so only prover can communicate to verifier (but verifier can ask questions)
+- this is 'one way' communication, so only prover can communicate to verifier
+  (but verifier can ask questions)
 
-Def'n: the class **DIP** is the class of languages that can be decided in polytime by a verifier that interacts (back and forth) with a prover in a polynomial amount of communication such that
+Def'n: the class **DIP** is the class of languages that can be decided in
+polytime by a verifier that interacts (back and forth) with a prover in a
+polynomial amount of communication such that
 
 - if x is in L, the prover can always convince the verifier with the interaction
 - if x is not in L, then no possible interaction convinces the verifier (erroneously)
@@ -2048,17 +2061,25 @@ Thm: DIP = NP
 
 Proof:
 
-- NP in DIP is obvious (the prover sends one message which is the certificate, the verifier can verify it in poly time)
-- to show DIP is in NP, we note that a DIP verifier can be simulated by an NP verifier V' that recieves "the whole transcript c = (m1, m2, m3, ..) that causes V to accept" as its certificate.
+- NP in DIP is obvious (the prover sends one message which is the certificate,
+  the verifier can verify it in poly time)
+- to show DIP is in NP, we note that a DIP verifier can be simulated by an NP
+  verifier V' that recieves "the whole transcript c = (m1, m2, m3, ..) that
+  causes V to accept" as its certificate.
 
-Def'n: IP is the class of language decidable with bounded error by a probTM that interacts with a prover (in polytime)
+Def'n: IP is the class of language decidable with bounded error by a probTM that
+interacts with a prover (in polytime)
 
-- if x is in L, the prover has a strategy to answer verifier's questions in such a way that causes verifier to accept with probability >= 2/3
-- if x is not in L, **any** strategy of the prover still causes the verifier to reject with probability >= 2/3
+- if x is in L, the prover has a strategy to answer verifier's questions in such
+  a way that causes verifier to accept with probability >= 2/3
+- if x is not in L, **any** strategy of the prover still causes the verifier to
+  reject with probability >= 2/3
 
-Note: the verifier has a random machine, the prover can't know what the verifier will do because it's random
+Note: the verifier has a random machine, the prover can't know what the verifier
+will do because it's random
 
-Theorem: IP is in NEXP - have to send all possible messages for every combination of random choices
+Theorem: IP is in NEXP - have to send all possible messages for every
+combination of random choices
 
 ### Graph isomorphism
 
@@ -2083,8 +2104,11 @@ proof:
   - creates H by randomly permuting the labels at verticies of Gi
 - then the verifier sends H to the prover; expects i as the response
 - if G1 isn't isomorphic to G2 then the prover can always determine i
-  - note that the prover is all powerful and can figure out *anything* (i.e. it could know if a machine halts, but the point here is it has to convince you in poly time)
-- if G1 isn't isomorphic to G2, then the prover guesses i correctly with probability only 1/2
+  - note that the prover is all powerful and can figure out *anything* (i.e. it
+    could know if a machine halts, but the point here is it has to convince you
+    in poly time)
+- if G1 isn't isomorphic to G2, then the prover guesses i correctly with
+  probability only 1/2
 - with two repetitions, now the chance of getting it right is 1/4
 
 
@@ -2096,8 +2120,8 @@ Def'n: the **space complexity** of an input/work tape TM is a function s: N -> N
 such that on any input x in {0,1}^n, M writes on at most O(s(n)) cells in the
 work tape
 
-Def'n: SPACE(s(n)) is the class of languages that can be decided by an input/work
-tape TM with space complexity s(n)
+Def'n: SPACE(s(n)) is the class of languages that can be decided by an
+input/work tape TM with space complexity s(n)
 
 e.g.
 
@@ -2108,7 +2132,7 @@ Def'n: L = SPACE(log n)
 
 Def'n: PSPACE = union SPACE(n^c) for c >=1
 
-Theorem: L ⊆ NL ⊆ P ⊆ NP ⊆ PSAPCE ⊆ EXP ⊆ NEXP
+Theorem: L ⊆ NL ⊆ P ⊆ NP ⊆ PSPACE ⊆ EXP ⊆ NEXP
 
 Proof: NP ⊆ PSAPCE
 
@@ -2119,14 +2143,14 @@ Proof: NP ⊆ PSAPCE
 Proof: L ⊆ P
 
 - if M uses s cells in the work tape on input x in {0,1}^n, it can be in at most
-  (|Γ|^s times s) times |Q| times n
-- (all combinations of configurations of the work tape, state, input tape)
+  ((|Γ|^s times s) times |Q| times n) configurations
+  - (all combinations of configurations of the work tape, state, input tape)
 - if M is halting, it can never be in the same config twice, so if its space
   complexity is O(log n), then time complexity is
   O(|Γ|^(O(log n)) \* |Q| \* log n \* n) = O(n^c) for some c = poly(n)
 
 "NL ⊆ P would be a fantastic exam question" -- nevermind, the proof he thought
-of was wrong, "so it's an exercise!
+of was wrong, "so it's an *EXERICSE*!"
 
 We know:
 
@@ -2192,7 +2216,7 @@ Thm: MIP = class of languages decidable by a probabilistic poly-time verifier
 in the RAM model (can query anywhere on the tape in constant time) that
 recieves a proof of exponential length
 
-Proof: exercise!
+Proof: left as exercise, but proved next class
 
 ## Lecture 24 (March 29)
 
