@@ -1042,7 +1042,10 @@ integers
 Q+ = {m/n : m, n are natural numbers}
 
  - make a 2D grid mxn, start in the top left corner, and go back and forth
-   diagonally (TODO: add a pic from the internetz)
+   diagonally
+
+![diagram](https://plus.maths.org/issue47/features/macgregor/diagram3.gif)
+
  - a nice alternative is f(m, n) = 2^m 3^n
 
 T = {M : M is a TM}
@@ -1075,23 +1078,23 @@ Thm: The set L of all language over Σ = {a,b} is uncountable.
 
 Proof: by **diagonalization**
 
-- assume by contradiction that L is countable. So there is a mapping phi: N->L
-such that every l in L equals phi(n) for some n in N
-- every l in L can e represented as a inifinite sqeuence s over {0,1} where the
+- assume by contradiction that L is countable. So there is a mapping Φ: N->L
+such that every l in L equals Φ(n) for some n in N
+- every l in L can e represented as a infinite sqeuence s over {0,1} where the
   ith element of s indiciates whether the ith string over {a,b} (countable) is
   in L or not
   e.g. L = {b, aa, bb} = 01101000... (where our ordering was a, b, aa, ab, bb...)
-- if we assume that L is countable, then there's some phi mapping of N->L
-- then phi can be written out as, e.g.
- - n -> phi(n)
+- if we assume that L is countable, then there's some Φ mapping of N->L
+- then Φ can be written out as, e.g.
+ - n -> Φ(n)
  - 1 -> 00000..
  - 2 -> 10000..
  - 3 -> 111010011...
  - 4 -> 000111... (random)
  - ....
 - consider the language L* with corresponding sequence is obtained by flipping
-  the ith coordinate of the sequence for phi(i)
-- by construction of phi, there must exist n* in N such that phi(n*) = L*
+  the ith coordinate of the sequence for Φ(i)
+- by construction of Φ, there must exist n* in N such that Φ(n*) = L*
 - Does L* include the n*-th string? if you say yes or no, you get a
   contradiction and this completes the proof
 
@@ -1099,14 +1102,14 @@ such that every l in L equals phi(n) for some n in N
 
 ### An Undecidable Problem
 
-Def'n: A_TM = {<M, w> : M is a TM, M accepts w}
+Def'n: `A_TM = {<M, w> : M is a TM, M accepts w}`
 
 Theorem: A_TM is recognizable
 
 Proof: let U be the TM that
 
 - (i) simulates M on w
-- (ii) accept if M ever reaches its accept state; reject if M rejects
+- (ii) accept if M ever reaches its accept state; reject otherwise
 - we do this with multiple tapes: one for M, one for w, one that holds the
   current state (and you use that state and M to decide what to do next)
 
@@ -1118,12 +1121,12 @@ Proof: by contradiction
 
 Let H be a TM that decides A_TM. Let D be the TM that takes as input <M> and
 
-- (i) run H as a subroutine on <M, <M>>
-- (ii) accept if H rejects; reject is H accepts
+- (i) run H as a subroutine on `<M, < M >>`
+- (ii) accept if H rejects; reject if H accepts
 - note that D halts on every input
-- does D accept or reject <D>?
- - D(<D>) accepts iff H rejects D on <D>, which means D rejects input <D>
- - D(<D>) rejects iff H accepts D on <D>, which means D accepts input <D>
+- does D accept or reject `<D>`?
+ - D(`<D>`) accepts iff H rejects D on `<D>`, which means D rejects input `<D>`
+ - D(`<D>`) rejects iff H accepts D on `<D>`, which means D accepts input `<D>`
  - contradiction either way!
 - so our assumption that A_TM is decidable is false
 
@@ -1131,15 +1134,15 @@ How is this related to diagonalization? check out section 4.2 in the text
 
 ### Halting problem
 
-Def'n: HALT_TM = {<M, w>: M is a TM and halts on input w}
+Def'n: `HALT_TM = {<M, w>: M is a TM and halts on input w}`
 
 Theorem: HALT_TM is undecidable
 
 Proof by contradiction:
 
 - let H be a TM that decides HALT_TM
-- let T be the TM that gets <M, w> as input
- - (i) call H as a subroutine on <M, w>
+- let T be the TM that gets `<M, w>` as input
+ - (i) call H as a subroutine on `<M, w>`
  - (ii) if H rejects, T rejects also
  - (iii) Otherwise, simulate M on w and return same answer
 - Then T decides A_TM
@@ -1147,7 +1150,7 @@ Proof by contradiction:
 
 ### More reductions
 
-Defn: EMPTY_TM = {<M> : L(M) = emptyset}
+Defn: `EMPTY_TM = {<M> : L(M) = emptyset}`
 
 Defn: L(M) = {w in Σ* : M accepts w} (ie the language recognized by M)
 
@@ -1170,7 +1173,7 @@ Proof: by contradiction
 
 accepting everything is also similarily undecidable :p
 
-Defn: EQ_TM = {<M1, M2> : L(M1) = L(M2)}
+Defn: `EQ_TM = {<M1, M2> : L(M1) = L(M2)}`
 
 Theorem: EQ_TM is also undecidable
 
@@ -1180,14 +1183,14 @@ make M1 a TM that we know doesn't accept anything)
 ### Rice's Theorem
 
 Defn: a **property** of languages of Turing machines is a subset of those
-languages. e.g. beign empty, including some string w, including only strings of
+languages. e.g. begin empty, including some string w, including only strings of
 even length, being regular, ....
 
 Defn: a property P of languages TMs is **nontrivial** if there exists M s.t.
 L(M) has property P and there exists M' s.t. L(M') does not have P.
 
-**Rice's Theorem**: For every non trivial property P of languges of TMs,
-L_p = {<M> : L(M) has property p} is undecidable
+**Rice's Theorem**: For every non trivial property P of languages of TMs,
+`L_P = {<M> : L(M) has property P}` is undecidable
 
 ## Lecture 12
 
@@ -1195,8 +1198,10 @@ midterm
 
 ## Lecture 13 (Feb 14)
 
-(extra non-exam things, except maybe
-"what is the statement of Hilbert's 10th problem")
+(extra non-exam things -- ie this week isn't covered on the exam)
+
+(this is because he forgot there was another week before reading week and
+doesn't want to start the second half of the course until we get back)
 
 ### Hilbert's 10th problem
 
@@ -1247,14 +1252,14 @@ the other direction:
 
 #### H10 (v4):
 
-Determine whether the language L_H10 = {<P> : P is a polynomial s.t. there
-exists x in N^n for which P(x) = 0} is decidable
+Determine whether the language L_H10 = `{<P> : P is a polynomial s.t. there
+exists x in N^n for which P(x) = 0}` is decidable
 
 ### Diophantine sets
 
 defn: the S, subset of N, is a **Diophantine set** if there is a polynomial P_s
-such that S = {a in N : there exists y2,...,yn in natural numbers s.t.
-P(a, y2, ..., yn) = 0}
+such that `S = {a in N : there exists y2,...,yn in natural numbers s.t.
+P(a, y2, ..., yn) = 0}`
 
 Claim: S = N is diophantine
 
@@ -1283,9 +1288,9 @@ Proof:
   but this might be a bit handwavy)
 - assume that L_H10 is decidable
 - let M be a turing machine that decies L_H10
-- construct M' that on input <x>
+- construct M' that on input `<x>`
   - constructs Q(y2, ..., yn) = P_s(x, y2, ..., yn)
-  - call M on <Q>
+  - call M on `<Q>`
   - accept if M accepts, reject if M rejects
 - so L_S is decidable... contradiction
 
@@ -1309,7 +1314,7 @@ Recall:
 - defn: the S, subset of N, is a **Diophantine set** if there is a polynomial
   P_s such that S = {a in N : there exists y2,...,yn in natural numbers
   s.t. P(a, y2, ..., yn) = 0}
-- L_S = {<x> : x in S}
+- `L_S = {<x> : x in S}`
 
 the conjecture: If S, subset of N, that satisfies L_S is recognizable, then S is
 diophantine
@@ -1394,7 +1399,7 @@ you can read on wired about russians making money on slot machines XD
 ### Unit II: Time Complexity
 
 Definition: the **(worst-case) running time** of a TM T is the function
-t: N -> N union {infinity} where t(n) is the maximum number of transitions
+t: N -> N union {∞} where t(n) is the maximum number of transitions
 followed by M before halting over all inputs of length n
 
 ...where the TM is a single-tape TM
@@ -1420,29 +1425,29 @@ Theorem: The language L = {0^k 1^k : k >=0} is in TIME(n^2)
 We can also do this in TIME(n log n)
 
 - Proof sketch: erase every 2nd 0, erase every 2nd 1, then check parities
-  (odd/even) of 0s an 1s -- if they're different, return false, if they are,
+  (odd/even) of 0s an 1s -- if they're different, return false, if they're same,
   repeat -- stop when all characters are erased
 - each pass takes O(n) transitions and there are O(logn) passes
 
 Theorem: Any single tape TM that decides L has run time Ω(n log n)
 
-Proof: challenge! (bonus marks)
+Proof: challenge *EXERCISE*! (if we do it we get bonus marks)
 
 Theorem: There is a 2-tape TM that decides L in time O(n)
 
 Proof: you write 1s for each 0 you see, then erase them for each 1 you see. If
        you have the empty string on the second tape at the end, you accept
 
-Corollary: TIME(t(n)) is NOT equal to TIME^multi(t(n))
+Corollary: TIME(t(n)) is NOT equal to TIME^multi_tape (t(n))
 
 Theorem: for every language L that can be decided by a k-tape TM with running
-time t(n), there is a 2-tape Tm with running time O(t(n) log(t(n)))
+time t(n), there is a 2-tape TM with running time O(t(n) log(t(n)))
 
 Thoerem: the language PAL = {x x^R : x in {0,1}*} can be decided by a 2-tape TM
 with running time O(n) *but* every 1-tape TM that decides PAL has running time
-Omega(n^2)
+Ω(n^2)
 
-Proof: challenge! (bonus)
+Proof: challenge! (bonus) -- but then later it was on our assignment
 
 ### Linear speedup theorem:
 
@@ -1463,14 +1468,14 @@ proof:
 
 - we can choose a new tape language Γ' = Γ^3
 - so if the old string was x1 x2 x3 x4 ....
-- then the new first character is "x1 x2 x3" amd the next is "x3 x4 x5" then
+- then the new first character is "x1 x2 x3" and the next is "x3 x4 x5" then
  "x5 x6 x7" etc
 - we have a bigger alphabet, but it still costs the same to read a character
   (even though the character has 'more information')
 - compressing the input takes time n
 - going back to beginning takes time n/2
 - compressing all the transitions of M within a single window into 1 transition
-  means M' makes at most 1/2*t(n) extra transitions
+  means M' makes at most 1/2*t(n) transitions
 
 ## Lecture 15 (March 2)
 
@@ -1517,9 +1522,9 @@ for any fixed k
 
 - E = union k >= 1 TIME(k^n)
    - this is often written as union k >= 1 TIME(2^kn)
-   - we couldn't figure out in class if it was closed
+   - we couldn't figure out in class if it was closed -- left as *EXERICSE*
 
-- EXP = union k >= 1 TIME(2^n^k) is closed
+- EXP = union k >= 1 TIME(2^n^k) **is** closed
 
 ##### 3. MEANING
 
@@ -1527,9 +1532,11 @@ Obs: for many languages, there is a simple brute-force search algorithm that
 decides the language in exponential time.
 
 - 2 COL: 2^n possible colorings to check, we can also make a polynomial time
-- 3 COL: 3^n ........................ ?? if it's in P
-- SAT: 2^n .......................... ?? if it's in P
-- primes: 2^n factors to check for a # with n binary digits, apparently this also in P!
+  algo that just alternates as we iterate among the vertices
+- 3 COL: 3^n ........................ ?? no one knows if it's in P
+- SAT: 2^n .......................... ?? no one knows if it's in P
+- primes: 2^n factors to check for a # with n binary digits, apparently this
+  also in P!
 
 For each of these languages L, showing that L in P means that we can do
 *exponentially* better than brute force search
@@ -1537,7 +1544,7 @@ For each of these languages L, showing that L in P means that we can do
 ### NP
 
 Def'n: The **running time** of a **NTM** is a function t: N->N where t(n) is the
-maximum # of transitions followed by *any* valid compuation path before the NTM
+maximum # of transitions followed by *any* valid computation path before the NTM
 halts and over *any* input of length n
 
 Def'n: NTIME(t(n)) is the class of languages that can be decided by an NTM with
@@ -1548,9 +1555,9 @@ Def'n: NP = union k>=1 NTIME(n^k)
 Def'n: The language L is **efficiently verifiable** if there is a
 polynomial-time deterministic TM M that satisfies:
 
-- (i) for all c in {0,1}* of length |c| = poly(|x|) such that m accepts <x, c>
+- (i) for all c in {0,1}* of length |c| = poly(|x|) such that m accepts `<x, c>`
 - (ii) for all x not in L, for all c in {0,1}* of length |c| = poly(|x|), M
-       rejects <x, c>
+       rejects `<x, c>`
 
 Proof:
 
@@ -1573,7 +1580,8 @@ Note: Lemma 1 in assignment: should be O(t log(t)) instead of O(n log(n))
 ### Polynomial-time reductions
 
 Def'n: A language A that is a subset of {0,1}* is **polynomial-time reducable**
-to B (also a subset of {0,1}*) if there exists f: {0,1}* -> {0,1}* that satisfies:
+to B (also a subset of {0,1}\*) if there exists f: {0,1}\* -> {0,1}\* that
+satisfies:
 
 - (i) there is a Turing machine with polynomial running time that on input
        x in {0,1}* writes f(x) on the tape, and
@@ -1590,10 +1598,11 @@ if B accepts/rejects
 Exercises:
 
 - unary addition <=_p unary subtraction (but + and - and = are 0s)
-  - f(x) = x^R
-- the language 0^k 1^k <=_p even palendromes = w w^R **** left as exercise
+  - f(x) = x^R but swap the operators fo a+b=c becomes c-b=a
+- the language 0^k 1^k <=_p even palendromes = w w^R **** left as *EXERICSE*
   - be careful - something not in the original language can't be mapped to a palendrome
-  - f(x) = x x'    where x' is x but all 0s are replaced with 1s and vice versa
+  - I tried f(x) = x x'    where x' is x but all 0s are replaced with 1s and
+    vice versa
     - nope, this doesn't work for 00110011 :(
 - 2COL <=_p 3COL
   - f(G) = G with new vertex that's connected to all the vertices in G
@@ -1615,7 +1624,7 @@ Theorem: There is a language L that is NP-complete
 
 Proof:
 
-- consider TMSAT = {<M, x, 1^u, 1^t>, such that there exists c in {0,1}* of
+- consider `TMSAT = {<M, x, 1^u, 1^t>`, such that there exists c in {0,1}* of
   length <= u s.t M accepts <x, c> in at most t steps}
 - TMSAT is in NP
   - we can build a NTM that guesses the certificate c and simulate M on <x, c>
@@ -1624,10 +1633,11 @@ Proof:
 - TMSAT is NP-hard
   - let A be any language in NP
   - let V be a polynomial time verifier for A
-  - define f(x) = <V, x, 1^p(|x|), 1^t(|x|) >
+  - define `f(x) = <V, x, 1^u(|x|), 1^t(|x|) >`
     - he's skipping over details of how to compute u and t in poly time
   - we can compute f in polynomial time
-  - and we can easily verify that x is in A iff f(x) is in TMSAT (make sure of this!)
+  - and we can easily verify that x is in A iff f(x) is in TMSAT (*EXERCISE*:
+    make sure of this!)
 
 ### Cook-Levin Theorem
 
@@ -1635,10 +1645,10 @@ Theorem (Cook '71, Levin '73): SAT is NP Complete
 
 SAT
 
-- e.g. phi (x1, x2, x3) = (x1 and x2) or (notx3 or x1)
+- e.g. Φ (x1, x2, x3) = (x1 and x2) or (notx3 or x1)
 - def'n: a Boolean formula is satisfiable if there is an assignment of True/False
   values to the variables that causes the formula to evaluate to True
-- def'n: SAT = <phi> : phi is a satisfiable boolean formula}
+- def'n: `SAT = <Φ> : Φ is a satisfiable boolean formula}`
 
 ## Lecture 18 (March 9)
 
@@ -1652,7 +1662,7 @@ Proof:
   assignment causes a formula to evaluate to True
 - Next we show that SAT is NP-hard. Let L be any language in NP. We want to show
   that L <=_p SAT. This means that we want to construct a function f_L that on
-  input x in {0,1}*, outputs f\_L(x) = phi\_x such that phi\_x is satisfiable
+  input x in {0,1}*, outputs f\_L(x) = Φ\_x such that Φ\_x is satisfiable
   iff x is in L and f\_L can be computed in polynomial time.
 - let M be a NTM with polynomial running time that decides L. We can assume:
   - (i) M never goes to the left of the first symbol of x in original input, and
@@ -1662,31 +1672,31 @@ Proof:
   and each row is a configuration (see def'n of configuration above) where each
   cell is 0 or 1 or blank and maybe also has a state appended to it
   (e.g. 0 and q2)
-- To build phi_x, we start by defining variables
+- To build Φ_x, we start by defining variables
   - z_{i,j,s} = 1 if cell (i, j) of Tableau is s ---- 0 otherwise
   - ^ intutive idea, we don't actually assign the values
 - there are 3(q+1) possible symbols in any cell when M has q states and t(n) x t(n)
   cells in the Tableau. So the total # of variables is polynomial in n
 - I. create formula that is satisfied only when variables encode a Tableau
   - i.e. only one value can be taken, no others can
-  - phi^(enc)\_{i,j} = OR(z\_{i,j,s} for all s) AND AND(NOT(z\_{i,j,s} AND
-    z{i,j,t}) for all s,t)
-  - define phi^(enc) = AND(phi^(enc)\_{i,j} for all i,j in t(n))
+  - Φ^(enc)\_{i,j} = OR(z\_{i,j,s} for all s) AND AND(NOT(z\_{i,j,s} AND
+    z\_{i,j,t}) for all s,t)
+  - define Φ^(enc) = AND(Φ^(enc)\_{i,j} for all i,j in t(n))
 - II. Check that each 'row' is a valid configuration.
-  - exercise: find formula phi^(config) that does this
+  - exercise: find formula Φ^(config) that does this
 - III. Check initial configuration, on input x
-  - phi^(init)\_j = z\_{1,1,x1-q0} if j = 1 --- z_{1, j, x\_j} if 1 < j <= n ---
+  - Φ^(init)\_j = z\_{1,1,x\_1-q\_0} if j = 1 --- z_{1, j, x\_j} if 1 < j <= n ---
     and z\_{i, j, -} if j > n
-  - phi^(init) = AND(phi^(init)\_j for all j)
+  - Φ^(init) = AND(Φ^(init)\_j for all j)
 - IV. Check that M reaches the accept state
-  - phi^(accept) = .... exercise!
+  - Φ^(accept) = .... exercise!
 - V. Check that the transitions in the Tableau are valid
   - key idea: enforce valid transitions on 2x3 windows (the pointer/head can
     only move one block, a character can only change if it previously had the
     pointer/head on it)
   - also have to check the transitions state+input -> output are valid
-  - phi^(transitions) = exercise
-- define phi_x = phi^(enc) AND phi^(init) AND phi^(acc) AND phi^(transitions)
+  - Φ^(transitions) = exercise
+- *EXERCISE*: define Φ_x = Φ^(enc) AND Φ^(init) AND Φ^(acc) AND Φ^(transitions)
 
 ### state of the art on P vs NP
 
@@ -1701,20 +1711,20 @@ Conjecture: P != NP. For any NP-complete L and any c > 0, there is no algorithm
 that computes L in time O(n^c)
 
 Conjecture (Strong Exponential-Time Hypothesis): There is a constant δ > 0
-such that every algorithm that computes SAT has time complexity Omega(2^(δ*n))
+such that every algorithm that computes SAT has time complexity Ω(2^(δ*n))
 
 Theorem 1: There exists a language L in NP such that any algorithm in the RAM
-model that computes L has running time Omega(n)
+model that computes L has running time Ω(n)
 
 Theorem 2: There is a language L in NP such that any multi-tape TM that decides
-L has running time Omega(n \* log\*(n)^(1/4))
-- log*n is iterated log, as in the number of powers of two ((2^2)^2)^2...
-  until we get n. There's a (false) claim that log*n <= 5 (but that usually the
+L has running time Ω(n \* log\*(n)^(1/4))
+- log\*n is iterated log, as in the number of powers of two ((2^2)^2)^2...
+  until we get n. There's a (false) claim that log\*n <= 5 (but that usually the
   case, it gives you the idea of how slowly it grows)
 - the idea is that it's a bit slower than linear, but just a biiiiitt
 
 Theorem 3: There exists a language L in NP such that any single-tape TM that
-decides L has running time Omega(n^2)
+decides L has running time Ω(n^2)
 
 
 ### Communication complexity
@@ -1723,7 +1733,7 @@ You have Alice and Bob and Alice knows only x and Bob knows only y, and the goal
 is to figure out f(x, y), where they both know how f works, by only sharing as
 little information as possible
 
-Def'n: A communiction protocol PI for functions mapping X x Y to Z is a binary
+Def'n: A communiction protocol π for functions mapping X cross Y to Z is a binary
 tree where
 
 (i) every internal node v is labelled with a function a\_v: X -> {0,1} or
@@ -1733,19 +1743,19 @@ tree where
 i.e. either Alice or Bob emits a 0 or a 1, and we use that to decide where to go
 next in the tree and what to do next
 
-Def'n: The protocol PI **computes** f: X x Y -> Z if for every x in X and y in Y,
-the leaf in PI reached by (x, y) is labelled f(x, y)
+Def'n: The protocol π **computes** f: X x Y -> Z if for every x in X and y in Y,
+the leaf in π reached by (x, y) is labelled f(x, y)
 
-Def'n: The **cost** of PI is the (maximum) depth of the tree. (= max number of
+Def'n: The **cost** of π is the (maximum) depth of the tree. (= max number of
 bits that Alice and Bob exchange to compute f(x, y) over all possible x, y in
 X x Y)
 
 Def'n: the **(deterministic) communication complexity** of f: X x Y -> Z is the
-minimum cost of a protocol PI that computes f. We call it D(f)
+minimum cost of a protocol π that computes f. We call it D(f)
 
 Proposition 1: Every function f: {0,1}^n x {0,1}^n -> {0,1} has CC D(f) <= n+1
 
-Proof: Define PI to have Alice communicate x to Bob. From the root ALice sends
+Proof: Define π to have Alice communicate x to Bob. From the root Alice sends
 x1, then always next sends x2.... etc until xn. Then Bob uses x and y to compute
 f and sends f(x,y), then we get our leaf z in Z
 
@@ -1760,18 +1770,18 @@ xor sum of y and outputs z
 
 Def'n: EQ: {0,1}^n x {0,1}^n -> {0,1} is EQ(x,y) = {1 if x = y, 0 if x != y}
 
-Theorem: D(EQ) = Omega(n)
+Theorem: D(EQ) = Ω(n)
 
 Proof:
 
-- let PI be any protocol that computes EQ. Consider every leaf labelled 1
-  in PI. Let's tag such a leaf with x in {0,1}^n if (x,x) leads to that leaf in PI
-- Claim 1: No leaf of PI can be tagged with two distinct x, x' in {0,1}^n
+- let π be any protocol that computes EQ. Consider every leaf labelled 1
+  in π. Let's tag such a leaf with x in {0,1}^n if (x,x) leads to that leaf in π
+- Claim 1: No leaf of π can be tagged with two distinct x, x' in {0,1}^n
   - Proof: by contradiction. Assume (x, x) and (x', x') both lead to the same leaf.
-    But then (x, x') also defines the same path in PI to a leaf that outputs 1.
+    But then (x, x') also defines the same path in π to a leaf that outputs 1.
     contradiction!
-- Claim 1 implies that PI must have >= 2^n leafs labelled 1. (pigeonhole principle!)
-- if PI has depth d, it has at most 2^d leaves, so it must have depth >= n
+- Claim 1 implies that π must have >= 2^n leafs labelled 1. (pigeonhole principle!)
+- if π has depth d, it has at most 2^d leaves, so it must have depth >= n
 
 ## Lecture 20 (March 16)
 
@@ -1783,18 +1793,18 @@ Recall Alice and Bob, only Alice has x and only Bob has y, they send messages
 back and forth to determine EQ(x, y)
 
 Theorem: Any single-tape TM that decides PAL = {ww^R : w in {0,1}*} must have
-running time Omega(n^2)
+running time Ω(n^2)
 
 Proof: let M be a single-tape TM that decides PAL with running time t(n)
 
-Goal: define a protocol PI that computes EQ with communication cost that depends
+Goal: define a protocol π that computes EQ with communication cost that depends
 on t(n)
 
 #### Idea 1: Alice and Bob can compute EQ(x, y) by simulating M on x y^R
 
 M accepts iff xy^R is in PAL
 
-Define PI as follows:
+Define π as follows:
   - 1. Alice simulates M until the tape head crosses over to the position n+1 on
     the input tape (no communication required)
   - 2. Alice sends the current state q to Bob. => O(1) bits of communication
@@ -1806,13 +1816,13 @@ Define PI as follows:
 Let m(x, y) be the number of times M crosses the boundary at position n on the
 tape when the input is xy^R
 
-So the total cost of PI is O(m(x, y))
+So the total cost of π is O(m(x, y))
 
-With the previous theorem: n <= D(EQ) <= cost(PI) <= O(m(x, y)) <= O(t(2n))
+With the previous theorem: n <= D(EQ) <= cost(π) <= O(m(x, y)) <= O(t(2n))
 
 - 2n because the length of total input string is 2n
 
-So t(n) >= Omega(n) -- not great!
+So t(n) >= Ω(n) -- not great!
 
 #### Idea 2:
 
@@ -1821,21 +1831,26 @@ Simulate M on x 0^2n y^R *but* choose the best boundary according to the input
 choose a handoff boundary given those, to minimize handoffs) instead of just
 fixing the midpoint as that boundary
 
-Define PI as follows:
+Define π as follows:
 
-- 1. Simulate M on x 0^2n x^R
+1. Simulate M on x 0^2n x^R
+
 - let i(x) be in the index of n, n+1, ..., 3n corresponding to the boundary
   crossed the least # of times by M on x 0^2n x^R
 - let m(x) be the # of times M crosssed the boundary i(x)
-- 2. Alice sends i(x) and m(x) to Bob
+
+2. Alice sends i(x) and m(x) to Bob
+
   - this takes log(n) + log(t(4n)) bits
   - optionally don't send m(x)
-- 3. Bob computes i(y) and m(y) by simulating m on y 0^2n y^R
-- 4. Bob sends 1 bit to say whether i(x) = i(y) *and* m(x)= m(y)
-- 5a. if i(x) != i(y) or m(x) != m(y) then x != y, so we're done!
-- 5b. otherwise run the simulation as before but with hand-offs at boundary i(x)
+
+3. Bob computes i(y) and m(y) by simulating m on y 0^2n y^R
+4. Bob sends 1 bit to say whether i(x) = i(y) *and* m(x)= m(y)
+5a. if i(x) != i(y) or m(x) != m(y) then x != y, so we're done!
+5b. otherwise run the simulation as before but with hand-offs at boundary i(x)
    - O(m(x)) bits of communication
-- so the total cost of PI is O(m(x))
+
+so the total cost of π is O(m(x))
 
 Claim: m(x) <= t(4n) / 2n
 
@@ -1844,20 +1859,234 @@ n, n+1, ..., 3n, so at least one of thse boundaries must be crossed
 <= t(4n)/2n times
 
 
-So n <= D(EQ) <= cost(PI) <= O(t(4n)/2 + log n)
+So n <= D(EQ) <= cost(π) <= O(t(4n)/2 + log n)
 
-- => Omega(n) <= t(4n)/n + log n
-- => Omega(n^2 - nlogn) <= t(4n)
-- => Omega(n^2) <= t(4n)
-- => Omega(n^2) <= t(n)
+- => Ω(n) <= t(4n)/n + log n
+- => Ω(n^2 - nlogn) <= t(4n)
+- => Ω(n^2) <= t(4n)
+- => Ω(n^2) <= t(n)
 
 ## Lecture 21 (March 21)
 
-see notes from Ahmed
+(I missed this lecture and Lecure 22. These notes were written by Ahmed and sent
+to me along with a recording of the lecture - I added in a few notes from what
+was said out loud as well)
+
+### Probabilistic TMs and BPP
+
+If you want randomized algorithms, take 46
+
+Def'n: A **probabilistic TM** is a nondeterministic TM with 2 transition
+functions delta0 and delta1. At each step of the computation, the TM flips a
+coin to determine whether it follows delta0 or delta1
+
+Def'n: The **running time of a probabilistic TM** is a function t: N -> N such
+that for every input x in {0,1}^n and for each positive outcome of the coin
+flips, M terminates after t(n) steps
+
+Def'n: The probabilistic TM M **decides L in {0,1}\* with bounded error** if it
+always halts and
+
+- when x is in L, M accepts with probability >= 2/3
+- when x is not in L, M rejects with probability >= 2/3
+
+Def'n: the language L is in BPP iff it is decided with bounded error by a
+poly-time probabilistic TM
+
+Thesis: BPP captures all languages that can be computed efficiently in any
+reasonable model of randomized computation
+
+Note: BPP includes P, because we could just have delta0 and delta1 to go the
+same state. Some people think BPP = P but it's an open problem
+
+Def'n: A **supergeneralized probabilistic TM** is a NDTM where each transition
+is associated with a number 0 < p < 1 that determines the probability that the
+TM follows this transition at appropriate steps. (and all transitions leaving a
+state on some input have probabilities adding to one). The way this runs is
+different thatn the NDTM we saw before (it picks a path, instead of running them
+all), but the setup is similar
+
+Note: This is like a normal NDTM but one that does always make the right choice
+
+Proposition: if L can be decided (with bounded error) by a super general
+probabilistic TM with running time t and all the transition probabilities of M
+are of the form p = c / 2^k where c and k are natural numbers, then it can be
+decided by a ProbTM with running time t' = O(t(n))
+
+Proof: the idea is you break up transitions into multiple states and transitions.
+
+- If q0 goes to A  and C with probability 1/4 and B with probability 1/2
+- then we can build a TM where we go to B with probability 1/2 or D with
+  probability 1/2 (like a ProbTM) and D goes to A with prob 1/2 and C with prob 1/2
+- this means we get to A or C with prob 1/4
+
+What about p = 1/3 or 1/pi? -- *EXERCISE* (answer is in our optional text)
+
+Theorem: if L can be decided by a polytime super general prob TM whose
+transition probs are polytime computable, then L is in BPP (if can compute each
+probability in polynomial(n))
+
+Note: Unfair coins are okay, but only in average case model, not ours.
+
+Real coins are sliightly off from fair. Can you really make a perfect fair coin?
+Can we use an unfair coin to come up with a fair flip? Here's how: flip it twice,
+if you see tails then heads it’s 0 if its heads then tails it’s 1, otherwise
+flip again (0 then 1 is same probability as 1 then 0). Except... there's a
+catch. The worst case running time is infinite :( Ha, you can't get randomness
+that easily.
+
+### Error reduction
+
+Prop: if M decides L with bounded error 1/3, then there exists a ProbTM M' that
+decides L with bounded error 7/27
+
+Proof: Run M three times. Take majority answer. Odds it's correct are
+(2/3)^3 + 3\*(1/3)\*(2/3)^2 = 20/27
+
+Theorem: if M decides L with bounded error 1/3 and running time t, then for any
+epsilon > 0, there's a probTM M' with bounded error epsilon and running time t'
+= O(t(n))
+
+Proof: again by majority of enough copies of M (proof involves something about
+churnoff bounds)
+
+Def'n: L is in **RP** iff there is a polytime ProbTM such that
+
+- when x is in L, M accepts with prob >= 1/2
+- when x is not in L, M ALWAYS rejects
+
+We can boost by running a bunch of times (concurrently) and accept as soon as
+any of them accept
+
+Def'n: L is in **Perfect RP** iff there is a polytime prob TM such that M
+accepts iff x is in L
+
+Prop: PerfectRP = P. Pick heads/tails and stick with it for the proof
+
+### Average-case Running Time
+
+Def'n: the **average case running time** of a probTM M is the fn t: N->N such
+that for every x in {0,1}^n, the expected running time of M on x is at most t(n)
+--- expected is meant in a stats way, as in sum over each path its probability
+of executing times its run time
+
+Def'n: L is in ZPP (zero probabilistic polynomial time) if there is a probTM
+with poly average-case running time s.t. M accepts iff x in L
+
+Theorem: If L is decidable with bounded error by a probTM with poly average-case
+running time, then L is in BPP
+
+Proof: the idea is to truncate (ie terminate) long running TMs. When we
+terminate it adds a bit more error (we could just accept or just reject, but
+that might be the wrong choice), but since we terminate so infrequently it adds
+very little error, so it’s ok. (something to do with marcov inequality)
+
 
 ## Lecture 22 (March 23)
 
-see notes from Ahmed
+(I missed this lecture and Lecure 21. These notes were written by Ahmed and sent
+to me along with a recording of the lecture - I added in a few notes from what
+was said out loud as well)
+
+### State of the Art on BPP
+
+Recall:
+
+- BPP is the languages decidable with bounded error by a poly-time probTM
+- RP is the same but with one sided error
+- ZPP is the same but with no error, and by an expected poly time probTM
+
+Hierarchy:
+
+![language-hierarchy](march-23-language-heirarchy.png)
+
+proof for ZPP in RP is like ZPP in BPP, but when terminating, always be sure to reject (since we can’t wrongly accept)
+
+Claim: BPP is a subset of NP because for L in BPP and input x, we have a verifier that takes a sequence of coin flips that leads to accept state as the certificate.
+
+FALSE (strong hint for the exam - understand why this is false)
+
+- if x is in L, there's a valid certificate to the accept state
+- if x is not in L, up to a third of the paths lead to the accept state wrongly (because we allow error), so there also exists a valid certificate!
+
+Theorem: RP is in NP
+
+- the above attempt at a proof now works for RP, because if x is in L at least half the paths lead to accept state, and if it's not then there's no valid certificate
+
+Question1: is BPP in NP?
+
+- open question
+
+THeorem: BPP is in EXP?
+
+- proof: brute force simulation, count paths. try all the possible coin flips - there's an exponential number of paths. count the probability of ending in an accept state. It'll only be >= 2/3 if we should accept
+
+Question 2: are there BPP-complete languages? (same as NP-complete definition, but replace NP with BPP)
+
+- unknown
+
+Question 3: is BPTIME(n^2) not equal to BPTIME(n)?
+
+- unknown. the problem is we can't use diagonalization for randomness
+
+### Interactive proofs
+
+![IP-diagram](march-23-interactive-proofs.png)
+
+- based off of communication complexity
+- the ‘prover’ gets x and as much time and space as it wants to come up with a certificate
+- then the verifier can verify it in poly time
+- this is an 'interactive' view of NP
+- this is 'one way' communication, so only prover can communicate to verifier (but verifier can ask questions)
+
+Def'n: the class **DIP** is the class of languages that can be decided in polytime by a verifier that interacts (back and forth) with a prover in a polynomial amount of communication such that
+
+- if x is in L, the prover can always convince the verifier with the interaction
+- if x is not in L, then no possible interaction convinces the verifier (erroneously)
+
+Thm: DIP = NP
+
+Proof:
+
+- NP in DIP is obvious (the prover sends one message which is the certificate, the verifier can verify it in poly time)
+- to show DIP is in NP, we note that a DIP verifier can be simulated by an NP verifier V' that recieves "the whole transcript c = (m1, m2, m3, ..) that causes V to accept" as its certificate.
+
+Def'n: IP is the class of language decidable with bounded error by a probTM that interacts with a prover (in polytime)
+
+- if x is in L, the prover has a strategy to answer verifier's questions in such a way that causes verifier to accept with probability >= 2/3
+- if x is not in L, **any** strategy of the prover still causes the verifier to reject with probability >= 2/3
+
+Note: the verifier has a random machine, the prover can't know what the verifier will do because it's random
+
+Theorem: IP is in NEXP - have to send all possible messages for every combination of random choices
+
+### Graph isomorphism
+
+- `GI = {<G1, G2> : G1 is isomorphic to G2}`
+- recall isomorphic means same graph but might have different labels on vertices
+- `GNI = {<G1, G2> : G1 and G2 aren't isomorphic}`
+
+Theorem: GI is in NP
+
+- Proof: the certificate is the mapping
+
+Question: is GNI in NP?
+
+- Unknown... for this class at least. Might be an open question but Eric forgets
+
+Theorem: GNI is in IP
+
+proof:
+
+- the verifier:
+  - draws i in {1, 2} at random
+  - creates H by randomly permuting the labels at verticies of Gi
+- then the verifier sends H to the prover; expects i as the response
+- if G1 isn't isomorphic to G2 then the prover can always determine i
+  - note that the prover is all powerful and can figure out *anything* (i.e. it could know if a machine halts, but the point here is it has to convince you in poly time)
+- if G1 isn't isomorphic to G2, then the prover guesses i correctly with probability only 1/2
+- with two repetitions, now the chance of getting it right is 1/4
+
 
 ## Lecture 23 (March 28)
 
